@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+
 class Lox
 {
     protected:    
@@ -23,7 +24,8 @@ class Lox
         void runPrompt(void);
         int lox_main(const std::vector<std::string> &args);
         //void lox_run(const std::string &source);
-        void lox_run(const unsigned char &source);
+        void lox_run(const unsigned char *source);
+        unsigned char* read_file(const std::string &fname, int *num_bytes);
 };
 
 #endif /*__LOX_HPP*/

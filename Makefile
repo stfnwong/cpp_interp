@@ -27,5 +27,10 @@ all: $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(INCLUDES) $(OBJECTS) -o intro $(LIBS)
 
 
+.PHONY : clean
+
+clean: 
+	rm -vf $(OBJ_DIR)/*.o
+
 print-%:
 	@echo $* $($*)
