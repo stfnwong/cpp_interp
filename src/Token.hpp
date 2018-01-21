@@ -2,15 +2,14 @@
  * Token definitions 
  *
  * Stefan Wong 2018
- *//
-
+ */
 
 #ifndef __TOKEN_HPP
 #define __TOKEN_HPP
 
 #include <string>
 
-enum TokenType{
+enum class TokenType{
     // Single character tokens 
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, 
     COMMA, DOT, MINUS, PLUS, SEMICOLON, SLASH, STAR,
