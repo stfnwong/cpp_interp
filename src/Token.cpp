@@ -43,6 +43,22 @@ std::unordered_map<TokenType, std::string> token_to_str = {
 };
 
 
+std::string Token::get_string_literal(void) const
+{
+    if(this->literal.has_value())
+        return std::get<std::string>(this->literal.value());
+
+    return {};
+}
+
+float Token::get_float_literal(void) const
+{
+    if(this->literal.has_value())
+        return std::get<float>(this->literal.value());
+
+    return {};
+}
+
 
 bool Token::has_literal(void) const
 {
