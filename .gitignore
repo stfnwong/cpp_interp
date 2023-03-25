@@ -1,6 +1,9 @@
 # Ignore object files 
 *.o
 
+# Ignore swap files 
+*.swp
+*.swo
 
 # Ignore langserver cache
 .ccls-cache/
