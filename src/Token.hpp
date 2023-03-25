@@ -72,6 +72,10 @@ struct Token
         //    type(type), lexeme(lexeme), line(line), literal(literal) {}
         ~Token() {}
 
+        // operators 
+        bool operator==(const Token& that) const;
+        bool operator!=(const Token& that) const;
+
         std::string get_string_literal(void) const;
         float get_float_literal(void) const;
         bool has_literal(void) const;

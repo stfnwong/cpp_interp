@@ -15,29 +15,7 @@
 
 #include "Token.hpp"
 
-
-
 constexpr const unsigned token_buf_size = 256;
-
-
-//struct CreateToken
-//{
-//    Token operator()(TokenType type, const std::string& lexeme, int line,  const std::string& literal) const
-//    {
-//        return Token(type, lexeme, line, literal);
-//    }
-//
-//    Token operator()(TokenType type, const std::string& lexeme, int line,  float literal) const
-//    {
-//        return Token(type, lexeme, line, literal);
-//    }
-//
-//    Token operator()(TokenType type, const std::string& lexeme, int line)
-//    {
-//        return Token(type, lexeme, line);
-//    }
-//};
-
 
 
 class Scanner
@@ -66,7 +44,7 @@ class Scanner
 
     public:
         Scanner(const std::string &source);
-        ~Scanner();
+        ~Scanner() {} 
         std::vector<Token> scan_tokens(void);
 };
 

@@ -43,6 +43,27 @@ std::unordered_map<TokenType, std::string> token_to_str = {
 };
 
 
+
+bool Token::operator==(const Token& that) const
+{
+    if(this->type != that.type)
+        return false;
+    if(this->lexeme != that.lexeme)
+        return false;
+    if(this->line != that.line)
+        return false;
+    if(this->literal.has_value() && that.literal.has_value())
+        return (this->literal.value() == that.literal.value()) ? true : false;
+
+    return true;
+}
+
+bool Token::operator!=(const Token& that) const
+{
+    return !(*this == that);
+}
+
+
 std::string Token::get_string_literal(void) const
 {
     if(this->literal.has_value())
@@ -71,7 +92,7 @@ std::string Token::to_string(void) const
 
     //tok_str << this->type << " " << this->lexeme << " " << this->literal;
 
-    oss << token_to_str[this->type] << " (" << this->lexeme << ")";
+    oss << token_to_str[this->type] << " \"" << this->lexeme << "\"";
     if(this->literal.has_value())
     {
         oss << " " << std::visit(make_literal_string(), this->literal.value()) << " ";

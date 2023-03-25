@@ -35,7 +35,8 @@ char Scanner::advance(void)
 
 void Scanner::add_token(TokenType type)
 {
-    this->tokens.push_back(Token(type, this->line));
+    std::string lexeme = this->source.substr(this->start, this->cur_pos - this->start);
+    this->tokens.push_back(Token(type, lexeme, this->line));
 }
 
 void Scanner::add_token(TokenType type, const std::string& literal)
