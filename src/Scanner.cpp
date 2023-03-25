@@ -6,49 +6,83 @@
  */
 
 #include "Scanner.hpp"
-#include "Token.hpp"
 
-Scanner::Scanner(const std::string &source)
+
+Scanner::Scanner(const std::string &source) : source(source), start(0), cur_pos(0), line(1) {}
+
+bool Scanner::at_end(void)
 {
-    this->source = source;
-    this->start = 0;
-    this->current = 0;
-    this->line = 1;
+    return this->cur_pos >= this->source.size();
 }
 
-bool Scanner::atEnd(void)
+char Scanner::advance(void)
 {
-    return this->current >= this->source.size();
+    // dont let the cur_pos go over the end of the source text array
+    if(this->cur_pos >= this->source.size())
+        this->cur_char = '\0';
+    else
+        this->cur_char = this->source[this->cur_pos];
+
+    if(this->cur_char == '\n')
+        this->line = this->line + 1;
+
+    this->cur_pos++;
+    return this->cur_char;
+    //return this->source[this->cur_pos];
 }
 
-void Scanner::scanToken(void)
+
+
+void Scanner::add_token(TokenType type)
+{
+    this->tokens.push_back(Token(type, this->line));
+}
+
+void Scanner::add_token(TokenType type, const std::string& literal)
+{
+    std::string lexeme = this->source.substr(this->start, this->cur_pos - this->start);
+    Token new_token = Token(type, lexeme, this->line, literal);
+    this->tokens.push_back(new_token);
+}
+
+void Scanner::add_token(TokenType type, float literal)
+{
+    std::string lexeme = this->source.substr(this->start, this->cur_pos - this->start);
+    Token new_token = Token(type, lexeme, this->line, literal);
+    this->tokens.push_back(new_token);
+}
+
+void Scanner::scan_token(void)
 {
     char c = advance();
+    
     switch(c)
     {
-        case '(': addToken(LEFT_PAREN); break;
-        case ')': addToken(RIGHT_PAREN); break;
-        case '{': addToken(LEFT_BRACE); break;
-        case '}': addToken(RIGHT_BRACE); break;
-        case ',': addToken(COMMA); break;
-        case '.': addToken(DOT); break;
-        case '-': addToken(MINUS); break;
-        case '+': addToken(PLUS); break;
-        case ';': addToken(SEMICOLON); break;
-        case '*': addToken(STAR); break;
+        case '(': add_token(TokenType::LEFT_PAREN); break;
+        case ')': add_token(TokenType::RIGHT_PAREN); break;
+        case '{': add_token(TokenType::LEFT_BRACE); break;
+        case '}': add_token(TokenType::RIGHT_BRACE); break;
+        case ',': add_token(TokenType::COMMA); break;
+        case '.': add_token(TokenType::DOT); break;
+        case '-': add_token(TokenType::MINUS); break;
+        case '+': add_token(TokenType::PLUS); break;
+        case ';': add_token(TokenType::SEMICOLON); break;
+        case '*': add_token(TokenType::STAR); break;
+        //default:
+
     }
 }
 
-std::list<Token> Scanner::ScanTokens(void)
+std::vector<Token> Scanner::scan_tokens(void)
 {
-    this->tokens = new std::list<Token>();
+    this->tokens.clear();
 
-    while(!this->atEnd())
+    while(!this->at_end())
     {
-        this->start = this->current;
-        this->scanToken();
+        this->start = this->cur_pos;
+        this->scan_token();
     }
-    this->tokens.push_back(new Token(LOX_EOF, "", NULL, this->line));
+    this->tokens.push_back(Token(TokenType::LOX_EOF, "", this->line));
 
     return tokens;
 }
