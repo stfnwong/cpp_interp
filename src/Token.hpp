@@ -29,7 +29,9 @@ enum class TokenType{
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,
     // End of file 
-    LOX_EOF
+    LOX_EOF,
+    // Empty token 
+    EMPTY
 };
 
 // Array of strings?
@@ -61,15 +63,15 @@ struct Token
     //void *literal;      // what to do about this...?
 
     public: 
+        Token() : type(TokenType::EMPTY), lexeme(""), line(0) {}
         Token(TokenType type, unsigned line) : type(type), lexeme(""), line(line) {}
-        Token(TokenType type, const std::string& lexeme, unsigned line) : type(type), lexeme(lexeme), line(line) {} 
-        Token(TokenType type, const std::string& lexeme, unsigned line, const std::string& literal) : type(type), lexeme(lexeme), line(line), literal{literal} {} 
-        Token(TokenType type, const std::string& lexeme, unsigned line, float literal) : type(type), lexeme(lexeme), line(line), literal(literal) {} 
+        Token(TokenType type, const std::string& lexeme, unsigned line) : 
+            type(type), lexeme(lexeme), line(line) {} 
+        Token(TokenType type, const std::string& lexeme, unsigned line, const std::string& literal) : 
+            type(type), lexeme(lexeme), line(line), literal{literal} {} 
+        Token(TokenType type, const std::string& lexeme, unsigned line, float literal) : 
+            type(type), lexeme(lexeme), line(line), literal(literal) {} 
 
-        // TODO: Do I need two constructors, one each for string and float versions of 
-        // this->literal?
-        //Token(TokenType type, const std::string& lexeme, int line, std::variant<std::string, float>literal) : 
-        //    type(type), lexeme(lexeme), line(line), literal(literal) {}
         ~Token() {}
 
         // operators 

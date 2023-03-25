@@ -16,8 +16,6 @@ TEST_CASE("test_create_token", "token")
     REQUIRE(test_token.line == 1);
     REQUIRE(test_token.has_literal() == false);
     REQUIRE(test_token.get_string_literal() == "");
-
-    std::cout << "get_float_literal(): " << test_token.get_float_literal() << std::endl;
 }
 
 TEST_CASE("test_create_token_with_string_literal", "token")
@@ -38,3 +36,22 @@ TEST_CASE("test_create_token_with_float_literal", "token")
     REQUIRE(test_token.get_float_literal() == 1.0f);
     REQUIRE_THROWS(test_token.get_string_literal());
 }
+
+TEST_CASE("test_copy_token", "token")
+{
+    Token src_token;
+
+    REQUIRE(src_token.type == TokenType::EMPTY);
+    REQUIRE(src_token.line == 0);
+
+    // can we copy another token by assignment?
+    Token dst_token = Token(TokenType::VAR, "some_var", 1);
+    REQUIRE(dst_token.type == TokenType::VAR);
+    REQUIRE(dst_token.line == 1);
+
+    src_token = dst_token;
+    REQUIRE(src_token.line == 1);
+    REQUIRE(src_token.type == TokenType::VAR);
+}
+
+// TODO: copy construction

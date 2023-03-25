@@ -39,7 +39,8 @@ std::unordered_map<TokenType, std::string> token_to_str = {
     {TokenType::SUPER, "SUPER"}, {TokenType::THIS, "THIS"}, {TokenType::TRUE, "TRUE"}, 
     {TokenType::VAR, "VAR"}, {TokenType::WHILE, "WHILE"},
     // End of file 
-    {TokenType::LOX_EOF, "LOX_EOF"}
+    {TokenType::LOX_EOF, "LOX_EOF"},
+    {TokenType::EMPTY, "EMPTY"}
 };
 
 
@@ -52,6 +53,8 @@ bool Token::operator==(const Token& that) const
         return false;
     if(this->line != that.line)
         return false;
+    // TODO: how to test floats? We want to call 
+    // float_equal(this->literal.value(), that.literal.value()) here if variant is a float
     if(this->literal.has_value() && that.literal.has_value())
         return (this->literal.value() == that.literal.value()) ? true : false;
 
