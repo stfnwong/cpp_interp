@@ -33,9 +33,11 @@ class Scanner
         std::array<char, token_buf_size> token_buf;
 
         // Check if we have consumed all input
-        bool at_end(void);
+        bool at_end(void) const;
         // Token scan helper functions 
         char advance(void);
+        bool match(char exp);
+        char peek(void) const;
         void add_token(TokenType type);
         void add_token(TokenType type, const std::string& literal);
         void add_token(TokenType type, float literal);

@@ -10,7 +10,7 @@
 
 Scanner::Scanner(const std::string &source) : source(source), start(0), cur_pos(0), line(1) {}
 
-bool Scanner::at_end(void)
+bool Scanner::at_end(void) const
 {
     return this->cur_pos >= this->source.size();
 }
@@ -27,10 +27,27 @@ char Scanner::advance(void)
         this->line = this->line + 1;
 
     this->cur_pos++;
-    return this->cur_char;
-    //return this->source[this->cur_pos];
+    //return this->cur_char;
+    return this->source[this->cur_pos-1];
 }
 
+bool Scanner::match(char exp) 
+{
+    if(this->at_end())
+        return false;
+    if(this->source[this->cur_pos] != exp)
+        return false;
+
+    this->cur_pos++;
+    return true;
+}
+
+char Scanner::peek(void) const
+{
+    if(this->at_end())
+        return '\0';
+    return this->source[this->cur_pos];
+}
 
 
 void Scanner::add_token(TokenType type)
@@ -59,18 +76,36 @@ void Scanner::scan_token(void)
     
     switch(c)
     {
-        case '(': add_token(TokenType::LEFT_PAREN); break;
-        case ')': add_token(TokenType::RIGHT_PAREN); break;
-        case '{': add_token(TokenType::LEFT_BRACE); break;
-        case '}': add_token(TokenType::RIGHT_BRACE); break;
-        case ',': add_token(TokenType::COMMA); break;
-        case '.': add_token(TokenType::DOT); break;
-        case '-': add_token(TokenType::MINUS); break;
-        case '+': add_token(TokenType::PLUS); break;
-        case ';': add_token(TokenType::SEMICOLON); break;
-        case '*': add_token(TokenType::STAR); break;
-        //default:
+        // one character tokens
+        case '(': this->add_token(TokenType::LEFT_PAREN); break;
+        case ')': this->add_token(TokenType::RIGHT_PAREN); break;
+        case '{': this->add_token(TokenType::LEFT_BRACE); break;
+        case '}': this->add_token(TokenType::RIGHT_BRACE); break;
+        case ',': this->add_token(TokenType::COMMA); break;
+        case '.': this->add_token(TokenType::DOT); break;
+        case '-': this->add_token(TokenType::MINUS); break;
+        case '+': this->add_token(TokenType::PLUS); break;
+        case ';': this->add_token(TokenType::SEMICOLON); break;
+        case '*': this->add_token(TokenType::STAR); break;
 
+        // two character tokens 
+        case '!': this->add_token(this->match('=') ? TokenType::BANG_EQUAL : TokenType::BANG); break;
+        case '=': this->add_token(this->match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL); break;
+        case '<': this->add_token(this->match('=') ? TokenType::LESS_EQUAL : TokenType::LESS); break;
+        case '>': this->add_token(this->match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER); break;
+
+        case '/':
+            if(this->match('/'))
+            {
+                while(this->peek() != '\n' && !this->at_end())
+                    this->advance();
+            }
+            else
+                this->add_token(TokenType::SLASH);
+            break;
+        default:
+            // TODO: report errors here
+            break;
     }
 }
 
