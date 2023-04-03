@@ -43,19 +43,19 @@ struct make_literal_string{
     std::string operator()(const std::string& s) const {
         return s;
     }
-    std::string operator()(int x) const
-    {
+    std::string operator()(int x) const {
         return std::to_string(x);
     }
 };
 
-using literal_type = std::variant<std::string, float>; 
 
 /*
  * A single token
  */
 struct Token
 {
+    using literal_type = std::variant<float, bool, std::string>; 
+
     TokenType type;
     std::string lexeme;
     unsigned line;
