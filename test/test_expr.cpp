@@ -11,20 +11,20 @@
 #include "Token.hpp"
 
 
-struct TestVisitor : public ExprVisitor<std::string>
+struct TestVisitor : public ExprVisitor
 {
     public:
-        std::string visit(BinaryExpr<std::string>& expr) override {
-            return LoxObject().to_string();
+        LoxObject visit(BinaryExpr& expr) override {
+            return LoxObject();
         }
-        std::string visit(GroupingExpr<std::string>& expr) override {
-            return LoxObject().to_string();
+        LoxObject visit(GroupingExpr& expr) override {
+            return LoxObject();
         }
-        std::string visit(LiteralExpr<std::string>& expr) override {
-            return LoxObject().to_string();
+        LoxObject visit(LiteralExpr& expr) override {
+            return LoxObject();
         }
-        std::string visit(UnaryExpr<std::string>& expr) override {
-            return LoxObject().to_string();
+        LoxObject visit(UnaryExpr& expr) override {
+            return LoxObject();
         }
 };
 
@@ -45,14 +45,13 @@ TEST_CASE("test_create_binary_expr", "expression")
     //    );
 
 
-    using T = std::string;
-    std::shared_ptr<LiteralExpr<T>> left = std::make_shared<LiteralExpr<T>>(
+    std::shared_ptr<LiteralExpr> left = std::make_shared<LiteralExpr>(
             LoxObject(
                 Token(TokenType::NUMBER, "1", 1, 1.0)
             )
         );
 
-    std::shared_ptr<LiteralExpr<T>>  right = std::make_shared<LiteralExpr<T>>(
+    std::shared_ptr<LiteralExpr>  right = std::make_shared<LiteralExpr>(
             LoxObject(
                 Token(TokenType::NUMBER, "1", 1, 1.0)
             )
@@ -60,15 +59,15 @@ TEST_CASE("test_create_binary_expr", "expression")
 
 
     Token op = Token(TokenType::PLUS, "+", 1);
-    BinaryExpr<T> test_expr = BinaryExpr<T>(left, right, op); 
+    BinaryExpr test_expr = BinaryExpr(left, right, op); 
 
     REQUIRE(test_expr.op == Token(TokenType::PLUS, "+", 1));
     TestVisitor test_visitor;
 
 
-    T ret = test_visitor.visit(test_expr);
+    LoxObject ret = test_visitor.visit(test_expr);
 
-    std::cout << "[" << __func__ << "] ret: " << ret << std::endl;
+    std::cout << "[" << __func__ << "] ret: " << ret.to_string() << std::endl;
 
 }
 

@@ -15,94 +15,94 @@
 
 
 struct BinaryExpr;
-template <typename T> struct GroupingExpr<T>;
+struct GroupingExpr;
 struct LiteralExpr;
 struct UnaryExpr;
 
 
 // Visitor object 
-template <typename T> struct ExprVisitor
+struct ExprVisitor
 {
     public:
-        virtual T visit(BinaryExpr<T>& expr) = 0;
-        virtual T visit(GroupingExpr<T>& expr) = 0;
-        virtual T visit(LiteralExpr<T>& expr) = 0;
-        virtual T visit(UnaryExpr<T>& expr) = 0;
+        virtual LoxObject visit(BinaryExpr& expr) = 0;
+        virtual LoxObject visit(GroupingExpr& expr) = 0;
+        virtual LoxObject visit(LiteralExpr& expr) = 0;
+        virtual LoxObject visit(UnaryExpr& expr) = 0;
 };
 
 
 // Base struct for all Expr types
-template <typename T> struct Expr
+struct Expr
 {
     public:
         Expr() {} 
         virtual ~Expr() {}
-        virtual LoxObject accept(ExprVisitor<T>& vistor) = 0;
+        virtual LoxObject accept(ExprVisitor& vistor) = 0;
 };
 
 
-//using std::shared_ptr<Expr<T>> = std::shared_ptr<Expr::template>;
+using ExprPtr = std::shared_ptr<Expr>;
 
-template <typename T> struct BinaryExpr : public Expr<T>
+struct BinaryExpr : public Expr
 {
-    std::shared_ptr<Expr<T>> left;
-    std::shared_ptr<Expr<T>> right;
+    ExprPtr left;
+    ExprPtr right;
     Token op;
 
     public:
-        BinaryExpr(std::shared_ptr<Expr<T>> left, std::shared_ptr<Expr<T>> right, const Token& op) : 
+        BinaryExpr(ExprPtr left, ExprPtr right, const Token& op) : 
             left(left), 
             op(op), 
             right(right) {}
 
         // Comparison (for unit tests, etc)
-        T accept(ExprVisitor<T>& visitor) {
+        LoxObject accept(ExprVisitor& visitor) {
             return visitor.visit(*this);
         }
 };
 
 
-template <typename T> struct GroupingExpr : public Expr<T>
+struct GroupingExpr : public Expr
 {
-    std::shared_ptr<Expr<T>> expr;
+    ExprPtr expr;
 
     public:
-        GroupingExpr(std::shared_ptr<Expr<T>> expr) : expr(expr) {} 
-        T accept(ExprVisitor<T>& visitor) override {
+        GroupingExpr(ExprPtr expr) : expr(expr) {} 
+        LoxObject accept(ExprVisitor& visitor) override {
             return visitor.visit(*this);
         }
 };
 
 
-template <typename T> struct UnaryExpr : public Expr<T>
+struct UnaryExpr : public Expr
 {
-    std::shared_ptr<Expr<T>> expr;
+    ExprPtr expr;
     Token op;
 
     public:
-        UnaryExpr(std::shared_ptr<Expr<T>> expr, const Token& op) : 
+        UnaryExpr(ExprPtr expr, const Token& op) : 
             expr(expr),
             op(op) {}
-        T accept(ExprVisitor<T>& visitor) final { 
+        LoxObject accept(ExprVisitor& visitor) final { 
             return visitor.visit(*this);
         }
 };
 
 
-template <typename T> struct LiteralExpr : public Expr<T>
+struct LiteralExpr : public Expr
 {
     LoxObject literal;
 
     public:
         LiteralExpr(const LoxObject& obj) : literal(obj) {} 
-        T accept(ExprVisitor<T>& visitor) final {
+        LoxObject accept(ExprVisitor& visitor) final {
             return visitor.visit(*this);
         }
 };
 
 
 
-struct AstPrinter : public ExprVisitor<std::string>
+struct AstPrinter : public ExprVisitor
 {
     public:
         AstPrinter() {}
@@ -111,7 +111,7 @@ struct AstPrinter : public ExprVisitor<std::string>
         //    return expr.accept(this);
         //}
 
-        std::string parenthesize(const std::string& name, std::vector<std::shared_ptr<Expr<std::string>>>& exprs)
+        std::string parenthesize(const std::string& name, std::vector<ExprPtr>& exprs)
         {
             std::ostringstream oss;
 
@@ -123,21 +123,10 @@ struct AstPrinter : public ExprVisitor<std::string>
             return oss.str();
         }
         
-        std::string visit(BinaryExpr& expr) final
+        std::string visit(const BinaryExpr& expr)
         {
-            std::vector<std::shared_ptr<Expr<std::string>>> exprs = {expr.left, expr.right};
-            return this->parenthesize(expr.op.lexeme, exprs);
-        }
-
-        std::string visit(GroupingExpr& expr) final
-        {
-            return "";
-        }
-
-        std::string visit(UnaryExpr& expr) final
-        {
-            std::vector<std::shared_ptr<Expr<std::string>>> exprs = {expr.expr};
-            return this->parenthesize(expr.op.lexeme, exprs);
+            std::vector<ExprPtr> exprs = {expr.left, expr.right};
+            return parenthesize(expr.op.lexeme, exprs);
         }
 
 };
