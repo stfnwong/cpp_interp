@@ -86,7 +86,6 @@ TEST_CASE("test_scan_number_literal", "scanner")
 TEST_CASE("test_scan_string_literal", "scanner")
 {
     std::string test_source = "\"some string literal\"";
-    std::cout << "test_source is: " << test_source << std::endl;
     std::vector<Token> exp_tokens = {
         Token(TokenType::STRING, "some string literal", 1),
         Token(TokenType::LOX_EOF, "", 1),
@@ -94,9 +93,6 @@ TEST_CASE("test_scan_string_literal", "scanner")
 
     Scanner test_scanner(test_source);
     std::vector<Token> tokens = test_scanner.scan();
-
-    for(const Token& tok : tokens)
-        std::cout << tok.to_string() << std::endl;
 
     REQUIRE(tokens.size() == exp_tokens.size());
     for(unsigned i = 0; i < tokens.size(); ++i)
