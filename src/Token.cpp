@@ -96,6 +96,14 @@ bool Token::has_literal(void) const
     return this->literal.has_value();
 }
 
+//std::string Token::to_string(void) const
+//{
+//    //if(this->literal.has_value())
+//    //    return std::visit(make_literal_string(), this->literal.value());
+//
+//    return this->lexeme;
+//}
+
 std::string Token::to_string(void) const
 {
     std::ostringstream oss;

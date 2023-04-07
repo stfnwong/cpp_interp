@@ -169,9 +169,9 @@ struct ASTPrinter2 : public ExprVisitor2<std::string>
         {
             std::ostringstream oss;
 
-            oss << "(" << name << " ";
+            oss << "(" << name;
             for(const auto& e : exprs)
-                oss << e->accept(*this) << " ";
+                oss << " " << e->accept(*this);
             oss << ")";
 
             return oss.str();

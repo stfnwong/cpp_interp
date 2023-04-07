@@ -106,6 +106,7 @@ struct Token
         float       get_float_literal(void) const;
         bool        has_literal(void) const;
         std::string to_string(void) const;
+        //std::string to_repr(void) const;
 };
 
 

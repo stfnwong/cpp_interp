@@ -4,7 +4,6 @@
  *
  */
 
-#include <sstream>
 #include "Object.hpp"
 
 
@@ -95,6 +94,11 @@ bool LoxObject::has_type(void) const
 
 
 std::string LoxObject::to_string(void) const
+{
+    return std::visit(get_value_string(), this->value.value());
+}
+
+std::string LoxObject::to_repr(void) const
 {
     std::ostringstream oss;
     if(this->value.has_value())

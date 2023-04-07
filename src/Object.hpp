@@ -7,17 +7,24 @@
 #ifndef __OBJECT_HPP
 #define __OBJECT_HPP
 
+#include <iomanip>
 #include <optional>
+#include <sstream>
 #include <variant>
 
 #include "Token.hpp"
 
+constexpr int f_precision = 4;
 
 // Why does this have to be here?
 struct get_value_string
 {
     std::string operator()(const std::string& s) const { return s; }
-    std::string operator()(float f) const { return std::to_string(f); }   // TODO: can we specify formatting width here?
+    std::string operator()(float f) const { 
+        std::ostringstream oss;
+        oss << std::setprecision(f_precision) << f;
+        return oss.str();
+    }   
     std::string operator()(bool b) const { return std::to_string(b); }
 };
 
@@ -50,6 +57,7 @@ struct LoxObject
         bool        has_type(void) const;
 
         std::string to_string(void) const;
+        std::string to_repr(void) const;
 };
 
 
