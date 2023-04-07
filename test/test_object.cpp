@@ -15,31 +15,16 @@ TEST_CASE("test_create_null_object", "object")
 {
     LoxObject test_object;
 
+    std::cout << "[" << __func__ << "] test_object: " << test_object.to_string() << std::endl;
+
     REQUIRE(test_object.has_type() == false);
     REQUIRE(test_object.type == TokenType::EMPTY);
+
+    //REQUIRE_THROWS(test_object.get_string_val());
+    //REQUIRE_THROWS(test_object.get_bool_val());
+    //REQUIRE_THROWS(test_object.get_float_val());
 }
 
-
-//TEST_CASE("test_create_bool_object", "object")
-//{
-//    Token test_token = Token(TokenType::TRUE, "true", 1);
-//    LoxObject test_object(test_token);
-//
-//    REQUIRE(test_object.has_type() == true);
-//    REQUIRE(test_object.type == test_token.type);
-//
-//    REQUIRE_THROWS(test_object.get_string_val());
-//    REQUIRE_THROWS(test_object.get_float_val());
-//
-//    REQUIRE(test_object.get_bool_val() == test_token.get_bool_literal());
-//    // False should be fine also, but when getting token literals or 
-//    // object values we return false when we fail (eg: when the std::optional is empty)
-//    test_token = Token(TokenType::FALSE, "false", 1);
-//    test_object = LoxObject(test_token);
-//    REQUIRE(test_object.has_type() == true);
-//    REQUIRE(test_object.type == test_token.type);
-//    REQUIRE(test_object.get_bool_val() == test_token.get_bool_literal());
-//}
 
 TEST_CASE("test_create_number_object", "object")
 {
@@ -58,4 +43,27 @@ TEST_CASE("test_create_number_object", "object")
 
 TEST_CASE("test_create_string_object", "object")
 {
+    std::string test_string = "some string";
+    // TODO: what can we do about the double argument?
+    Token test_token = Token(TokenType::STRING, test_string, 1, test_string);
+    LoxObject test_object(test_token);
+
+    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.type == test_token.type);
+
+    REQUIRE_THROWS(test_object.get_float_val());
+    REQUIRE_THROWS(test_object.get_bool_val());
+
+    REQUIRE(test_object.get_string_val() == test_string);
+}
+
+TEST_CASE("test_object_equality_operator", "object")
+{
+    Token tok_a = Token(TokenType::NUMBER, "5", 1, 5.0);
+    Token tok_b = Token(TokenType::NUMBER, "6", 1, 6.0);
+
+    LoxObject obj_a(tok_a);
+    LoxObject obj_b(tok_b);
+
+    REQUIRE(obj_a != obj_b);
 }

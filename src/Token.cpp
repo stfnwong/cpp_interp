@@ -44,7 +44,7 @@ std::unordered_map<TokenType, std::string> token_to_str = {
 };
 
 
-
+// ======== Operators ========
 bool Token::operator==(const Token& that) const
 {
     if(this->type != that.type)
@@ -65,6 +65,13 @@ bool Token::operator!=(const Token& that) const
 {
     return !(*this == that);
 }
+
+Token& Token::operator=(Token that) 
+{
+    swap(*this, that);
+    return *this;
+}
+
 
 
 std::string Token::get_string_literal(void) const

@@ -17,7 +17,7 @@
 struct get_value_string
 {
     std::string operator()(const std::string& s) const { return s; }
-    std::string operator()(float f) const { return std::to_string(f); }
+    std::string operator()(float f) const { return std::to_string(f); }   // TODO: can we specify formatting width here?
     std::string operator()(bool b) const { return std::to_string(b); }
 };
 
@@ -41,6 +41,7 @@ struct LoxObject
         LoxObject(const Token& token);
 
         bool operator==(const LoxObject& that) const;
+        bool operator!=(const LoxObject& that) const;
 
         std::string get_string_val(void) const;
         float       get_float_val(void) const;

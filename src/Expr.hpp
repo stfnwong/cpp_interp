@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include <iostream>  // TODO: debug only, remove
+
 #include "Token.hpp"
 #include "Object.hpp"
 
@@ -22,6 +24,7 @@ struct UnaryExpr;
 
 
 // Visitor object 
+// TODO: should these become pointers....?
 struct ExprVisitor
 {
     public:
@@ -104,6 +107,7 @@ struct UnaryExpr : public Expr
         UnaryExpr(ExprPtr expr, const Token& op) : 
             expr(expr),
             op(op) {}
+
         LoxObject accept(ExprVisitor& visitor) final { 
             return visitor.visit(*this);
         }
@@ -149,38 +153,62 @@ struct LiteralExpr : public Expr
 
 
 
-//struct AstPrinter : public ExprVisitor
-//{
-//    public:
-//        AstPrinter() {}
-//
-//        std::string print(Expr& expr) {
-//            return expr.accept(*this).to_string();
-//        }
-//
-//        std::string parenthesize(const std::string& name, std::vector<ExprPtr>& exprs)
-//        {
-//            std::ostringstream oss;
-//
-//            oss << "(" << name;
-//            for(const auto& e : exprs)
-//                oss << e->accept(*this).to_string() << " ";
-//            oss << ")";
-//
-//            return oss.str();
-//        }
-//        
-//        std::string visit(const BinaryExpr& expr)
-//        {
-//            std::vector<ExprPtr> exprs = {expr.left, expr.right};
-//            return parenthesize(expr.op.lexeme, exprs);
-//        }
-//
-//        LoxObject visit(const LiteralExpr& expr)
-//        {
-//            return expr.literal;
-//        }
-//
-//};
+// TODO: this whole class is kind of a hack....
+struct ASTPrinter : public ExprVisitor
+{
+    public:
+        ASTPrinter() {}
+
+        std::string print(Expr& expr) {
+            return expr.accept(*this).to_string();
+        }
+
+        std::string parenthesize(const std::string& name, std::vector<ExprPtr>& exprs)
+        {
+            std::ostringstream oss;
+
+            oss << "(" << name << " ";
+            for(const auto& e : exprs)
+                oss << e->accept(*this).to_string() << " ";
+            oss << ")";
+
+            return oss.str();
+        }
+
+        LoxObject visit(BinaryExpr& expr)
+        {
+            std::vector<ExprPtr> exprs = {expr.left, expr.right};
+            std::string str = this->parenthesize(expr.op.lexeme, exprs);
+            std::cout << "[" << __func__ << "] str: " << str << std::endl;
+            return LoxObject(Token(TokenType::STRING, str, 0, str));
+        }
+
+        LoxObject visit(LiteralExpr& expr)
+        {
+            std::cout << "[" << __func__ << "] visiting " << expr.to_string() << std::endl;
+            if(expr.literal.has_type())
+            {
+                // TODO: re-write this
+                return LoxObject(Token(TokenType::STRING, expr.literal.get_string_val(), 1, expr.literal.get_string_val()));
+            }
+
+            return LoxObject(Token(TokenType::NIL));
+        }
+
+        LoxObject visit(GroupingExpr& expr)
+        {
+            std::vector<ExprPtr> exprs = {expr.expr};
+            std::string str = this->parenthesize("group", exprs);
+            std::cout << "[" << __func__ << "] str: " << str << std::endl;
+            return LoxObject(Token(TokenType::STRING, str, 1, str));
+        }
+
+        LoxObject visit(UnaryExpr& expr)
+        {
+            std::vector<ExprPtr> exprs = {expr.expr};
+            std::string str = this->parenthesize(expr.op.lexeme, exprs);
+            return LoxObject(Token(TokenType::STRING, str, 1, str));
+        }
+};
 
 #endif /*__EXPR_HPP*/

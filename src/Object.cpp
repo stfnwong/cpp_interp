@@ -47,6 +47,14 @@ bool LoxObject::operator==(const LoxObject& that) const
     return true;
 }
 
+
+bool LoxObject::operator!=(const LoxObject& that) const
+{
+    return !(*this == that);
+}
+
+
+// TODO: do I want to throw here? 
 std::string LoxObject::get_string_val(void) const
 {
     if(this->value.has_value())

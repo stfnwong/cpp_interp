@@ -65,6 +65,7 @@ struct Token
     public: 
         Token() : type(TokenType::EMPTY), lexeme(""), line(0) {}
         Token(TokenType type) : type(type), lexeme(""), line(0) {}
+        Token(TokenType type, const std::string l) : type(type), lexeme(l), line(0) {}
         Token(TokenType type, unsigned line) : type(type), lexeme(""), line(line) {}
         Token(TokenType type, const std::string& lexeme, unsigned line) : 
             type(type), lexeme(lexeme), line(line) {} 
@@ -99,11 +100,7 @@ struct Token
         bool operator!=(const Token& that) const;
 
         // Assignment 
-        Token& operator=(Token that) 
-        {
-            swap(*this, that);
-            return *this;
-        }
+        Token& operator=(Token that) ;
 
         std::string get_string_literal(void) const;
         float       get_float_literal(void) const;

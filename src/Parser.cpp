@@ -23,8 +23,6 @@ bool Parser::check(const TokenType& t)
 
 bool Parser::match(const std::vector<TokenType>& types)
 {
-    std::cout << "[" << __func__ << "] checking token " << this->current << ": " 
-        << this->peek().to_string() << std::endl;
     for(const TokenType& t : types)
     {
         if(this->check(t))
@@ -61,6 +59,36 @@ Token Parser::consume(const TokenType& t, const std::string& msg)
         return this->advance();
 
     throw ParseError(this->peek(), msg);
+}
+
+void Parser::synchronise(void)
+{
+    this->advance();
+
+    while(!this->at_end())
+    {
+        // Statement is definitely terminated
+        if(this->previous().type == TokenType::SEMICOLON)
+            return;
+
+        switch(this->peek().type)
+        {
+            case TokenType::CLASS:
+            case TokenType::FUN:
+            case TokenType::VAR:
+            case TokenType::FOR:
+            case TokenType::IF:
+            case TokenType::WHILE:
+            case TokenType::PRINT:
+            case TokenType::RETURN:
+                return;
+            // shut linter up
+            default:
+                continue;
+        }
+    }
+
+    this->advance();
 }
 
 

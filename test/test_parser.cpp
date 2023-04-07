@@ -33,6 +33,7 @@ TEST_CASE("test_parse_binary_expr", "parser")
     REQUIRE(parser.num_tokens() == test_tokens.size());
 
     // Should return an expression
+    //std::unique_ptr<BinaryExpr> out_expr = dynamic_cast<BinaryExpr>(parser.parse().get());
     std::unique_ptr<Expr> out_expr = parser.parse();
     std::cout << "[" << __func__ << "] out_expr (type: " << typeid(out_expr.get()).name()
         << "): " << out_expr->to_string() << std::endl;
