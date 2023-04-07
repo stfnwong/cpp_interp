@@ -14,50 +14,50 @@
 #include "Object.hpp"
 
 
-template <typename T> struct BinaryExpr;
-template <typename T> struct GroupingExpr;
-template <typename T> struct LiteralExpr;
-template <typename T> struct UnaryExpr;
+template <typename E, typename T> struct BinaryExpr;
+template <typename E, typename T> struct GroupingExpr;
+template <typename E, typename T> struct LiteralExpr;
+template <typename E, typename T> struct UnaryExpr;
 
 
 // Visitor object 
-template <typename T> struct ExprVisitor
+template <typename E, typename T> struct ExprVisitor
 {
     public:
-        virtual T visit(LiteralExpr<T>& expr) = 0;
-        virtual T visit(UnaryExpr<T>& expr) = 0;
-        virtual T visit(BinaryExpr<T>& expr) = 0;
-        virtual T visit(GroupingExpr<T>& expr) = 0;
+        virtual T visit(LiteralExpr<E, T>& expr) = 0;
+        virtual T visit(UnaryExpr<E, T>& expr) = 0;
+        virtual T visit(BinaryExpr<E, T>& expr) = 0;
+        virtual T visit(GroupingExpr<E, T>& expr) = 0;
 };
 
 
-template <typename T> struct Expr
+template <typename E, typename T> struct Expr
 {
     public:
         Expr() {} 
         virtual ~Expr() {}
 
-        virtual T           accept(ExprVisitor<T>& visitor) = 0;
+        virtual T           accept(ExprVisitor<E, T>& visitor) = 0;
         virtual std::string to_string(void) const = 0;
 };
 
 
-template <typename T> struct LiteralExpr : public Expr<T>
+template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
 {
     LoxObject value;
 
     public:
         LiteralExpr(const Token& tok) : value(LoxObject(tok)) {} 
 
-        bool operator==(const LiteralExpr<T>& that) const {
+        bool operator==(const LiteralExpr<E, T>& that) const {
             return this->value == that.value;
         }
         
-        bool operator!=(const LiteralExpr<T>& that) const {
+        bool operator!=(const LiteralExpr<E, T>& that) const {
             return !(*this == that);
         }
         
-        T accept(ExprVisitor<T>& visitor) final {
+        T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
 
@@ -71,15 +71,15 @@ template <typename T> struct LiteralExpr : public Expr<T>
 };
 
 
-template <typename T> struct UnaryExpr : public Expr<T>
+template <typename E, typename T> struct UnaryExpr : public Expr<E, T>
 {
-    std::shared_ptr<Expr<T>> value;
+    std::shared_ptr<Expr<E, T>> value;
     Token op;
 
     public:
-        UnaryExpr(std::shared_ptr<Expr<T>> v, const Token& t) : value(v), op(t) {}
+        UnaryExpr(std::shared_ptr<Expr<E, T>> v, const Token& t) : value(v), op(t) {}
 
-        bool operator==(const UnaryExpr<T>& that) const 
+        bool operator==(const UnaryExpr<E, T>& that) const 
         {
             if(this->value.get() != that.value.get())
                 return false;
@@ -89,11 +89,11 @@ template <typename T> struct UnaryExpr : public Expr<T>
             return true;
         }
 
-        bool operator!=(const UnaryExpr<T>& that) const {
+        bool operator!=(const UnaryExpr<E, T>& that) const {
             return !(*this == that);
         }
 
-        T accept(ExprVisitor<T>& visitor) final {
+        T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
 
@@ -108,19 +108,19 @@ template <typename T> struct UnaryExpr : public Expr<T>
 };
 
 
-template <typename T> struct BinaryExpr : public Expr<T>
+template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
 {
-    std::shared_ptr<Expr<T>> left;
-    std::shared_ptr<Expr<T>> right;
+    std::shared_ptr<Expr<E, T>> left;
+    std::shared_ptr<Expr<E, T>> right;
     Token op;
 
     public:
-        BinaryExpr(std::shared_ptr<Expr<T>> l, std::shared_ptr<Expr<T>> r, const Token& op) : 
+        BinaryExpr(std::shared_ptr<Expr<E, T>> l, std::shared_ptr<Expr<E, T>> r, const Token& op) : 
             left(l), 
             right(r), 
             op(op) {}
 
-        bool operator==(const BinaryExpr<T>& that) const 
+        bool operator==(const BinaryExpr<E, T>& that) const 
         {
             if(this->left.get() != that.left.get())
                 return false;
@@ -132,11 +132,11 @@ template <typename T> struct BinaryExpr : public Expr<T>
             return true;
         }
 
-        bool operator!=(const BinaryExpr<T>& that) const {
+        bool operator!=(const BinaryExpr<E, T>& that) const {
             return !(*this == that);
         }
 
-        T accept(ExprVisitor<T>& visitor) final {
+        T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
 
@@ -153,22 +153,22 @@ template <typename T> struct BinaryExpr : public Expr<T>
 };
 
 
-template <typename T> struct GroupingExpr : public Expr<T>
+template <typename E, typename T> struct GroupingExpr : public Expr<E, T>
 {
-    std::shared_ptr<Expr<T>> expression;
+    std::shared_ptr<Expr<E, T>> expression;
 
     public:
-        GroupingExpr(std::shared_ptr<Expr<T>> e) : expression(e) {}
+        GroupingExpr(std::shared_ptr<Expr<E, T>> e) : expression(e) {}
 
-        bool operator==(const GroupingExpr<T>& that) const {
+        bool operator==(const GroupingExpr<E, T>& that) const {
             return this->expression.get() == that.expression.get();
         }
 
-        bool operator!=(const GroupingExpr<T>& that) const {
+        bool operator!=(const GroupingExpr<E, T>& that) const {
             return !(*this == that);
         }
 
-        T accept(ExprVisitor<T>& visitor) final {
+        T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
 
@@ -184,13 +184,14 @@ template <typename T> struct GroupingExpr : public Expr<T>
 /*
  * ASTPrinter
  */
-struct ASTPrinter2 : public ExprVisitor<std::string>
+struct ASTPrinter : public ExprVisitor<LoxObject, std::string>
 {
+    using E = LoxObject;
     using T = std::string;
-    using ExprPtr = std::shared_ptr<Expr<T>>;
+    using ExprPtr = std::shared_ptr<Expr<E, T>>;
 
     public:
-        std::string print(Expr<std::string>& expr) {
+        std::string print(Expr<E, T>& expr) {
             return expr.accept(*this);
         }
 
@@ -206,7 +207,7 @@ struct ASTPrinter2 : public ExprVisitor<std::string>
             return oss.str();
         }
 
-        std::string visit(LiteralExpr<std::string>& expr) final
+        std::string visit(LiteralExpr<E, T>& expr) final
         {
             if(expr.value.has_type())
                 return expr.value.to_string();
@@ -216,19 +217,19 @@ struct ASTPrinter2 : public ExprVisitor<std::string>
             return "Nil";       // TODO: Think about if there is anything else we might prefer to return
         }
 
-        std::string visit(UnaryExpr<std::string>& expr) final
+        std::string visit(UnaryExpr<E, T>& expr) final
         {
             std::vector<ExprPtr> exprs = {expr.value};
             return this->parenthesize(expr.op.lexeme, exprs);
         }
 
-        std::string visit(BinaryExpr<std::string>& expr) final
+        std::string visit(BinaryExpr<E, T>& expr) final
         {
             std::vector<ExprPtr> exprs = {expr.left, expr.right};
             return this->parenthesize(expr.op.lexeme, exprs);
         }
 
-        std::string visit(GroupingExpr<T>& expr) final
+        std::string visit(GroupingExpr<E, T>& expr) final
         {
             std::vector<ExprPtr> exprs = {expr.expression};
             return this->parenthesize("Group", exprs);

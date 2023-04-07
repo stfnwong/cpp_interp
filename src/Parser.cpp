@@ -93,40 +93,40 @@ void Parser::synchronise(void)
 
 
 // ======== GRAMMAR RULES ======== //
-std::unique_ptr<Expr<LoxObject>> Parser::primary(void)
+std::unique_ptr<Expr<E, T>> Parser::primary(void)
 {
     //if(this->match({TokenType::FALSE}))
-    //    return std::make_unique<LiteralExpr<LoxObject>>(this->peek());
+    //    return std::make_unique<LiteralExpr<E, T>>(this->peek());
 
     if(this->match({TokenType::TRUE, TokenType::FALSE, TokenType::NIL}))
-        return std::make_unique<LiteralExpr<LoxObject>>(this->previous());
+        return std::make_unique<LiteralExpr<E, T>>(this->previous());
 
     if(this->match({TokenType::STRING, TokenType::NUMBER}))
-        return std::make_unique<LiteralExpr<LoxObject>>(this->previous());
+        return std::make_unique<LiteralExpr<E, T>>(this->previous());
 
     if(this->match({TokenType::LEFT_PAREN}))
     {
         auto expr = this->expression();
         this->consume(TokenType::RIGHT_PAREN, "Expected ')' after expression");
-        return std::make_unique<GroupingExpr<LoxObject>>(std::move(expr));
+        return std::make_unique<GroupingExpr<E, T>>(std::move(expr));
     }
 
     throw ParseError(this->peek(), "Expected expression");
 }
 
-std::unique_ptr<Expr<LoxObject>> Parser::unary(void)
+std::unique_ptr<Expr<E, T>> Parser::unary(void)
 {
     if(this->match({TokenType::BANG, TokenType::MINUS}))
     {
         Token op = this->previous();
         auto right = this->unary();
-        return std::make_unique<UnaryExpr<LoxObject>>(std::move(right), op);
+        return std::make_unique<UnaryExpr<E, T>>(std::move(right), op);
     }
 
     return this->primary();
 }
 
-std::unique_ptr<Expr<LoxObject>> Parser::factor(void)
+std::unique_ptr<Expr<E, T>> Parser::factor(void)
 {
     auto expr = this->unary();
 
@@ -134,7 +134,7 @@ std::unique_ptr<Expr<LoxObject>> Parser::factor(void)
     {
         Token op = this->previous();
         auto right = this->unary();
-        expr = std::make_unique<BinaryExpr<LoxObject>>(
+        expr = std::make_unique<BinaryExpr<E, T>>(
                 std::move(expr), std::move(right), op
         );
     }
@@ -142,15 +142,15 @@ std::unique_ptr<Expr<LoxObject>> Parser::factor(void)
     return expr;
 }
 
-std::unique_ptr<Expr<LoxObject>> Parser::term(void)
+std::unique_ptr<Expr<E, T>> Parser::term(void)
 {
     auto expr = this->factor();
     
     while(this->match({TokenType::MINUS, TokenType::PLUS}))
     {
         Token op = this->previous();
-        std::unique_ptr<Expr<LoxObject>> right = this->factor();
-        expr = std::make_unique<BinaryExpr<LoxObject>>(
+        std::unique_ptr<Expr<E, T>> right = this->factor();
+        expr = std::make_unique<BinaryExpr<E, T>>(
                 std::move(expr), std::move(right), op
         );
     }
@@ -158,7 +158,7 @@ std::unique_ptr<Expr<LoxObject>> Parser::term(void)
     return expr;
 }
 
-std::unique_ptr<Expr<LoxObject>> Parser::comparison(void)
+std::unique_ptr<Expr<E, T>> Parser::comparison(void)
 {
     auto expr = this->term();
 
@@ -170,7 +170,7 @@ std::unique_ptr<Expr<LoxObject>> Parser::comparison(void)
     {
         Token op = this->previous();
         auto right = this->term();
-        expr = std::make_unique<BinaryExpr<LoxObject>>(
+        expr = std::make_unique<BinaryExpr<E, T>>(
                 std::move(expr), std::move(right), op
         );
     }
@@ -178,7 +178,7 @@ std::unique_ptr<Expr<LoxObject>> Parser::comparison(void)
     return expr;
 }
 
-std::unique_ptr<Expr<LoxObject>> Parser::equality(void) 
+std::unique_ptr<Expr<E, T>> Parser::equality(void) 
 {
     auto expr = this->comparison();
 
@@ -186,19 +186,19 @@ std::unique_ptr<Expr<LoxObject>> Parser::equality(void)
     {
         Token op = this->previous();
         auto right = this->comparison();
-        expr = std::make_unique<BinaryExpr<LoxObject>>(std::move(expr), std::move(right), op);
+        expr = std::make_unique<BinaryExpr<E, T>>(std::move(expr), std::move(right), op);
     }
 
     return expr;
 }
 
-std::unique_ptr<Expr<LoxObject>> Parser::expression(void)
+std::unique_ptr<Expr<E, T>> Parser::expression(void)
 {
     return this->equality();
 }
 
 
-std::unique_ptr<Expr<LoxObject>> Parser::parse(void)
+std::unique_ptr<Expr<E, T>> Parser::parse(void)
 {
     if(this->tokens.size() > 0)
     {
@@ -206,7 +206,7 @@ std::unique_ptr<Expr<LoxObject>> Parser::parse(void)
             return this->expression();
         } catch(ParseError& e) {
             return nullptr;
-            //return std::make_unique<Expr<LoxObject>>(nullptr):
+            //return std::make_unique<Expr<E, T>>(nullptr):
         }
     }
     else

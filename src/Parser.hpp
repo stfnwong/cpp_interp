@@ -25,6 +25,10 @@ struct ParseError : public std::exception
 };
 
 
+using T = std::string;
+using E = LoxObject;
+
+
 class Parser
 {
     std::vector<Token> tokens;
@@ -41,17 +45,17 @@ class Parser
 
         void synchronise(void);
 
-        std::unique_ptr<Expr<LoxObject>> primary(void);            // literals, etc
-        std::unique_ptr<Expr<LoxObject>> unary(void);
-        std::unique_ptr<Expr<LoxObject>> factor(void);  // multiplication, division
-        std::unique_ptr<Expr<LoxObject>> term(void);    // addition, subtraction
-        std::unique_ptr<Expr<LoxObject>> equality(void);
-        std::unique_ptr<Expr<LoxObject>> comparison(void);
-        std::unique_ptr<Expr<LoxObject>> expression(void);
+        std::unique_ptr<Expr<E, T>> primary(void);            // literals, etc
+        std::unique_ptr<Expr<E, T>> unary(void);
+        std::unique_ptr<Expr<E, T>> factor(void);  // multiplication, division
+        std::unique_ptr<Expr<E, T>> term(void);    // addition, subtraction
+        std::unique_ptr<Expr<E, T>> equality(void);
+        std::unique_ptr<Expr<E, T>> comparison(void);
+        std::unique_ptr<Expr<E, T>> expression(void);
 
     public:
         Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
-        std::unique_ptr<Expr<LoxObject>> parse(void);
+        std::unique_ptr<Expr<E, T>> parse(void);
         unsigned num_tokens(void) const;
 };
 
