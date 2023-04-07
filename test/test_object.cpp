@@ -15,8 +15,6 @@ TEST_CASE("test_create_null_object", "object")
 {
     LoxObject test_object;
 
-    std::cout << "[" << __func__ << "] test_object: " << test_object.to_string() << std::endl;
-
     REQUIRE(test_object.has_type() == false);
     REQUIRE(test_object.type == TokenType::EMPTY);
 

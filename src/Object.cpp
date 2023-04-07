@@ -95,7 +95,10 @@ bool LoxObject::has_type(void) const
 
 std::string LoxObject::to_string(void) const
 {
-    return std::visit(get_value_string(), this->value.value());
+    if(this->has_type())
+        return std::visit(get_value_string(), this->value.value());
+
+    return "LoxObject()";
 }
 
 std::string LoxObject::to_repr(void) const
