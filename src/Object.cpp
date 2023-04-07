@@ -54,6 +54,14 @@ bool LoxObject::operator!=(const LoxObject& that) const
 }
 
 
+std::string LoxObject::get_val_as_str(void) const
+{
+    if(this->value.has_value())
+        return std::visit(get_value_string(), this->value.value());
+
+    return "Nil";
+}
+
 // TODO: do I want to throw here? 
 std::string LoxObject::get_string_val(void) const
 {

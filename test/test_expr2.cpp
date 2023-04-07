@@ -36,6 +36,10 @@ TEST_CASE("test_create_unary_expr", "expr2")
     UnaryExpr2<T> test_expr(left, op);
 
     REQUIRE(test_expr.op == Token(TokenType::MINUS, "-"));
+
+    LiteralExpr2<T> exp_value(Token(TokenType::NUMBER, "1", 1, 1.0));
+
+    REQUIRE(*std::dynamic_pointer_cast<LiteralExpr2<T>>(test_expr.value).get() == exp_value);
 }
 
 
@@ -63,3 +67,26 @@ TEST_CASE("test_create_binary_expr", "expr2")
 }
 
 
+
+TEST_CASE("test_ast_printer", "expr2")
+{
+    ASTPrinter2 printer;
+
+    // Create some expression
+    Token op(TokenType::PLUS, "+");
+    
+    std::shared_ptr<LiteralExpr2<T>> left = std::make_shared<LiteralExpr2<T>>(
+            Token(TokenType::NUMBER, "1", 1, 1.0)
+    );
+
+    std::shared_ptr<LiteralExpr2<T>> right = std::make_shared<LiteralExpr2<T>>(
+            Token(TokenType::NUMBER, "1", 1, 2.0)
+    );
+
+    BinaryExpr2<T> test_expr(left, right, op);
+    
+    REQUIRE(test_expr.op == Token(TokenType::PLUS, "+"));
+
+    std::cout << "[" << __func__ << "] printer.print(test_expr) : " << printer.print(test_expr) << std::endl;
+
+}

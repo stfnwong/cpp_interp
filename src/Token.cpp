@@ -100,8 +100,7 @@ std::string Token::to_string(void) const
 {
     std::ostringstream oss;
 
-    //tok_str << this->type << " " << this->lexeme << " " << this->literal;
-
+    // TODO: move make_literal_string inside class?
     oss << token_to_str[this->type] << " \"" << this->lexeme << "\"";
     if(this->literal.has_value())
     {

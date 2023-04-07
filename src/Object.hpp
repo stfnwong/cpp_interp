@@ -43,6 +43,7 @@ struct LoxObject
         bool operator==(const LoxObject& that) const;
         bool operator!=(const LoxObject& that) const;
 
+        std::string get_val_as_str(void) const;
         std::string get_string_val(void) const;
         float       get_float_val(void) const;
         bool        get_bool_val(void) const;

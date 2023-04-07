@@ -9,11 +9,11 @@
 #include <memory>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "Object.hpp"
 
 
-// Firstly, the visitor should probably take pointers...
 template <typename T> struct BinaryExpr2;
 template <typename T> struct GroupingExpr2;
 template <typename T> struct LiteralExpr2;
@@ -21,21 +21,14 @@ template <typename T> struct UnaryExpr2;
 
 
 // Visitor object 
-// TODO: should these become pointers....?
 template <typename T> struct ExprVisitor2
 {
     public:
         virtual T visit(BinaryExpr2<T>& expr) = 0;
-        virtual T visit(GroupingExpr2<T>& expr) = 0;
+        //virtual T visit(GroupingExpr2<T>& expr) = 0;
         virtual T visit(LiteralExpr2<T>& expr) = 0;
         virtual T visit(UnaryExpr2<T>& expr) = 0;
-
-        //virtual T visit(std::unique_ptr<BinaryExpr2<T>> expr) = 0;
-        //virtual T visit(std::unique_ptr<GroupingExpr2<T>> expr) = 0;
-        //virtual T visit(std::unique_ptr<LiteralExpr2<T>> expr) = 0;
-        //virtual T visit(std::unique_ptr<UnaryExpr2<T>> expr) = 0;
 };
-
 
 
 template <typename T> struct Expr2
@@ -43,9 +36,6 @@ template <typename T> struct Expr2
     public:
         Expr2() {} 
         virtual ~Expr2() {}
-
-        //virtual bool operator==(const Expr2<T>& that) const = 0;
-        //virtual bool operator!=(const Expr2<T>& that) const = 0;
 
         virtual T           accept(ExprVisitor2<T>& visitor) = 0;
         virtual std::string to_string(void) const = 0;
@@ -163,6 +153,52 @@ template <typename T> struct BinaryExpr2 : public Expr2<T>
 };
 
 
+/*
+ * ASTPrinter
+ */
+struct ASTPrinter2 : public ExprVisitor2<std::string>
+{
+    using ExprPtr = std::shared_ptr<Expr2<std::string>>;
+
+    public:
+        std::string print(Expr2<std::string>& expr) {
+            return expr.accept(*this);
+        }
+
+        std::string parenthesize(const std::string& name, std::vector<ExprPtr>& exprs)
+        {
+            std::ostringstream oss;
+
+            oss << "(" << name << " ";
+            for(const auto& e : exprs)
+                oss << e->accept(*this) << " ";
+            oss << ")";
+
+            return oss.str();
+        }
+
+        std::string visit(LiteralExpr2<std::string>& expr) final
+        {
+            if(expr.value.has_type())
+                return expr.value.to_string();
+                //return expr.value.get_val_as_str();
+                //return expr.value.get_string_val();
+
+            return "Nil";       // TODO: Think about if there is anything else we might prefer to return
+        }
+
+        std::string visit(UnaryExpr2<std::string>& expr) final
+        {
+            std::vector<ExprPtr> exprs = {expr.value};
+            return this->parenthesize(expr.op.lexeme, exprs);
+        }
+
+        std::string visit(BinaryExpr2<std::string>& expr) final
+        {
+            std::vector<ExprPtr> exprs = {expr.left, expr.right};
+            return this->parenthesize(expr.op.lexeme, exprs);
+        }
+};
 
 
 
