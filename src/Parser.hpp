@@ -41,17 +41,17 @@ class Parser
 
         void synchronise(void);
 
-        std::unique_ptr<Expr> primary(void);            // literals, etc
-        std::unique_ptr<Expr> unary(void);
-        std::unique_ptr<Expr> factor(void);  // multiplication, division
-        std::unique_ptr<Expr> term(void);    // addition, subtraction
-        std::unique_ptr<Expr> equality(void);
-        std::unique_ptr<Expr> comparison(void);
-        std::unique_ptr<Expr> expression(void);
+        std::unique_ptr<Expr<LoxObject>> primary(void);            // literals, etc
+        std::unique_ptr<Expr<LoxObject>> unary(void);
+        std::unique_ptr<Expr<LoxObject>> factor(void);  // multiplication, division
+        std::unique_ptr<Expr<LoxObject>> term(void);    // addition, subtraction
+        std::unique_ptr<Expr<LoxObject>> equality(void);
+        std::unique_ptr<Expr<LoxObject>> comparison(void);
+        std::unique_ptr<Expr<LoxObject>> expression(void);
 
     public:
         Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
-        std::unique_ptr<Expr> parse(void);
+        std::unique_ptr<Expr<LoxObject>> parse(void);
         unsigned num_tokens(void) const;
 };
 

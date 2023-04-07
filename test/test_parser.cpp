@@ -21,6 +21,8 @@ TEST_CASE("test_parse_empty_input", "parser")
 
 TEST_CASE("test_parse_binary_expr", "parser")
 {
+    using T = LoxObject;
+
     // expression is 
     std::vector<Token> test_tokens = {
         Token(TokenType::NUMBER, "2", 1, 2.0f),
@@ -34,7 +36,7 @@ TEST_CASE("test_parse_binary_expr", "parser")
 
     // Should return an expression
     //std::unique_ptr<BinaryExpr> out_expr = dynamic_cast<BinaryExpr>(parser.parse().get());
-    std::unique_ptr<Expr> out_expr = parser.parse();
+    std::unique_ptr<Expr<T>> out_expr = parser.parse();
     std::cout << "[" << __func__ << "] out_expr (type: " << typeid(out_expr.get()).name()
         << "): " << out_expr->to_string() << std::endl;
 
