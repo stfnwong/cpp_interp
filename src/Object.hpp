@@ -25,7 +25,7 @@ struct get_value_string
 
 struct LoxObject
 {
-    TokenType src_type;
+    TokenType type;
     std::optional<std::variant<float, bool, std::string>> value;
 
     // some fancy visitor structure here to get the value..
@@ -37,8 +37,10 @@ struct LoxObject
     };
 
     public:
-        LoxObject() : src_type(TokenType::EMPTY) {}
+        LoxObject() : type(TokenType::EMPTY) {}
         LoxObject(const Token& token);
+
+        bool operator==(const LoxObject& that) const;
 
         std::string get_string_val(void) const;
         float       get_float_val(void) const;

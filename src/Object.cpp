@@ -8,7 +8,7 @@
 #include "Object.hpp"
 
 
-LoxObject::LoxObject(const Token& token) : src_type(token.type)
+LoxObject::LoxObject(const Token& token) : type(token.type)
 {
     switch(token.type)
     {
@@ -32,6 +32,19 @@ LoxObject::LoxObject(const Token& token) : src_type(token.type)
         default:
             break;
     }
+}
+
+
+bool LoxObject::operator==(const LoxObject& that) const
+{
+    if(this->type != that.type)
+        return false;
+    if(this->value.has_value() != that.value.has_value())
+        return false;
+    else
+        return this->value.value() == that.value.value();
+
+    return true;
 }
 
 std::string LoxObject::get_string_val(void) const

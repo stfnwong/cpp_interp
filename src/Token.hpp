@@ -8,6 +8,7 @@
 #define __TOKEN_HPP
 
 
+#include <algorithm>
 #include <optional>
 #include <string>
 #include <variant>
@@ -60,10 +61,10 @@ struct Token
     std::string lexeme;
     unsigned line;
     std::optional<literal_type> literal;
-    //void *literal;      // what to do about this...?
 
     public: 
         Token() : type(TokenType::EMPTY), lexeme(""), line(0) {}
+        Token(TokenType type) : type(type), lexeme(""), line(0) {}
         Token(TokenType type, unsigned line) : type(type), lexeme(""), line(line) {}
         Token(TokenType type, const std::string& lexeme, unsigned line) : 
             type(type), lexeme(lexeme), line(line) {} 
@@ -74,13 +75,39 @@ struct Token
 
         ~Token() {}
 
+        // swap method 
+        friend void swap(Token& a, Token& b)
+        {
+            using std::swap;  // enable ADL
+            swap(a.type, b.type);
+            swap(a.lexeme, b.lexeme);
+            swap(a.line, b.line);
+            swap(a.literal, b.literal);
+        }
+
+        // copy ctor
+        Token(const Token& that)
+        {
+            this->type = that.type;
+            this->lexeme = that.lexeme;
+            this->line = that.line;
+            this->literal = that.literal;
+        }
+
         // operators 
         bool operator==(const Token& that) const;
         bool operator!=(const Token& that) const;
 
+        // Assignment 
+        Token& operator=(Token that) 
+        {
+            swap(*this, that);
+            return *this;
+        }
+
         std::string get_string_literal(void) const;
-        float get_float_literal(void) const;
-        bool has_literal(void) const;
+        float       get_float_literal(void) const;
+        bool        has_literal(void) const;
         std::string to_string(void) const;
 };
 

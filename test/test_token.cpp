@@ -54,4 +54,19 @@ TEST_CASE("test_copy_token", "token")
     REQUIRE(src_token.type == TokenType::VAR);
 }
 
-// TODO: copy construction
+TEST_CASE("test_create_token_with_only_type", "token")
+{
+    Token test_token(TokenType::PLUS);
+
+    REQUIRE(test_token.type == TokenType::PLUS);
+    REQUIRE(test_token.lexeme == "");
+    REQUIRE(test_token.line == 0);
+}
+
+TEST_CASE("test_token_copy_ctor", "token")
+{
+    Token src_token = Token(TokenType::PLUS, "+", 1);
+
+    Token dst_token = Token(src_token);
+    REQUIRE(src_token == dst_token);
+}

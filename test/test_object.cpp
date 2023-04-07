@@ -16,7 +16,7 @@ TEST_CASE("test_create_null_object", "object")
     LoxObject test_object;
 
     REQUIRE(test_object.has_type() == false);
-    REQUIRE(test_object.src_type == TokenType::EMPTY);
+    REQUIRE(test_object.type == TokenType::EMPTY);
 }
 
 
@@ -26,7 +26,7 @@ TEST_CASE("test_create_null_object", "object")
 //    LoxObject test_object(test_token);
 //
 //    REQUIRE(test_object.has_type() == true);
-//    REQUIRE(test_object.src_type == test_token.type);
+//    REQUIRE(test_object.type == test_token.type);
 //
 //    REQUIRE_THROWS(test_object.get_string_val());
 //    REQUIRE_THROWS(test_object.get_float_val());
@@ -37,7 +37,7 @@ TEST_CASE("test_create_null_object", "object")
 //    test_token = Token(TokenType::FALSE, "false", 1);
 //    test_object = LoxObject(test_token);
 //    REQUIRE(test_object.has_type() == true);
-//    REQUIRE(test_object.src_type == test_token.type);
+//    REQUIRE(test_object.type == test_token.type);
 //    REQUIRE(test_object.get_bool_val() == test_token.get_bool_literal());
 //}
 
@@ -47,10 +47,15 @@ TEST_CASE("test_create_number_object", "object")
     LoxObject test_object(test_token);
 
     REQUIRE(test_object.has_type() == true);
-    REQUIRE(test_object.src_type == test_token.type);
+    REQUIRE(test_object.type == test_token.type);
 
     REQUIRE_THROWS(test_object.get_string_val());
     REQUIRE_THROWS(test_object.get_bool_val());
 
     REQUIRE(float_equal(test_object.get_float_val(), test_token.get_float_literal()));
+}
+
+
+TEST_CASE("test_create_string_object", "object")
+{
 }
