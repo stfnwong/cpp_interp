@@ -92,6 +92,15 @@ bool LoxObject::has_type(void) const
     return (this->value.has_value()) ? true : false;
 }
 
+bool LoxObject::has_string_type(void) const
+{
+    return (this->type == TokenType::STRING || this->type == TokenType::IDENTIFIER) ? true : false;
+}
+
+bool LoxObject::has_number_type(void) const
+{
+    return (this->type == TokenType::NUMBER) ? true : false;
+}
 
 std::string LoxObject::to_string(void) const
 {

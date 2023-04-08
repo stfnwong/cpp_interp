@@ -47,7 +47,8 @@ $(TEST_OBJECTS): $(OBJ_DIR)/%.o : $(TEST_DIR)/%.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(INCS) -c $< -o $@ 
 
 # ==== TEST TARGETS ==== #
-TESTS=test_token test_object test_scanner test_expr test_parser
+TESTS=test_token test_object test_scanner test_expr test_parser\
+	  test_interpreter
 
 $(TESTS): $(TEST_OBJECTS) $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) $(OBJ_DIR)/$@.o\
@@ -63,7 +64,7 @@ $(PROGRAM_OBJECTS): $(OBJ_DIR)/%.o : $(PROGRAM_DIR)/%.cpp
 
 $(PROGRAMS): $(OBJECTS) $(PROGRAM_OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) $(OBJ_DIR)/$@.o \
-		$(INCS) -o $(BIN_DIR)/$@ $(LIBS)
+		$(INCS) -o $@ $(LIBS)
 
 # Main targets 
 #

@@ -5,26 +5,26 @@
  * Stefan Wong 2018
  */
 
-#include <cstdio>
 #include <fstream>
 #include <algorithm>
 #include <iterator>
+#include <iostream>
 
 #include <cstdio>
 
 #include "Lox.hpp"
-
+/*
 // Routine to read files, C style 
-unsigned char* Lox::read_file(const std::string &fname, int *num_bytes)
+std::string read_file(const std::string& fname, int *num_bytes)
 {
     FILE *fp;
-    size_t length;
+    std::size_t length;
     unsigned char *source;
 
     fp = fopen(fname.c_str(), "rb");
     if(!fp)
     {
-        fprintf(stderr, "Failed to read file %s\n", fname.c_str());
+        std::cerr << "Failed to read file " << fname << std::endl;
         *num_bytes = -1;
         return nullptr;
     }
@@ -36,7 +36,7 @@ unsigned char* Lox::read_file(const std::string &fname, int *num_bytes)
     source = new unsigned char[length];
     if(!source)
     {
-        fprintf(stderr, "Failed to allocate memory for source\n");
+        std::cerr << "Failed to allocate memory for source." << std::endl;
         *num_bytes = -1;
         return nullptr;
     }
@@ -53,7 +53,7 @@ unsigned char* Lox::read_file(const std::string &fname, int *num_bytes)
     source[length] = '\0';
     *num_bytes = length;
 
-    return source;
+    return std::string(source);
 }
 
 
@@ -119,3 +119,11 @@ void Lox::lox_run(const unsigned char *source)
 {
 
 }
+
+
+
+int main(int argc, char *argv[])
+{
+    return 0;
+}
+*/

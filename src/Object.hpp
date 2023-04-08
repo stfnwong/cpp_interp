@@ -47,6 +47,12 @@ struct LoxObject
         LoxObject() : type(TokenType::EMPTY) {}
         LoxObject(const Token& token);
 
+        // Constructors for container types 
+        LoxObject(float f) : type(TokenType::NUMBER), value(f) {} 
+        LoxObject(const std::string& s) : type(TokenType::STRING), value(s) {} 
+        LoxObject(const TokenType t, const std::string& s) : type(t), value(s) {} 
+        LoxObject(bool b) : type(b ? TokenType::TRUE : TokenType::FALSE), value(b) {} 
+
         bool operator==(const LoxObject& that) const;
         bool operator!=(const LoxObject& that) const;
 
@@ -55,6 +61,8 @@ struct LoxObject
         float       get_float_val(void) const;
         bool        get_bool_val(void) const;
         bool        has_type(void) const;
+        bool        has_string_type(void) const;
+        bool        has_number_type(void) const;
 
         std::string to_string(void) const;
         std::string to_repr(void) const;

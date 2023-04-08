@@ -65,3 +65,47 @@ TEST_CASE("test_object_equality_operator", "object")
 
     REQUIRE(obj_a != obj_b);
 }
+
+
+// It would be nice to be able to use these objects as generic containers for the
+// types we encounter when parsing. 
+TEST_CASE("test_object_create_float", "object")
+{
+    LoxObject test_object(1.0f);
+
+    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.type == TokenType::NUMBER);
+    REQUIRE(float_equal(test_object.get_float_val(), 1.0f));
+
+    REQUIRE_THROWS(test_object.get_string_val());
+    REQUIRE_THROWS(test_object.get_bool_val());
+}
+
+TEST_CASE("test_object_create_string", "object")
+{
+    std::string test_string = "some junk";
+    LoxObject test_object(test_string);
+
+    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.type == TokenType::STRING);
+    REQUIRE(test_object.get_string_val() == test_string);
+
+    REQUIRE_THROWS(test_object.get_float_val());
+    REQUIRE_THROWS(test_object.get_bool_val());
+
+}
+
+TEST_CASE("test_object_create_bool", "object")
+{
+    float a = 1.0f;
+    float b = 2.0f;
+    LoxObject test_object(a < b);
+
+    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.type == TokenType::TRUE);
+    REQUIRE(test_object.get_bool_val() == true);
+
+    REQUIRE_THROWS(test_object.get_float_val());
+    REQUIRE_THROWS(test_object.get_string_val());
+
+}
