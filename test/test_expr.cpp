@@ -35,12 +35,10 @@ TEST_CASE("test_create_unary_expr", "expr")
     );
 
     UnaryExpr<E, T> test_expr(left, op);
-
-    REQUIRE(test_expr.op == Token(TokenType::MINUS, "-"));
-
     LiteralExpr<E, T> exp_value(Token(TokenType::NUMBER, "1", 1, 1.0));
 
-    REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(test_expr.value).get() == exp_value);
+    REQUIRE(test_expr.op == Token(TokenType::MINUS, "-"));
+    REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(test_expr.right).get() == exp_value);
 }
 
 
@@ -62,11 +60,14 @@ TEST_CASE("test_create_binary_expr", "expr")
 
     BinaryExpr<E, T> test_expr(left, right, op);
     
-    REQUIRE(test_expr.op == Token(TokenType::PLUS, "+"));
+    REQUIRE(test_expr.get_op() == Token(TokenType::PLUS, "+"));
 
     LiteralExpr<E, T> exp_left(Token(TokenType::NUMBER, "1", 1, 1.0));
     LiteralExpr<E, T> exp_right(Token(TokenType::NUMBER, "2", 1, 2.0));
 
+    // These cast can be handy in that we can use the == operator directly, but when
+    // implementing components using this use the get_*() methods instead (so that 
+    // its not required to know the type of the derived object).
     REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(test_expr.left).get() == exp_left);
     REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(test_expr.right).get() == exp_right);
 }

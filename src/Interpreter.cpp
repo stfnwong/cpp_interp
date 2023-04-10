@@ -64,12 +64,12 @@ LoxObject Interpreter::visit(LiteralExpr<E, T>& expr)
 
 LoxObject Interpreter::visit(GroupingExpr<E, T>& expr)
 {
-    return this->evaluate(expr.expression);
+    return this->evaluate(expr.left);
 }
 
 LoxObject Interpreter::visit(UnaryExpr<E, T>& expr)
 {
-    LoxObject right = this->evaluate(expr.value);
+    LoxObject right = this->evaluate(expr.right);
 
     switch(expr.op.type)
     {

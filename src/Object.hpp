@@ -32,7 +32,7 @@ struct get_value_string
 
 struct LoxObject
 {
-    TokenType type;
+    TokenType type;         // TODO: take an entire token?
     std::optional<std::variant<float, bool, std::string>> value;
 
     // some fancy visitor structure here to get the value..

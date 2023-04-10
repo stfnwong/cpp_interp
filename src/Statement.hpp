@@ -30,6 +30,7 @@ template <typename E, typename T> struct Stmt
 };
 
 
+// TODO: make these shared_ptr<Expr<E, T>>
 template <typename E, typename T> struct PrintStmt : public Stmt<E, T>
 {
     std::unique_ptr<Expr<E, T>> expr;

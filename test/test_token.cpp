@@ -47,6 +47,16 @@ TEST_CASE("test_create_null_token", "token")
     REQUIRE(null_token.has_literal() == false);
 }
 
+TEST_CASE("test_create_null_token_no_args", "token")
+{
+    Token test_token;
+
+    REQUIRE(test_token.type == TokenType::EMPTY);
+    REQUIRE(test_token.lexeme == "");
+    REQUIRE(test_token.line == 0);
+    REQUIRE(test_token.has_literal() == false);
+}
+
 TEST_CASE("test_copy_token", "token")
 {
     Token src_token;

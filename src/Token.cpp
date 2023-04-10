@@ -96,26 +96,26 @@ bool Token::has_literal(void) const
     return this->literal.has_value();
 }
 
-//std::string Token::to_string(void) const
-//{
-//    //if(this->literal.has_value())
-//    //    return std::visit(make_literal_string(), this->literal.value());
-//
-//    return this->lexeme;
-//}
-
 std::string Token::to_string(void) const
 {
-    std::ostringstream oss;
+    //if(this->literal.has_value())
+    //    return std::visit(make_literal_string(), this->literal.value());
 
-    // TODO: move make_literal_string inside class?
-    oss << token_to_str[this->type] << " \"" << this->lexeme << "\"";
-    if(this->literal.has_value())
-    {
-        oss << " " << std::visit(make_literal_string(), this->literal.value()) << " ";
-    }
-    oss << " line: " << this->line << " ";
-
-    return oss.str();
+    return this->lexeme;
 }
 
+//std::string Token::to_string(void) const
+//{
+//    std::ostringstream oss;
+//
+//    // TODO: move make_literal_string inside class?
+//    oss << token_to_str[this->type] << " \"" << this->lexeme << "\"";
+//    if(this->literal.has_value())
+//    {
+//        oss << " " << std::visit(make_literal_string(), this->literal.value()) << " ";
+//    }
+//    oss << " line: " << this->line << " ";
+//
+//    return oss.str();
+//}
+//
