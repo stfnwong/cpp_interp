@@ -47,6 +47,8 @@ TEST_CASE("test_create_print_statement", "stmt")
         Token(TokenType::PRINT, "print", 1),
         Token(TokenType::STRING, test_string, 1, test_string)
     };
+
+
 }
 
 TEST_CASE("test_create_expression_statement", "stmt")
@@ -54,11 +56,10 @@ TEST_CASE("test_create_expression_statement", "stmt")
     std::unique_ptr<Expr<E, T>> test_expr = create_binary_expression();
 
     ExpressionStmt expr_stmt(std::move(test_expr));
-    std::cout << expr_stmt.expr->to_string() << std::endl;
-    std::cout << typeid(expr_stmt.expr).name() << std::endl;
-    std::cout << typeid(expr_stmt.expr.get()).name() << std::endl;
-    //std::cout << expr_stmt.expr->left.to_string() << std::endl;
+    // Take apart the expressions and check
+    auto expr = expr_stmt.get_expr();
 
-    //LiteralExpr<E,T> exp_left(TokenType::NUMBER, "2", 1, 2.0);
-    //REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(expr_stmt.expr->left).get() == exp_left);
+    REQUIRE(expr->get_left()->get_value() == LoxObject(1.0f));
+    REQUIRE(expr->get_right()->get_value() == LoxObject(2.0f));
+    REQUIRE(expr->get_op() == Token(TokenType::PLUS, "+"));
 }

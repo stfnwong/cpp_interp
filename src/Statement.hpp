@@ -26,14 +26,15 @@ template <typename E, typename T> struct Stmt
     public:
         Stmt() {} 
         virtual ~Stmt() {}
-        virtual T accept(StmtVisitor<E, T>& visitor) = 0;
+        virtual T                           accept(StmtVisitor<E, T>& visitor) = 0;
+        virtual std::shared_ptr<Expr<E, T>> get_expr(void) const = 0;
 };
 
 
 // TODO: make these shared_ptr<Expr<E, T>>
 template <typename E, typename T> struct PrintStmt : public Stmt<E, T>
 {
-    std::unique_ptr<Expr<E, T>> expr;
+    std::shared_ptr<Expr<E, T>> expr;
 
     public:
         //PrintStmt(std::unique_ptr<Expr<E, T>> expr) : expr(expr) {} 
@@ -42,12 +43,16 @@ template <typename E, typename T> struct PrintStmt : public Stmt<E, T>
         T accept(StmtVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
+
+        std::shared_ptr<Expr<E, T>> get_expr(void) const final {
+            return this->expr;
+        }
 };
 
 
 template <typename E, typename T> struct ExpressionStmt : public Stmt<E, T>
 {
-    std::unique_ptr<Expr<E, T>> expr;
+    std::shared_ptr<Expr<E, T>> expr;
 
     public:
         //ExpressionStmt(std::unique_ptr<Expr<E, T>> expr)  : expr(expr) {} 
@@ -55,6 +60,10 @@ template <typename E, typename T> struct ExpressionStmt : public Stmt<E, T>
 
         T accept(StmtVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
+        }
+
+        std::shared_ptr<Expr<E, T>> get_expr(void) const final {
+            return this->expr;
         }
 };
 
