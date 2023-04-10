@@ -8,6 +8,7 @@
 
 #include "Expr.hpp"
 
+
 template <typename E, typename T> struct PrintStmt;
 template <typename E, typename T> struct ExpressionStmt;
 
@@ -27,6 +28,8 @@ template <typename E, typename T> struct Stmt
         explicit Stmt() = default;
         virtual ~Stmt() = default;
         virtual T accept(StmtVisitor<E, T>& visitor) = 0;
+        virtual const Expr<E, T>* get_expr(void) const = 0;
+        virtual std::string to_string(void) const = 0;
 };
 
 
@@ -43,6 +46,16 @@ template <typename E, typename T> struct PrintStmt : public Stmt<E, T>
             return visitor.visit(*this);
         }
 
+        const Expr<E, T>* get_expr(void) const final {
+            return this->expr.get();
+        }
+
+        std::string to_string(void) const final
+        {
+            std::ostringstream oss;
+            oss << "PrintStmt<" << this->expr->to_string() << ">";
+            return oss.str();
+        }
 };
 
 
@@ -55,6 +68,17 @@ template <typename E, typename T> struct ExpressionStmt : public Stmt<E, T>
 
         T accept(StmtVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
+        }
+
+        const Expr<E, T>* get_expr(void) const final {
+            return this->expr.get();
+        }
+
+        std::string to_string(void) const final 
+        {
+            std::ostringstream oss;
+            oss << "ExpressionStmt<" << this->expr->to_string() << ">";
+            return oss.str();
         }
 };
 

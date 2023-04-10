@@ -26,14 +26,6 @@ struct RuntimeError : public std::exception
         }
 };
 
-static bool had_runtime_error = false;
-
-static void runtime_error(RuntimeError& e)
-{
-    std::cerr << e.what() << std::endl << "[line " << e.token.line << "]";
-    had_runtime_error = true;
-}
-
 
 using E = LoxObject;
 using T = LoxObject;

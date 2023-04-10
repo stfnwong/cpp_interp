@@ -5,6 +5,14 @@
 
 #include "Interpreter.hpp"
 
+static bool had_runtime_error = false;
+
+static void runtime_error(RuntimeError& e)
+{
+    std::cerr << e.what() << std::endl << "[line " << e.token.line << "]";
+    had_runtime_error = true;
+}
+
 
 bool Interpreter::is_truthy(const LoxObject& obj) const
 {
