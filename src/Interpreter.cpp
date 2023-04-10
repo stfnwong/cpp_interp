@@ -50,7 +50,7 @@ void Interpreter::check_number_operands(const Token& otor, const LoxObject& o1, 
 }
 
 // TODO: this has to be a pointer...
-LoxObject Interpreter::evaluate(std::shared_ptr<Expr<E, T>> expr)
+LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<E, T>>& expr)
 {
     return expr->accept(*this);
 }
@@ -82,7 +82,7 @@ LoxObject Interpreter::visit(UnaryExpr<E, T>& expr)
     }
 
     throw RuntimeError(expr.op, "Invalid operator for Unary Expression");
-    //return LoxObject();     // unreachable - TODO: should we throw an error here?
+    return LoxObject();     // unreachable - TODO: should we throw an error here?
 }
 
 LoxObject Interpreter::visit(BinaryExpr<E, T>& expr)
@@ -143,7 +143,7 @@ LoxObject Interpreter::visit(BinaryExpr<E, T>& expr)
 
 
 // ======== PUBLIC FUNCTIONS ======== //
-std::string Interpreter::interpret(std::shared_ptr<Expr<E, T>> expr)
+std::string Interpreter::interpret(const std::unique_ptr<Expr<E, T>>& expr)
 {
     try {
         LoxObject value = this->evaluate(expr);

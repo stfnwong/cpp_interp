@@ -31,26 +31,17 @@ template <typename E, typename T> struct ExprVisitor
 };
 
 
-// TODO: consider here doing either 
-// 1) Having a common interface to access members (get_left(), get_right(), 
-// get_op(), for instance)
-//
-// 2) Having a field that indicates the type of the expression.o
-//
-// To avoid use of dynamic_pointer_cast().
-
+/*
+ * Abstract Base Class for Expression Objects
+ */
 template <typename E, typename T> struct Expr
 {
     public:
-        Expr() {} 
-        virtual ~Expr() {}
+        explicit Expr() = default;
+        virtual ~Expr() = default;
 
         virtual T           accept(ExprVisitor<E, T>& visitor) = 0;
-        virtual std::shared_ptr<Expr<E, T>> get_left(void) const = 0;
-        virtual std::shared_ptr<Expr<E, T>> get_right(void) const = 0;
-        virtual Token                       get_op(void) const = 0;
-        virtual LoxObject                   get_value(void) const = 0;  // TODO: not sure about this one....
-        virtual std::string                 to_string(void) const = 0;
+        virtual std::string to_string(void) const = 0;
 };
 
 
@@ -61,6 +52,7 @@ template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
     public:
         LiteralExpr(const Token& tok) : value(LoxObject(tok)) {} 
         LiteralExpr(const LoxObject& o) : value(o) {}
+        ~LiteralExpr() {} 
 
         bool operator==(const LiteralExpr<E, T>& that) const {
             return this->value == that.value;
@@ -70,24 +62,8 @@ template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
             return !(*this == that);
         }
 
-        std::shared_ptr<Expr<E, T>> get_left(void) const final {
-            return nullptr;
-        }
-
-        std::shared_ptr<Expr<E, T>> get_right(void) const final {
-            return nullptr;
-        }
-
-        Token get_op(void) const final {
-            return Token();
-        }
-        
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
-        }
-
-        LoxObject get_value(void) const final {
-            return this->value;
         }
 
         std::string to_string(void) const final
@@ -102,11 +78,15 @@ template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
 
 template <typename E, typename T> struct UnaryExpr : public Expr<E, T>
 {
-    std::shared_ptr<Expr<E, T>> right;
+    std::unique_ptr<Expr<E, T>> right;
     Token op;
 
     public:
-        UnaryExpr(std::shared_ptr<Expr<E, T>> v, const Token& t) : right(v), op(t) {}
+        UnaryExpr(std::unique_ptr<Expr<E, T>> v, const Token& t) : 
+            right(std::move(v)), 
+            op(t) {}
+
+        ~UnaryExpr() {}
 
         bool operator==(const UnaryExpr<E, T>& that) const 
         {
@@ -126,22 +106,6 @@ template <typename E, typename T> struct UnaryExpr : public Expr<E, T>
             return visitor.visit(*this);
         }
 
-        std::shared_ptr<Expr<E, T>> get_left (void) const final {
-            return nullptr;
-        }
-
-        std::shared_ptr<Expr<E, T>> get_right(void) const final {
-            return this->right;
-        }
-
-        LoxObject get_value(void) const final {
-            return LoxObject();
-        }
-
-        Token get_op(void) const final {
-            return this->op;
-        }
-
         std::string to_string(void) const final
         {
             std::ostringstream oss;
@@ -155,15 +119,17 @@ template <typename E, typename T> struct UnaryExpr : public Expr<E, T>
 
 template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
 {
-    std::shared_ptr<Expr<E, T>> left;
-    std::shared_ptr<Expr<E, T>> right;
+    std::unique_ptr<Expr<E, T>> left;
+    std::unique_ptr<Expr<E, T>> right;
     Token op;
 
     public:
-        BinaryExpr(std::shared_ptr<Expr<E, T>> l, std::shared_ptr<Expr<E, T>> r, const Token& op) : 
-            left(l), 
-            right(r), 
+        BinaryExpr(std::unique_ptr<Expr<E, T>> l, std::unique_ptr<Expr<E, T>> r, const Token& op) : 
+            left(std::move(l)), 
+            right(std::move(r)), 
             op(op) {}
+
+        ~BinaryExpr() {} 
 
         bool operator==(const BinaryExpr<E, T>& that) const 
         {
@@ -181,27 +147,9 @@ template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
             return !(*this == that);
         }
 
-        std::shared_ptr<Expr<E, T>> get_left(void) const final {
-            return this->left;
-        }
-
-        std::shared_ptr<Expr<E, T>> get_right(void) const final {
-            return this->right;
-        }
-
-        Token get_op(void) const final {
-            return this->op;
-
-        }
-
-        LoxObject get_value(void) const final {
-            return LoxObject();
-        }
-
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
-
 
         std::string to_string(void) const final
         {
@@ -218,10 +166,11 @@ template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
 
 template <typename E, typename T> struct GroupingExpr : public Expr<E, T>
 {
-    std::shared_ptr<Expr<E, T>> left;
+    std::unique_ptr<Expr<E, T>> left;
 
     public:
-        GroupingExpr(std::shared_ptr<Expr<E, T>> e) : left(e) {}
+        GroupingExpr(std::unique_ptr<Expr<E, T>> e) : left(std::move(e)) {}
+        ~GroupingExpr() {}
 
         bool operator==(const GroupingExpr<E, T>& that) const {
             return this->left.get() == that.left.get();
@@ -233,22 +182,6 @@ template <typename E, typename T> struct GroupingExpr : public Expr<E, T>
 
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
-        }
-
-        std::shared_ptr<Expr<E, T>> get_left(void) const final {
-            return this->left;
-        }
-
-        std::shared_ptr<Expr<E, T>> get_right(void) const final {
-            return nullptr;
-        }
-
-        Token get_op(void) const final {
-            return Token();
-        }
-
-        LoxObject get_value(void) const final {
-            return LoxObject();
         }
 
         std::string to_string(void) const final 
@@ -267,51 +200,58 @@ struct ASTPrinter : public ExprVisitor<LoxObject, std::string>
 {
     using E = LoxObject;
     using T = std::string;
-    using ExprPtr = std::shared_ptr<Expr<E, T>>;
+    using ExprPtr = std::unique_ptr<Expr<E, T>>;
 
     public:
         std::string print(Expr<E, T>& expr) {
             return expr.accept(*this);
         }
 
-        std::string parenthesize(const std::string& name, std::vector<ExprPtr>& exprs)
-        {
-            std::ostringstream oss;
+        //std::string parenthesize(const std::string& name, std::vector<ExprPtr>& exprs)
+        //{
+        //    std::ostringstream oss;
 
-            oss << "(" << name;
-            for(const auto& e : exprs)
-                oss << " " << e->accept(*this);
-            oss << ")";
+        //    oss << "(" << name;
+        //    for(const auto& e : exprs)
+        //        oss << " " << e->accept(*this);
+        //    oss << ")";
 
-            return oss.str();
-        }
+        //    return oss.str();
+        //}
 
         std::string visit(LiteralExpr<E, T>& expr) final
         {
             if(expr.value.has_type())
                 return expr.value.to_string();
-                //return expr.value.get_val_as_str();
-                //return expr.value.get_string_val();
 
             return "Nil";       // TODO: Think about if there is anything else we might prefer to return
         }
 
         std::string visit(UnaryExpr<E, T>& expr) final
         {
-            std::vector<ExprPtr> exprs = {expr.right};
-            return this->parenthesize(expr.op.lexeme, exprs);
+            std::ostringstream oss;
+            oss << "(" << expr.op.lexeme << " ";
+            oss << expr.right->accept(*this);
+            oss << ")";
+            return oss.str();
+            //return this->parenthesize(expr.op.lexeme, exprs);
         }
 
         std::string visit(BinaryExpr<E, T>& expr) final
         {
-            std::vector<ExprPtr> exprs = {expr.left, expr.right};
-            return this->parenthesize(expr.op.lexeme, exprs);
+            std::ostringstream oss;
+            oss << "(" << expr.op.lexeme;
+            oss << " " << expr.left->accept(*this);
+            oss << " " << expr.right->accept(*this);
+            oss << ")";
+            return oss.str();
         }
 
         std::string visit(GroupingExpr<E, T>& expr) final
         {
-            std::vector<ExprPtr> exprs = {expr.left};
-            return this->parenthesize("Group", exprs);
+            std::ostringstream oss;
+            oss << "(" << expr.left->accept(*this) << ")";
+            return oss.str();
         }
 };
 

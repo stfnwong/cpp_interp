@@ -211,31 +211,33 @@ std::unique_ptr<Stmt<E, T>> Parser::print_statement(void)
 {
     auto value = this->expression();
     this->consume(TokenType::SEMICOLON, "Expect ';' after value");
-    return nullptr;
-    //return std::make_unique<PrintStmt<E, T>>(value);
+    return std::make_unique<PrintStmt<E, T>>(std::move(value));
 }
 
 std::unique_ptr<Stmt<E, T>> Parser::expression_statement(void)
 {
     auto value = this->expression();
     this->consume(TokenType::SEMICOLON, "Expect ';' after expression");
-    return nullptr;
-    //return std::make_unique<ExpressionStmt<E, T>>(std::move(value));
+    return std::make_unique<ExpressionStmt<E, T>>(std::move(value));
 }
 
 
 // ======== PUBLIC  FUNCTIONS ======== //
-std::list<std::unique_ptr<Stmt<E, T>>> Parser::parse(void)
+std::vector<std::unique_ptr<Stmt<E, T>>> Parser::parse(void)
 {
     using StmtPtr = std::unique_ptr<Stmt<E, T>>;
+    std::vector<StmtPtr> statements; 
+
     if(this->tokens.size() > 0)
     {
-        std::list<StmtPtr> statements; 
         while(!this->at_end())
-            statements.push_back(this->statement());
+            statements.push_back(std::move(this->statement()));
+            //statements.push_back(this->statement());
     }
     else
         throw ParseError(Token(), "Got 0 input tokens");
+    
+    return statements;
 }
 
 unsigned Parser::num_tokens(void) const {

@@ -47,7 +47,7 @@ class Interpreter : ExprVisitor<E, T>
         void check_number_operand(const Token& otor, const LoxObject& orand);
         void check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
 
-        LoxObject evaluate(std::shared_ptr<Expr<E, T>> expr);
+        LoxObject evaluate(const std::unique_ptr<Expr<E, T>>& expr);
         
         // Expressions
         LoxObject visit(LiteralExpr<E, T>& expr);
@@ -57,7 +57,7 @@ class Interpreter : ExprVisitor<E, T>
 
     public:
         Interpreter() {} 
-        std::string interpret(std::shared_ptr<Expr<E, T>> expression);
+        std::string interpret(const std::unique_ptr<Expr<E, T>>& expression);
 };
 
 

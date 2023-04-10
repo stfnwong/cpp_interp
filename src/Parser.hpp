@@ -9,7 +9,6 @@
 
 
 #include <exception>
-#include <list>
 #include <vector>
 
 #include "Expr.hpp"
@@ -63,7 +62,7 @@ class Parser
 
     public:
         Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
-        std::list<std::unique_ptr<Stmt<E, T>>> parse(void);
+        std::vector<std::unique_ptr<Stmt<E, T>>> parse(void);
         //std::unique_ptr<Expr<E, T>> parse(void);
         unsigned num_tokens(void) const;
 };

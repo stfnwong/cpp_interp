@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "Parser.hpp"
+#include "Object.hpp"
 
 
 TEST_CASE("test_parse_empty_input", "parser")
@@ -24,7 +25,7 @@ TEST_CASE("test_parse_binary_expr", "parser")
     using T = std::string;
     using E = LoxObject;
 
-    // expression is 
+    // expression is "2 + 2"
     std::vector<Token> test_tokens = {
         Token(TokenType::NUMBER, "2", 1, 2.0f),
         Token(TokenType::PLUS, "+", 1),
@@ -35,10 +36,12 @@ TEST_CASE("test_parse_binary_expr", "parser")
     REQUIRE(parser.num_tokens() == test_tokens.size());
 
     // Should return an expression
-    //std::unique_ptr<Expr<E, T>> out_expr = parser.parse();
+    //std::list<std::unique_ptr<Stmt<E, T>>> parse_result = parser.parse();
+    auto parse_result = parser.parse();
+    REQUIRE(parse_result.size() == 1);
+    //auto out_expr = parse_result.front();
 
-    //ASTPrinter printer;
-
-    //std::string exp_parsed_str = "(+ 2 2)";
-    //REQUIRE(printer.print(*out_expr) == exp_parsed_str);
+    //REQUIRE(out_expr->get_expr()->get_left()->get_value() == LoxObject(2.0f));
+    //REQUIRE(out_expr->get_expr()->get_right()->get_value() == LoxObject(2.0f));
+    //REQUIRE(out_expr->get_expr()->get_op() == Token(TokenType::PLUS, "+", 1));
 }

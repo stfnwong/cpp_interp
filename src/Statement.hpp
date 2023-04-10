@@ -24,8 +24,8 @@ template <typename E, typename T> struct StmtVisitor
 template <typename E, typename T> struct Stmt
 {
     public:
-        Stmt() {} 
-        virtual ~Stmt() {}
+        explicit Stmt() = default;
+        virtual ~Stmt() = default;
         virtual T                           accept(StmtVisitor<E, T>& visitor) = 0;
         virtual std::shared_ptr<Expr<E, T>> get_expr(void) const = 0;
 };
@@ -34,6 +34,7 @@ template <typename E, typename T> struct Stmt
 // TODO: make these shared_ptr<Expr<E, T>>
 template <typename E, typename T> struct PrintStmt : public Stmt<E, T>
 {
+    // TODO: why do I have to do double move here?
     std::shared_ptr<Expr<E, T>> expr;
 
     public:
