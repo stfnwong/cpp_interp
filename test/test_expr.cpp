@@ -52,8 +52,12 @@ TEST_CASE("test_create_binary_expr", "expr")
             Token(TokenType::NUMBER, "1", 1, 1.0)
     );
 
+    // TODO: Bug - the object doesn't contain a token, so we can't detect errors in the
+    // token itself. I have had the lexeme "1" here and it was not caught by the test.
+    // Do I want to have a unique_ptr to a Token and do a move each time the token is 
+    // moved?
     std::shared_ptr<LiteralExpr<E, T>> right = std::make_shared<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "1", 1, 2.0)
+            Token(TokenType::NUMBER, "2", 1, 2.0)
     );
 
     BinaryExpr<E, T> test_expr(left, right, op);
@@ -70,9 +74,29 @@ TEST_CASE("test_create_binary_expr", "expr")
 
 //TEST_CASE("test_create_grouping_expr", "expr")
 //{
-//    std::shared_ptr<LiteralExpr<E, T>> number = std::make_shared<LiteralExpr<T>>(
+//    // Make a binary expression and a unary expression
+//
+//    // Binary Expression
+//    std::shared_ptr<LiteralExpr<E, T>> a = std::make_shared<LiteralExpr<E, T>>(
 //            Token(TokenType::NUMBER, "1", 1, 1.0)
 //    );
+//    std::shared_ptr<LiteralExpr<E, T>> b = std::make_shared<LiteralExpr<E, T>>(
+//            Token(TokenType::NUMBER, "1", 1, 1.0)
+//    );
+//
+//    Token op(TokenType::PLUS, "+", 1);
+//    std::shared_ptr<BinaryExpr<E, T>> ab = std::make_shared<BinaryExpr<E, T>>(a, b, op);
+//
+//    // Unary Expression
+//    std::shared_ptr<LiteralExpr<E, T>> ul = std::make_shared<LiteralExpr<E, T>>(
+//            Token(TokenType::NUMBER, "3", 1, 3.0)
+//    );
+//    std::shared_ptr<UnaryExpr<E, T>> u = std::make_shared<UnaryExpr<E, T>>(
+//            ul, 
+//            Token(TokenType::MINUS, "-")
+//    );
+//
+//    // Now make a grouping expression
 //}
 
 

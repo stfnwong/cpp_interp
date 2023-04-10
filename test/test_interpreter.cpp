@@ -9,7 +9,7 @@
 #include "Interpreter.hpp"
 
 
-TEST_CASE("test_interpret_expr", "interpreter")
+TEST_CASE("test_interpret_binary_expr", "interpreter")
 {
     // Expression is 1 + 1 
     Token op(TokenType::PLUS, "+");
@@ -33,5 +33,4 @@ TEST_CASE("test_interpret_expr", "interpreter")
     std::cout << "[" << __func__ << "] out_eval : " << out_eval << std::endl;
 
     REQUIRE(out_eval == "2");
-
 }

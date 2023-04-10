@@ -31,6 +31,14 @@ template <typename E, typename T> struct ExprVisitor
 };
 
 
+// TODO: consider here doing either 
+// 1) Having a common interface to access members (get_left(), get_right(), 
+// get_op(), for instance)
+//
+// 2) Having a field that indicates the type of the expression.o
+//
+// To avoid use of dynamic_pointer_cast().
+
 template <typename E, typename T> struct Expr
 {
     public:

@@ -11,7 +11,6 @@
 #include "Object.hpp"
 
 
-
 struct RuntimeError : public std::exception
 {
     Token token;
@@ -49,15 +48,15 @@ class Interpreter : ExprVisitor<E, T>
         void check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
 
         LoxObject evaluate(std::shared_ptr<Expr<E, T>> expr);
-
-    public:
-        Interpreter() {} 
-
+        
+        // Expressions
         LoxObject visit(LiteralExpr<E, T>& expr);
         LoxObject visit(GroupingExpr<E, T>& expr);
         LoxObject visit(UnaryExpr<E, T>& expr);
         LoxObject visit(BinaryExpr<E, T>& expr);
 
+    public:
+        Interpreter() {} 
         std::string interpret(std::shared_ptr<Expr<E, T>> expression);
 };
 

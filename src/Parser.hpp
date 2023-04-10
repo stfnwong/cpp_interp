@@ -9,9 +9,11 @@
 
 
 #include <exception>
+#include <list>
 #include <vector>
 
 #include "Expr.hpp"
+#include "Statement.hpp"
 #include "Token.hpp"
 
 
@@ -45,6 +47,7 @@ class Parser
 
         void synchronise(void);
 
+        // Expressions
         std::unique_ptr<Expr<E, T>> primary(void);            // literals, etc
         std::unique_ptr<Expr<E, T>> unary(void);
         std::unique_ptr<Expr<E, T>> factor(void);  // multiplication, division
@@ -53,9 +56,15 @@ class Parser
         std::unique_ptr<Expr<E, T>> comparison(void);
         std::unique_ptr<Expr<E, T>> expression(void);
 
+        // Statements 
+        std::unique_ptr<Stmt<E, T>> statement(void);
+        std::unique_ptr<Stmt<E, T>> print_statement(void);
+        std::unique_ptr<Stmt<E, T>> expression_statement(void);
+
     public:
         Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
-        std::unique_ptr<Expr<E, T>> parse(void);
+        std::list<std::unique_ptr<Stmt<E, T>>> parse(void);
+        //std::unique_ptr<Expr<E, T>> parse(void);
         unsigned num_tokens(void) const;
 };
 

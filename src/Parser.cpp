@@ -197,17 +197,42 @@ std::unique_ptr<Expr<E, T>> Parser::expression(void)
     return this->equality();
 }
 
-
-std::unique_ptr<Expr<E, T>> Parser::parse(void)
+// ======== STATEMENT  FUNCTIONS ======== //
+std::unique_ptr<Stmt<E, T>> Parser::statement(void)
 {
+    if(this->match({TokenType::PRINT}))
+        return this->print_statement();
+
+    return this->expression_statement();
+}
+
+
+std::unique_ptr<Stmt<E, T>> Parser::print_statement(void)
+{
+    auto value = this->expression();
+    this->consume(TokenType::SEMICOLON, "Expect ';' after value");
+    return nullptr;
+    //return std::make_unique<PrintStmt<E, T>>(value);
+}
+
+std::unique_ptr<Stmt<E, T>> Parser::expression_statement(void)
+{
+    auto value = this->expression();
+    this->consume(TokenType::SEMICOLON, "Expect ';' after expression");
+    return nullptr;
+    //return std::make_unique<ExpressionStmt<E, T>>(std::move(value));
+}
+
+
+// ======== PUBLIC  FUNCTIONS ======== //
+std::list<std::unique_ptr<Stmt<E, T>>> Parser::parse(void)
+{
+    using StmtPtr = std::unique_ptr<Stmt<E, T>>;
     if(this->tokens.size() > 0)
     {
-        try {
-            return this->expression();
-        } catch(ParseError& e) {
-            return nullptr;
-            //return std::make_unique<Expr<E, T>>(nullptr):
-        }
+        std::list<StmtPtr> statements; 
+        while(!this->at_end())
+            statements.push_back(this->statement());
     }
     else
         throw ParseError(Token(), "Got 0 input tokens");

@@ -56,7 +56,7 @@ LoxObject Interpreter::evaluate(std::shared_ptr<Expr<E, T>> expr)
 }
 
 
-// ======== PUBLIC VISITOR FUNCTIONS ======== //
+// ======== EXPRESSION VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(LiteralExpr<E, T>& expr)
 {
     return expr.value;
@@ -81,7 +81,8 @@ LoxObject Interpreter::visit(UnaryExpr<E, T>& expr)
             break;          // shut linter up
     }
 
-    return LoxObject();     // unreachable - TODO: should we throw an error here?
+    throw RuntimeError(expr.op, "Invalid operator for Unary Expression");
+    //return LoxObject();     // unreachable - TODO: should we throw an error here?
 }
 
 LoxObject Interpreter::visit(BinaryExpr<E, T>& expr)
@@ -141,6 +142,7 @@ LoxObject Interpreter::visit(BinaryExpr<E, T>& expr)
 }
 
 
+// ======== PUBLIC FUNCTIONS ======== //
 std::string Interpreter::interpret(std::shared_ptr<Expr<E, T>> expr)
 {
     try {
