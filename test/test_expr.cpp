@@ -30,15 +30,18 @@ TEST_CASE("test_create_literal_expr", "expr")
 TEST_CASE("test_create_unary_expr", "expr")
 {
     Token op(TokenType::MINUS, "-");
-    std::unique_ptr<LiteralExpr<E, T>> left = std::make_unique<LiteralExpr<E, T>>(
+    std::unique_ptr<LiteralExpr<E, T>> right = std::make_unique<LiteralExpr<E, T>>(
             Token(TokenType::NUMBER, "1", 1, 1.0)
     );
 
-    UnaryExpr<E, T> test_expr(std::move(left), op);
-    LiteralExpr<E, T> exp_value(Token(TokenType::NUMBER, "1", 1, 1.0));
+    UnaryExpr<E, T> test_expr(std::move(right), op);
+    LiteralExpr<E, T> exp_right(Token(TokenType::NUMBER, "1", 1, 1.0));
 
     REQUIRE(test_expr.op == Token(TokenType::MINUS, "-"));
-    //REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(test_expr.right).get() == exp_value);
+    std::cout << "[" << __func__ << "] test_expr : " << test_expr.to_string() << std::endl;
+    //REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(test_expr.right).get() == exp_right);
+    //REQUIRE(test_expr.right == exp_value);
+    ///REQUIRE(*std::dynamic_pointer_cast<LiteralExpr<E, T>>(test_expr.right).get() == exp_value);
 }
 
 
