@@ -21,26 +21,26 @@ template <typename E, typename T> struct StmtVisitor
 };
 
 
-// TODO: create a common get_expr() interface
+
 template <typename E, typename T> struct Stmt
 {
     public:
         explicit Stmt() = default;
         virtual ~Stmt() = default;
         virtual T accept(StmtVisitor<E, T>& visitor) = 0;
+        // TODO: not sure about the get_expr() method now... I am using in in
+        // unit tests for convenience.
         virtual const Expr<E, T>* get_expr(void) const = 0;
         virtual std::string to_string(void) const = 0;
 };
 
 
-// TODO: make these unique_ptr<Expr<E, T>>
 template <typename E, typename T> struct PrintStmt : public Stmt<E, T>
 {
-    // TODO: why do I have to do double move here?
     std::unique_ptr<Expr<E, T>> expr;
 
     public:
-        PrintStmt(std::unique_ptr<Expr<E, T>> expr) : expr(std::move(expr)) {} 
+        PrintStmt(std::unique_ptr<Expr<E, T>> expr) : expr(std::move(expr)) {}
 
         T accept(StmtVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
@@ -64,7 +64,7 @@ template <typename E, typename T> struct ExpressionStmt : public Stmt<E, T>
     std::unique_ptr<Expr<E, T>> expr;
 
     public:
-        ExpressionStmt(std::unique_ptr<Expr<E, T>> expr)  : expr(std::move(expr)) {} 
+        ExpressionStmt(std::unique_ptr<Expr<E, T>> expr)  : expr(std::move(expr)) {}
 
         T accept(StmtVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
@@ -74,7 +74,7 @@ template <typename E, typename T> struct ExpressionStmt : public Stmt<E, T>
             return this->expr.get();
         }
 
-        std::string to_string(void) const final 
+        std::string to_string(void) const final
         {
             std::ostringstream oss;
             oss << "ExpressionStmt<" << this->expr->to_string() << ">";
@@ -83,6 +83,5 @@ template <typename E, typename T> struct ExpressionStmt : public Stmt<E, T>
 };
 
 
-// TODO: Statement visitor
 
 #endif /*__STATEMENT_HPP*/

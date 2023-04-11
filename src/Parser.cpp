@@ -55,7 +55,6 @@ Token Parser::advance(void)
 
 Token Parser::consume(const TokenType& t, const std::string& msg)
 {
-    std::cout << "[" << __func__ << "] consuming " << token_to_str[t] << "..." << std::endl;
     if(this->check(t))
         return this->advance();
 

@@ -9,6 +9,7 @@
 
 #include "Expr.hpp"
 #include "Object.hpp"
+#include "Statement.hpp"
 
 
 struct RuntimeError : public std::exception
@@ -27,11 +28,13 @@ struct RuntimeError : public std::exception
 };
 
 
-using E = LoxObject;
-using T = LoxObject;
+using ExprType = LoxObject;
+//using VisitType = std::string;
+using VisitType = LoxObject;
+using StmtVisitType = LoxObject;
 
 
-class Interpreter : ExprVisitor<E, T>
+class Interpreter : public ExprVisitor<ExprType, VisitType>, public StmtVisitor<ExprType, StmtVisitType>
 {
     private:
         bool is_truthy(const LoxObject& obj) const;
@@ -39,17 +42,24 @@ class Interpreter : ExprVisitor<E, T>
         void check_number_operand(const Token& otor, const LoxObject& orand);
         void check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
 
-        LoxObject evaluate(const std::unique_ptr<Expr<E, T>>& expr);
+        LoxObject evaluate(const std::unique_ptr<Expr<ExprType, VisitType>>& expr);
+        void      execute(const std::unique_ptr<Stmt<ExprType, VisitType>>& stmt);
         
         // Expressions
-        LoxObject visit(LiteralExpr<E, T>& expr);
-        LoxObject visit(GroupingExpr<E, T>& expr);
-        LoxObject visit(UnaryExpr<E, T>& expr);
-        LoxObject visit(BinaryExpr<E, T>& expr);
+        LoxObject visit(LiteralExpr<ExprType, VisitType>& expr) final;
+        LoxObject visit(GroupingExpr<ExprType, VisitType>& expr) final;
+        LoxObject visit(UnaryExpr<ExprType, VisitType>& expr) final;
+        LoxObject visit(BinaryExpr<ExprType, VisitType>& expr) final;
+
+        // Statments 
+        LoxObject visit(PrintStmt<ExprType, StmtVisitType>& stmt) final;
+        LoxObject visit(ExpressionStmt<ExprType, StmtVisitType>& stmt) final;
+
 
     public:
         Interpreter() {} 
-        std::string interpret(const std::unique_ptr<Expr<E, T>>& expression);
+        void interpret(const std::vector<std::unique_ptr<Stmt<ExprType, StmtVisitType>>>& statements);
+        //std::string interpret(const std::unique_ptr<Expr<ExprType, VisitType>>& expression);
 };
 
 

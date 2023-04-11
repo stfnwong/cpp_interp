@@ -26,7 +26,8 @@ struct ParseError : public std::exception
 };
 
 
-using T = std::string;
+//using T = std::string;
+using T = LoxObject;
 using E = LoxObject;
 
 

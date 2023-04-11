@@ -3,7 +3,7 @@
 
 
 for t in bin/test/*; do
-    ./$t || rc=$?
+    echo $t && ./$t || rc=$?
     if [[ rc -ne 0 ]] ; then
         exit $rc
     fi

@@ -23,9 +23,6 @@ TEST_CASE("test_parse_empty_input", "parser")
 
 TEST_CASE("test_parse_binary_expr", "parser")
 {
-    using T = std::string;
-    using E = LoxObject;
-
     // expression is "2 + 2"
     std::vector<Token> test_tokens = {
         Token(TokenType::NUMBER, "2", 1, 2.0f),

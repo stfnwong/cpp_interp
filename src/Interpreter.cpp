@@ -3,7 +3,9 @@
  */
 
 
+#include <iostream>
 #include "Interpreter.hpp"
+
 
 static bool had_runtime_error = false;
 
@@ -57,25 +59,29 @@ void Interpreter::check_number_operands(const Token& otor, const LoxObject& o1, 
     throw RuntimeError(otor, "Both operands must be numbers");
 }
 
-// TODO: this has to be a pointer...
-LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<E, T>>& expr)
+LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<ExprType, VisitType>>& expr)
 {
     return expr->accept(*this);
 }
 
+void Interpreter::execute(const std::unique_ptr<Stmt<ExprType, VisitType>>& stmt)
+{
+    stmt->accept(*this);
+}
+
 
 // ======== EXPRESSION VISITOR FUNCTIONS ======== //
-LoxObject Interpreter::visit(LiteralExpr<E, T>& expr)
+LoxObject Interpreter::visit(LiteralExpr<ExprType, VisitType>& expr)
 {
     return expr.value;
 }
 
-LoxObject Interpreter::visit(GroupingExpr<E, T>& expr)
+LoxObject Interpreter::visit(GroupingExpr<ExprType, VisitType>& expr)
 {
     return this->evaluate(expr.left);
 }
 
-LoxObject Interpreter::visit(UnaryExpr<E, T>& expr)
+LoxObject Interpreter::visit(UnaryExpr<ExprType, VisitType>& expr)
 {
     LoxObject right = this->evaluate(expr.right);
 
@@ -93,14 +99,14 @@ LoxObject Interpreter::visit(UnaryExpr<E, T>& expr)
     return LoxObject();     // unreachable - TODO: should we throw an error here?
 }
 
-LoxObject Interpreter::visit(BinaryExpr<E, T>& expr)
+LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
 {
     LoxObject left = this->evaluate(expr.left);
     LoxObject right = this->evaluate(expr.right);
 
     switch(expr.op.type)
     {
-        // Arithmetic operators 
+        // Arithmetic operators
         case TokenType::MINUS:
             this->check_number_operands(expr.op, left, right);
             return LoxObject(left.get_float_val() - right.get_float_val());
@@ -113,7 +119,7 @@ LoxObject Interpreter::visit(BinaryExpr<E, T>& expr)
             this->check_number_operands(expr.op, left, right);
             return LoxObject(left.get_float_val() * right.get_float_val());
 
-        // Lox allows string concat with '+' operator 
+        // Lox allows string concat with '+' operator
         case TokenType::PLUS:
             this->check_number_operands(expr.op, left, right);
             if(left.has_string_type() && right.has_string_type())
@@ -149,17 +155,47 @@ LoxObject Interpreter::visit(BinaryExpr<E, T>& expr)
     return LoxObject();     // TODO: unreachable, throw error?
 }
 
+// ======== STATEMENT VISITOR FUNCTIONS ======== //
+LoxObject Interpreter::visit(PrintStmt<ExprType, StmtVisitType>& stmt)
+{
+    LoxObject value = this->evaluate(stmt.expr);
+    std::cout << value.to_string() << std::endl;
+
+    // NOTE: one downside of this architecture is that I now have to return this 
+    // bogus value.
+    return LoxObject();
+}
+
+LoxObject Interpreter::visit(ExpressionStmt<ExprType, StmtVisitType>& stmt)
+{
+    // TODO: don't print here (since this isn't a print statement)
+    std::cout << this->evaluate(stmt.expr).to_string() << std::endl;
+    return LoxObject();
+}
+
 
 // ======== PUBLIC FUNCTIONS ======== //
-std::string Interpreter::interpret(const std::unique_ptr<Expr<E, T>>& expr)
+void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<ExprType, StmtVisitType>>>& statements)
 {
     try {
-        LoxObject value = this->evaluate(expr);
-        return value.to_string();
+        for(unsigned i = 0; i < statements.size(); ++i)
+            this->execute(statements[i]);
     }
     catch(RuntimeError& e) {
         runtime_error(e);
     }
-
-    return "FAILED";  // unreachable, but shuts linter up
 }
+
+
+//std::string Interpreter::interpret(const std::unique_ptr<Expr<ExprType, VisitType>>& expr)
+//{
+//    try {
+//        LoxObject value = this->evaluate(expr);
+//        return value.to_string();
+//    }
+//    catch(RuntimeError& e) {
+//        runtime_error(e);
+//    }
+//
+//    return "FAILED";  // unreachable, but shuts linter up
+//}
