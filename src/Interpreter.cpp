@@ -61,6 +61,7 @@ void Interpreter::check_number_operands(const Token& otor, const LoxObject& o1, 
 
 LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<ExprType, VisitType>>& expr)
 {
+    std::cout << "[" << __func__ << "] evaluating <" << typeid(expr).name() << "> " << expr->to_string() << std::endl;
     return expr->accept(*this);
 }
 
@@ -169,8 +170,11 @@ LoxObject Interpreter::visit(PrintStmt<ExprType, StmtVisitType>& stmt)
 LoxObject Interpreter::visit(ExpressionStmt<ExprType, StmtVisitType>& stmt)
 {
     // TODO: don't print here (since this isn't a print statement)
-    std::cout << this->evaluate(stmt.expr).to_string() << std::endl;
-    return LoxObject();
+    LoxObject value =  this->evaluate(stmt.expr);
+    std::cout << value.to_string() << std::endl;
+    
+    //std::cout << this->evaluate(stmt.expr).to_string() << std::endl;
+    return value;
 }
 
 

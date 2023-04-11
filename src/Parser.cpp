@@ -3,8 +3,9 @@
  * A recursive descent parser
  */
 
-#include <iostream>
+#include <iostream>    // TODO: debug only, remove
 
+#include "Lox.hpp"
 #include "Parser.hpp"
 
 bool Parser::at_end(void) const
@@ -112,8 +113,10 @@ std::unique_ptr<Expr<ExprType, VisitType>> Parser::primary(void)
         return std::make_unique<GroupingExpr<ExprType, VisitType>>(std::move(expr));
     }
 
+    Lox::error(this->peek(), "Expected expression");
     throw ParseError(this->peek(), "Expected expression");
 }
+
 
 std::unique_ptr<Expr<ExprType, VisitType>> Parser::unary(void)
 {
@@ -211,6 +214,7 @@ std::unique_ptr<Stmt<ExprType, VisitType>> Parser::statement(void)
 std::unique_ptr<Stmt<ExprType, VisitType>> Parser::print_statement(void)
 {
     auto value = this->expression();
+    std::cout << "[" << __func__ << "] expr return: <" << typeid(value.get()).name() << "> " << value->to_string() << std::endl;
     this->consume(TokenType::SEMICOLON, "Expect ';' after value");
     return std::make_unique<PrintStmt<ExprType, VisitType>>(std::move(value));
 }
@@ -229,15 +233,22 @@ std::vector<std::unique_ptr<Stmt<ExprType, VisitType>>> Parser::parse(void)
     using StmtPtr = std::unique_ptr<Stmt<ExprType, VisitType>>;
     std::vector<StmtPtr> statements; 
 
-    if(this->tokens.size() > 0)
+    try 
     {
-        while(!this->at_end())
-            statements.push_back(std::move(this->statement()));
-            //statements.push_back(this->statement());
+        if(this->tokens.size() > 0)
+        {
+            while(!this->at_end())
+                statements.push_back(std::move(this->statement()));
+                //statements.push_back(this->statement());
+        }
+        else
+            throw ParseError(Token(), "Got 0 input tokens");
     }
-    else
-        throw ParseError(Token(), "Got 0 input tokens");
-    
+    catch(ParseError& error)
+    {
+        this->synchronise();
+    }
+
     return statements;
 }
 

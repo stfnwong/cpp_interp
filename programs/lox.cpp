@@ -15,19 +15,28 @@
 #include "Scanner.hpp"
 #include "Parser.hpp"
 #include "Interpreter.hpp"
-;
+#include "Lox.hpp"
+
 
 static const std::string VERSION_STRING = "deez nuts";
+static bool had_error = false;
 
 
 void run(const std::string& source)
 {
     Scanner scanner(source);
-    Parser parser(scanner.scan());
+    auto scanned_tokens = scanner.scan();
+    for(const auto& tok : scanned_tokens)
+        std::cout << tok.to_repr() << std::endl;
+    Parser parser(scanned_tokens);
 
     const auto statements = parser.parse();
+    std::cout << "[" << __func__ << "] statments : " << std::endl;
+    for(const auto& statement : statements)
+        std::cout << statement->to_string() << std::endl;
 
-    // TODO: check static error here...
+    if(Lox::had_error)
+        return;
 
     Interpreter interp;
     interp.interpret(statements);
@@ -52,7 +61,11 @@ void run_file(const std::string& filename)
         source += line + "\n";
 
     run(source);
-    // TODO: handle errors
+
+    if(Lox::had_error)
+        exit(2);
+    if(Lox::had_runtime_error)
+        exit(3);
 }
 
 
@@ -68,7 +81,7 @@ void run_prompt(void)
         if(std::getline(std::cin, code))
         {
             run(code);
-            // reset error here
+            Lox::had_error = false;  // why do I have to do this?
         }
         else
         {

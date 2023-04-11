@@ -104,18 +104,18 @@ std::string Token::to_string(void) const
     return this->lexeme;
 }
 
-//std::string Token::to_string(void) const
-//{
-//    std::ostringstream oss;
-//
-//    // TODO: move make_literal_string inside class?
-//    oss << token_to_str[this->type] << " \"" << this->lexeme << "\"";
-//    if(this->literal.has_value())
-//    {
-//        oss << " " << std::visit(make_literal_string(), this->literal.value()) << " ";
-//    }
-//    oss << " line: " << this->line << " ";
-//
-//    return oss.str();
-//}
-//
+std::string Token::to_repr(void) const
+{
+    std::ostringstream oss;
+
+    // TODO: move make_literal_string inside class?
+    oss << "Token<" << token_to_str[this->type] << "> \"" << this->lexeme << "\"";
+    if(this->literal.has_value())
+    {
+        oss << " " << std::visit(make_literal_string(), this->literal.value()) << " ";
+    }
+    oss << " line: " << this->line << " ";
+
+    return oss.str();
+}
+
