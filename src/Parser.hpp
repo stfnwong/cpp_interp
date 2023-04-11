@@ -11,6 +11,7 @@
 #include <exception>
 #include <vector>
 
+#include "Common.hpp"
 #include "Expr.hpp"
 #include "Statement.hpp"
 #include "Token.hpp"
@@ -48,23 +49,23 @@ class Parser
         void synchronise(void);
 
         // Expressions
-        std::unique_ptr<Expr<E, T>> primary(void);            // literals, etc
-        std::unique_ptr<Expr<E, T>> unary(void);
-        std::unique_ptr<Expr<E, T>> factor(void);  // multiplication, division
-        std::unique_ptr<Expr<E, T>> term(void);    // addition, subtraction
-        std::unique_ptr<Expr<E, T>> equality(void);
-        std::unique_ptr<Expr<E, T>> comparison(void);
-        std::unique_ptr<Expr<E, T>> expression(void);
+        std::unique_ptr<Expr<ExprType, VisitType>> primary(void);            // literals, etc
+        std::unique_ptr<Expr<ExprType, VisitType>> unary(void);
+        std::unique_ptr<Expr<ExprType, VisitType>> factor(void);  // multiplication, division
+        std::unique_ptr<Expr<ExprType, VisitType>> term(void);    // addition, subtraction
+        std::unique_ptr<Expr<ExprType, VisitType>> equality(void);
+        std::unique_ptr<Expr<ExprType, VisitType>> comparison(void);
+        std::unique_ptr<Expr<ExprType, VisitType>> expression(void);
 
         // Statements 
-        std::unique_ptr<Stmt<E, T>> statement(void);
-        std::unique_ptr<Stmt<E, T>> print_statement(void);
-        std::unique_ptr<Stmt<E, T>> expression_statement(void);
+        std::unique_ptr<Stmt<ExprType, VisitType>> statement(void);
+        std::unique_ptr<Stmt<ExprType, VisitType>> print_statement(void);
+        std::unique_ptr<Stmt<ExprType, VisitType>> expression_statement(void);
 
     public:
         Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
-        std::vector<std::unique_ptr<Stmt<E, T>>> parse(void);
-        //std::unique_ptr<Expr<E, T>> parse(void);
+        std::vector<std::unique_ptr<Stmt<ExprType, VisitType>>> parse(void);
+        //std::unique_ptr<Expr<ExprType, VisitType>> parse(void);
         unsigned num_tokens(void) const;
 };
 

@@ -94,40 +94,40 @@ void Parser::synchronise(void)
 
 
 // ======== GRAMMAR RULES ======== //
-std::unique_ptr<Expr<E, T>> Parser::primary(void)
+std::unique_ptr<Expr<ExprType, VisitType>> Parser::primary(void)
 {
     //if(this->match({TokenType::FALSE}))
-    //    return std::make_unique<LiteralExpr<E, T>>(this->peek());
+    //    return std::make_unique<LiteralExpr<ExprType, VisitType>>(this->peek());
 
     if(this->match({TokenType::TRUE, TokenType::FALSE, TokenType::NIL}))
-        return std::make_unique<LiteralExpr<E, T>>(this->previous());
+        return std::make_unique<LiteralExpr<ExprType, VisitType>>(this->previous());
 
     if(this->match({TokenType::STRING, TokenType::NUMBER}))
-        return std::make_unique<LiteralExpr<E, T>>(this->previous());
+        return std::make_unique<LiteralExpr<ExprType, VisitType>>(this->previous());
 
     if(this->match({TokenType::LEFT_PAREN}))
     {
         auto expr = this->expression();
         this->consume(TokenType::RIGHT_PAREN, "Expected ')' after expression");
-        return std::make_unique<GroupingExpr<E, T>>(std::move(expr));
+        return std::make_unique<GroupingExpr<ExprType, VisitType>>(std::move(expr));
     }
 
     throw ParseError(this->peek(), "Expected expression");
 }
 
-std::unique_ptr<Expr<E, T>> Parser::unary(void)
+std::unique_ptr<Expr<ExprType, VisitType>> Parser::unary(void)
 {
     if(this->match({TokenType::BANG, TokenType::MINUS}))
     {
         Token op = this->previous();
         auto right = this->unary();
-        return std::make_unique<UnaryExpr<E, T>>(std::move(right), op);
+        return std::make_unique<UnaryExpr<ExprType, VisitType>>(std::move(right), op);
     }
 
     return this->primary();
 }
 
-std::unique_ptr<Expr<E, T>> Parser::factor(void)
+std::unique_ptr<Expr<ExprType, VisitType>> Parser::factor(void)
 {
     auto expr = this->unary();
 
@@ -135,7 +135,7 @@ std::unique_ptr<Expr<E, T>> Parser::factor(void)
     {
         Token op = this->previous();
         auto right = this->unary();
-        expr = std::make_unique<BinaryExpr<E, T>>(
+        expr = std::make_unique<BinaryExpr<ExprType, VisitType>>(
                 std::move(expr), std::move(right), op
         );
     }
@@ -143,15 +143,15 @@ std::unique_ptr<Expr<E, T>> Parser::factor(void)
     return expr;
 }
 
-std::unique_ptr<Expr<E, T>> Parser::term(void)
+std::unique_ptr<Expr<ExprType, VisitType>> Parser::term(void)
 {
     auto expr = this->factor();
     
     while(this->match({TokenType::MINUS, TokenType::PLUS}))
     {
         Token op = this->previous();
-        std::unique_ptr<Expr<E, T>> right = this->factor();
-        expr = std::make_unique<BinaryExpr<E, T>>(
+        std::unique_ptr<Expr<ExprType, VisitType>> right = this->factor();
+        expr = std::make_unique<BinaryExpr<ExprType, VisitType>>(
                 std::move(expr), std::move(right), op
         );
     }
@@ -159,7 +159,7 @@ std::unique_ptr<Expr<E, T>> Parser::term(void)
     return expr;
 }
 
-std::unique_ptr<Expr<E, T>> Parser::comparison(void)
+std::unique_ptr<Expr<ExprType, VisitType>> Parser::comparison(void)
 {
     auto expr = this->term();
 
@@ -171,7 +171,7 @@ std::unique_ptr<Expr<E, T>> Parser::comparison(void)
     {
         Token op = this->previous();
         auto right = this->term();
-        expr = std::make_unique<BinaryExpr<E, T>>(
+        expr = std::make_unique<BinaryExpr<ExprType, VisitType>>(
                 std::move(expr), std::move(right), op
         );
     }
@@ -179,7 +179,7 @@ std::unique_ptr<Expr<E, T>> Parser::comparison(void)
     return expr;
 }
 
-std::unique_ptr<Expr<E, T>> Parser::equality(void) 
+std::unique_ptr<Expr<ExprType, VisitType>> Parser::equality(void) 
 {
     auto expr = this->comparison();
 
@@ -187,19 +187,19 @@ std::unique_ptr<Expr<E, T>> Parser::equality(void)
     {
         Token op = this->previous();
         auto right = this->comparison();
-        expr = std::make_unique<BinaryExpr<E, T>>(std::move(expr), std::move(right), op);
+        expr = std::make_unique<BinaryExpr<ExprType, VisitType>>(std::move(expr), std::move(right), op);
     }
 
     return expr;
 }
 
-std::unique_ptr<Expr<E, T>> Parser::expression(void)
+std::unique_ptr<Expr<ExprType, VisitType>> Parser::expression(void)
 {
     return this->equality();
 }
 
 // ======== STATEMENT  FUNCTIONS ======== //
-std::unique_ptr<Stmt<E, T>> Parser::statement(void)
+std::unique_ptr<Stmt<ExprType, VisitType>> Parser::statement(void)
 {
     if(this->match({TokenType::PRINT}))
         return this->print_statement();
@@ -208,25 +208,25 @@ std::unique_ptr<Stmt<E, T>> Parser::statement(void)
 }
 
 
-std::unique_ptr<Stmt<E, T>> Parser::print_statement(void)
+std::unique_ptr<Stmt<ExprType, VisitType>> Parser::print_statement(void)
 {
     auto value = this->expression();
     this->consume(TokenType::SEMICOLON, "Expect ';' after value");
-    return std::make_unique<PrintStmt<E, T>>(std::move(value));
+    return std::make_unique<PrintStmt<ExprType, VisitType>>(std::move(value));
 }
 
-std::unique_ptr<Stmt<E, T>> Parser::expression_statement(void)
+std::unique_ptr<Stmt<ExprType, VisitType>> Parser::expression_statement(void)
 {
     auto value = this->expression();
     this->consume(TokenType::SEMICOLON, "Expect ';' after expression");
-    return std::make_unique<ExpressionStmt<E, T>>(std::move(value));
+    return std::make_unique<ExpressionStmt<ExprType, VisitType>>(std::move(value));
 }
 
 
 // ======== PUBLIC  FUNCTIONS ======== //
-std::vector<std::unique_ptr<Stmt<E, T>>> Parser::parse(void)
+std::vector<std::unique_ptr<Stmt<ExprType, VisitType>>> Parser::parse(void)
 {
-    using StmtPtr = std::unique_ptr<Stmt<E, T>>;
+    using StmtPtr = std::unique_ptr<Stmt<ExprType, VisitType>>;
     std::vector<StmtPtr> statements; 
 
     if(this->tokens.size() > 0)

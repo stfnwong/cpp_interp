@@ -7,6 +7,7 @@
 
 #include <iostream>   // TODO: move all the error stuff to Error.hpp
 
+#include "Common.hpp"
 #include "Expr.hpp"
 #include "Object.hpp"
 #include "Statement.hpp"
@@ -27,11 +28,6 @@ struct RuntimeError : public std::exception
         }
 };
 
-
-using ExprType = LoxObject;
-//using VisitType = std::string;
-using VisitType = LoxObject;
-using StmtVisitType = LoxObject;
 
 
 class Interpreter : public ExprVisitor<ExprType, VisitType>, public StmtVisitor<ExprType, StmtVisitType>
