@@ -7,3 +7,6 @@
 
 # Ignore langserver cache
 .ccls-cache/
+
+# Ignore the interpreter binary
+lox
