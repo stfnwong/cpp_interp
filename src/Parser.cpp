@@ -95,6 +95,7 @@ void Parser::synchronise(void)
 
 
 // ======== GRAMMAR RULES ======== //
+
 std::unique_ptr<Expr<ExprType, VisitType>> Parser::primary(void)
 {
     //if(this->match({TokenType::FALSE}))
@@ -105,6 +106,9 @@ std::unique_ptr<Expr<ExprType, VisitType>> Parser::primary(void)
 
     if(this->match({TokenType::STRING, TokenType::NUMBER}))
         return std::make_unique<LiteralExpr<ExprType, VisitType>>(this->previous());
+
+    if(this->match({TokenType::IDENTIFIER}))
+        return std::make_unique<VariableExpr<ExprType, VisitType>>(this->previous());
 
     if(this->match({TokenType::LEFT_PAREN}))
     {
@@ -202,6 +206,35 @@ std::unique_ptr<Expr<ExprType, VisitType>> Parser::expression(void)
 }
 
 // ======== STATEMENT  FUNCTIONS ======== //
+std::unique_ptr<Stmt<ExprType, VisitType>> Parser::declaration(void)
+{
+    try {
+        if(this->match({TokenType::VAR}))
+            return this->var_declaration();
+
+        return this->statement();
+    }
+    catch(ParseError& e)
+    {
+        this->synchronise();
+        return nullptr;
+    }
+}
+
+
+std::unique_ptr<Stmt<ExprType, VisitType>> Parser::var_declaration(void)
+{
+    Token name = this->consume(TokenType::IDENTIFIER, "Expect variable name");
+
+    std::unique_ptr<Expr<ExprType, VisitType>> initialiser = nullptr;
+    if(this->match({TokenType::EQUAL}))
+        initialiser = this->expression();
+
+    this->consume(TokenType::SEMICOLON, "Expect ';' adter variable declaration");
+
+    return std::make_unique<VariableStmt<ExprType, VisitType>>(name, std::move(initialiser));
+}
+
 std::unique_ptr<Stmt<ExprType, VisitType>> Parser::statement(void)
 {
     if(this->match({TokenType::PRINT}))

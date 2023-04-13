@@ -46,10 +46,13 @@ class Interpreter : public ExprVisitor<ExprType, VisitType>, public StmtVisitor<
         LoxObject visit(GroupingExpr<ExprType, VisitType>& expr) final;
         LoxObject visit(UnaryExpr<ExprType, VisitType>& expr) final;
         LoxObject visit(BinaryExpr<ExprType, VisitType>& expr) final;
+        LoxObject visit(VariableExpr<ExprType, VisitType>& expr) final;
+
 
         // Statments 
         LoxObject visit(PrintStmt<ExprType, StmtVisitType>& stmt) final;
         LoxObject visit(ExpressionStmt<ExprType, StmtVisitType>& stmt) final;
+        LoxObject visit(VariableStmt<ExprType, StmtVisitType>& stmt) final;
 
 
     public:

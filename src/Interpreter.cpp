@@ -156,6 +156,13 @@ LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
     return LoxObject();     // TODO: unreachable, throw error?
 }
 
+
+LoxObject Interpreter::visit(VariableExpr<ExprType, VisitType>& expr)
+{
+    return LoxObject();     // TODO: need to define environment
+}
+
+
 // ======== STATEMENT VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(PrintStmt<ExprType, StmtVisitType>& stmt)
 {
@@ -177,6 +184,14 @@ LoxObject Interpreter::visit(ExpressionStmt<ExprType, StmtVisitType>& stmt)
     return value;
 }
 
+LoxObject Interpreter::visit(VariableStmt<ExprType, StmtVisitType>& stmt)
+{
+    LoxObject value;
+    if(stmt.get_expr())
+        value = this->evaluate(stmt.expr);
+
+    return value;       // bogus return...
+}
 
 // ======== PUBLIC FUNCTIONS ======== //
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<ExprType, StmtVisitType>>>& statements)

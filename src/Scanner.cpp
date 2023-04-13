@@ -9,7 +9,7 @@
 #include <cctype>
 #include <iostream>
 
-#include "Error.hpp"
+#include "Lox.hpp"
 #include "Scanner.hpp"
 
 
@@ -165,7 +165,7 @@ void Scanner::scan_token(void)
             else if(this->is_alphanum(c))
                 this->identifier();
             else
-                Error(this->line, "Unknown token"); // TODO: format a string here
+                Lox::error(this->line, "Unknown token"); // TODO: format a string here
             break;
     }
 }
@@ -186,7 +186,7 @@ void Scanner::string_literal(void)
 
     if(this->at_end())
     {
-        Error(this->line, "unterminated string");
+        Lox::error(this->line, "unterminated string");
         return;
     }
 

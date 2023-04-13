@@ -27,10 +27,6 @@ struct ParseError : public std::exception
 };
 
 
-//using T = std::string;
-using T = LoxObject;
-using E = LoxObject;
-
 
 class Parser
 {
@@ -58,6 +54,8 @@ class Parser
         std::unique_ptr<Expr<ExprType, VisitType>> expression(void);
 
         // Statements 
+        std::unique_ptr<Stmt<ExprType, VisitType>> declaration(void);            // literals, etc
+        std::unique_ptr<Stmt<ExprType, VisitType>> var_declaration(void);            // literals, etc
         std::unique_ptr<Stmt<ExprType, VisitType>> statement(void);
         std::unique_ptr<Stmt<ExprType, VisitType>> print_statement(void);
         std::unique_ptr<Stmt<ExprType, VisitType>> expression_statement(void);

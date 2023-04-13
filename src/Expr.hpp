@@ -18,6 +18,7 @@ template <typename E, typename T> struct BinaryExpr;
 template <typename E, typename T> struct GroupingExpr;
 template <typename E, typename T> struct LiteralExpr;
 template <typename E, typename T> struct UnaryExpr;
+template <typename E, typename T> struct VariableExpr;
 
 
 // Visitor object 
@@ -28,6 +29,7 @@ template <typename E, typename T> struct ExprVisitor
         virtual T visit(UnaryExpr<E, T>& expr) = 0;
         virtual T visit(BinaryExpr<E, T>& expr) = 0;
         virtual T visit(GroupingExpr<E, T>& expr) = 0;
+        virtual T visit(VariableExpr<E, T>& expr) = 0;
 };
 
 
@@ -193,6 +195,37 @@ template <typename E, typename T> struct GroupingExpr : public Expr<E, T>
 };
 
 
+template <typename E, typename T> struct VariableExpr : public Expr<E, T>
+{
+    //std::unique_ptr<Expr<E, T>> left;
+    Token token;
+
+    public:
+        VariableExpr(const Token& tok) : token(tok) {}
+        ~VariableExpr() {} 
+
+        bool operator==(const VariableExpr<E, T>& that) const {
+            return this->left.get() == that.left.get();
+        }
+
+        bool operator!=(const VariableExpr<E, T>& that) const {
+            return !(*this == that);
+        }
+
+        T accept(ExprVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        std::string to_string(void) const final
+        {
+            std::ostringstream oss;
+            oss << "VariableExpr<" << this->token.to_string() << ">";
+            return oss.str();
+        }
+};
+
+
+
 /*
  * ASTPrinter
  */
@@ -251,6 +284,14 @@ struct ASTPrinter : public ExprVisitor<LoxObject, std::string>
         {
             std::ostringstream oss;
             oss << "(" << expr.left->accept(*this) << ")";
+            return oss.str();
+        }
+
+        std::string visit(VariableExpr<E, T>& expr) final
+        {
+            std::ostringstream oss;
+            oss << "(var " << expr.token.to_string() << ")";
+            //oss << "(var " << expr.left->accept(*this) << ")";
             return oss.str();
         }
 };
