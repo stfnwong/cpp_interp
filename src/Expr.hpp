@@ -70,10 +70,15 @@ template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
 
         std::string to_string(void) const final
         {
-            if(this->value.has_type())
-                return this->value.to_string();
-            
-            return "nil";
+            std::ostringstream oss;
+            oss << "LiteralExpr<" << this->value.to_repr() << ">";
+            //oss << "LiteralExpr<" << this->value.to_string() << ">";
+            return oss.str();
+
+            //if(this->value.has_type())
+            //    return this->value.to_string();
+            //
+            //return "nil";
         }
 };
 

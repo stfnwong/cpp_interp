@@ -74,16 +74,22 @@ void Interpreter::execute(const std::unique_ptr<Stmt<ExprType, VisitType>>& stmt
 // ======== EXPRESSION VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(LiteralExpr<ExprType, VisitType>& expr)
 {
+    std::cout << "[" << __func__ << "] visiting " << 
+        typeid(expr).name() << ": " << expr.to_string() << std::endl;
     return expr.value;
 }
 
 LoxObject Interpreter::visit(GroupingExpr<ExprType, VisitType>& expr)
 {
+    std::cout << "[" << __func__ << "] visiting " << 
+        typeid(expr).name() << ": " << expr.to_string() << std::endl;
     return this->evaluate(expr.left);
 }
 
 LoxObject Interpreter::visit(UnaryExpr<ExprType, VisitType>& expr)
 {
+    std::cout << "[" << __func__ << "] visiting " << 
+        typeid(expr).name() << ": " << expr.to_string() << std::endl;
     LoxObject right = this->evaluate(expr.right);
 
     switch(expr.op.type)
@@ -102,6 +108,7 @@ LoxObject Interpreter::visit(UnaryExpr<ExprType, VisitType>& expr)
 
 LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
 {
+    std::cout << "[" << __func__ << "] visiting " << expr.to_string() << std::endl;
     LoxObject left = this->evaluate(expr.left);
     LoxObject right = this->evaluate(expr.right);
 
@@ -190,6 +197,8 @@ LoxObject Interpreter::visit(VariableStmt<ExprType, StmtVisitType>& stmt)
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
 
+    this->env.define(stmt.token.lexeme, value);
+
     return value;       // bogus return...
 }
 
@@ -204,17 +213,3 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<ExprType, Stm
         runtime_error(e);
     }
 }
-
-
-//std::string Interpreter::interpret(const std::unique_ptr<Expr<ExprType, VisitType>>& expr)
-//{
-//    try {
-//        LoxObject value = this->evaluate(expr);
-//        return value.to_string();
-//    }
-//    catch(RuntimeError& e) {
-//        runtime_error(e);
-//    }
-//
-//    return "FAILED";  // unreachable, but shuts linter up
-//}

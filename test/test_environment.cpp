@@ -21,8 +21,11 @@ TEST_CASE("test_add_variable", "environment")
     env.define("some_var", var);
 
     // Get an object that exists
-    LoxObject out_obj = env.get(Token(TokenType::STRING, "some_var"));
+    LoxObject out_obj = env.get(Token(TokenType::IDENTIFIER, "some_var"));
 
     REQUIRE(out_obj.has_type() == true);
+
+    // Try to get an undefined variable 
+    REQUIRE_THROWS(env.get(Token(TokenType::IDENTIFIER, "no_such_var")));
 }
 

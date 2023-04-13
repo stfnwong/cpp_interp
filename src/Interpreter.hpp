@@ -8,6 +8,7 @@
 #include <iostream>   // TODO: move all the error stuff to Error.hpp
 
 #include "Common.hpp"
+#include "Environment.hpp"
 #include "Error.hpp"
 #include "Expr.hpp"
 #include "Object.hpp"
@@ -18,6 +19,8 @@
 class Interpreter : public ExprVisitor<ExprType, VisitType>, public StmtVisitor<ExprType, StmtVisitType>
 {
     private:
+        Environment env;
+
         bool is_truthy(const LoxObject& obj) const;
         bool is_equal(const LoxObject& a, const LoxObject& b) const;
         void check_number_operand(const Token& otor, const LoxObject& orand);
@@ -43,7 +46,6 @@ class Interpreter : public ExprVisitor<ExprType, VisitType>, public StmtVisitor<
     public:
         Interpreter() {} 
         void interpret(const std::vector<std::unique_ptr<Stmt<ExprType, StmtVisitType>>>& statements);
-        //std::string interpret(const std::unique_ptr<Expr<ExprType, VisitType>>& expression);
 };
 
 

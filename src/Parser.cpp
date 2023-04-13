@@ -107,7 +107,11 @@ std::unique_ptr<Expr<ExprType, VisitType>> Parser::primary(void)
         return std::make_unique<LiteralExpr<ExprType, VisitType>>(this->previous());
 
     if(this->match({TokenType::STRING, TokenType::NUMBER}))
-        return std::make_unique<LiteralExpr<ExprType, VisitType>>(this->previous());
+    {
+        Token prev = this->previous();
+        auto ret = std::make_unique<LiteralExpr<ExprType, VisitType>>(prev);
+        return ret;
+    }
 
     if(this->match({TokenType::IDENTIFIER}))
         return std::make_unique<VariableExpr<ExprType, VisitType>>(this->previous());
@@ -249,7 +253,7 @@ std::unique_ptr<Stmt<ExprType, VisitType>> Parser::statement(void)
 std::unique_ptr<Stmt<ExprType, VisitType>> Parser::print_statement(void)
 {
     auto value = this->expression();
-    std::cout << "[" << __func__ << "] expr return: <" << typeid(value.get()).name() << "> " << value->to_string() << std::endl;
+    std::cout << "[" << __func__ << "] expr return: <" << typeid(value.get()).name() << "> (" << value->to_string() << ")" << std::endl;
     this->consume(TokenType::SEMICOLON, "Expect ';' after value");
     return std::make_unique<PrintStmt<ExprType, VisitType>>(std::move(value));
 }

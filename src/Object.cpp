@@ -25,7 +25,10 @@ LoxObject::LoxObject(const Token& token) : token(token)
 
         case TokenType::STRING:
         case TokenType::IDENTIFIER:
-            this->value = token.get_string_literal();
+            if(token.has_literal())
+                this->value = token.get_string_literal();
+            else
+                this->value = token.lexeme;
             break;
 
         default:
@@ -120,10 +123,14 @@ std::string LoxObject::to_string(void) const
 std::string LoxObject::to_repr(void) const
 {
     std::ostringstream oss;
-    if(this->value.has_value())
-        oss << "LoxObject<" << std::visit(get_value_string(), this->value.value()) << ">";
+    if(this->has_string_type())
+        oss << "LoxObject<\"" << this->token.to_string() << "\">";
     else
-        oss << "LoxObject<Null>";
+        oss << "LoxObject<" << this->token.to_string() << ">";
+    //if(this->value.has_value())
+    //    oss << "LoxObject<" << std::visit(get_value_string(), this->value.value()) << ">";
+    //else
+    //    oss << "LoxObject<Null>";
 
     return oss.str();
 }
