@@ -59,34 +59,34 @@ void Interpreter::check_number_operands(const Token& otor, const LoxObject& o1, 
     throw RuntimeError(otor, "Both operands must be numbers");
 }
 
-LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<ExprType, VisitType>>& expr)
+LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
 {
     std::cout << "[" << __func__ << "] evaluating <" << typeid(expr).name() << "> " << expr->to_string() << std::endl;
     return expr->accept(*this);
 }
 
-void Interpreter::execute(const std::unique_ptr<Stmt<ExprType, VisitType>>& stmt)
+void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
 {
     stmt->accept(*this);
 }
 
 
 // ======== EXPRESSION VISITOR FUNCTIONS ======== //
-LoxObject Interpreter::visit(LiteralExpr<ExprType, VisitType>& expr)
+LoxObject Interpreter::visit(LiteralExpr<EType, VType>& expr)
 {
     std::cout << "[" << __func__ << "] visiting " << 
         typeid(expr).name() << ": " << expr.to_string() << std::endl;
     return expr.value;
 }
 
-LoxObject Interpreter::visit(GroupingExpr<ExprType, VisitType>& expr)
+LoxObject Interpreter::visit(GroupingExpr<EType, VType>& expr)
 {
     std::cout << "[" << __func__ << "] visiting " << 
         typeid(expr).name() << ": " << expr.to_string() << std::endl;
     return this->evaluate(expr.left);
 }
 
-LoxObject Interpreter::visit(UnaryExpr<ExprType, VisitType>& expr)
+LoxObject Interpreter::visit(UnaryExpr<EType, VType>& expr)
 {
     std::cout << "[" << __func__ << "] visiting " << 
         typeid(expr).name() << ": " << expr.to_string() << std::endl;
@@ -106,7 +106,7 @@ LoxObject Interpreter::visit(UnaryExpr<ExprType, VisitType>& expr)
     return LoxObject();     // unreachable - TODO: should we throw an error here?
 }
 
-LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
+LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 {
     std::cout << "[" << __func__ << "] visiting " << expr.to_string() << std::endl;
     LoxObject left = this->evaluate(expr.left);
@@ -164,14 +164,21 @@ LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
 }
 
 
-LoxObject Interpreter::visit(VariableExpr<ExprType, VisitType>& expr)
+LoxObject Interpreter::visit(VariableExpr<EType, VType>& expr)
 {
-    return LoxObject();     // TODO: need to define environment
+    std::cout << "[" << __func__ << "] checking env for " << expr.token.to_string() << std::endl;
+    return this->env.get(expr.token);
 }
 
+LoxObject Interpreter::visit(AssignmentExpr<EType, VType>& expr)
+{
+    LoxObject value = this->evaluate(expr.expr);
+    this->env.assign(expr.token, value);
+    return value;
+}
 
 // ======== STATEMENT VISITOR FUNCTIONS ======== //
-LoxObject Interpreter::visit(PrintStmt<ExprType, StmtVisitType>& stmt)
+LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {
     LoxObject value = this->evaluate(stmt.expr);
     std::cout << value.to_string() << std::endl;
@@ -181,7 +188,7 @@ LoxObject Interpreter::visit(PrintStmt<ExprType, StmtVisitType>& stmt)
     return LoxObject();
 }
 
-LoxObject Interpreter::visit(ExpressionStmt<ExprType, StmtVisitType>& stmt)
+LoxObject Interpreter::visit(ExpressionStmt<EType, StmtVType>& stmt)
 {
     // TODO: don't print here (since this isn't a print statement)
     LoxObject value =  this->evaluate(stmt.expr);
@@ -191,19 +198,20 @@ LoxObject Interpreter::visit(ExpressionStmt<ExprType, StmtVisitType>& stmt)
     return value;
 }
 
-LoxObject Interpreter::visit(VariableStmt<ExprType, StmtVisitType>& stmt)
+LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
 {
     LoxObject value;
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
 
+    std::cout << "[" << __func__ << "] VariableStmt has value " << value.to_repr() << std::endl;
     this->env.define(stmt.token.lexeme, value);
 
     return value;       // bogus return...
 }
 
 // ======== PUBLIC FUNCTIONS ======== //
-void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<ExprType, StmtVisitType>>>& statements)
+void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVType>>>& statements)
 {
     try {
         for(unsigned i = 0; i < statements.size(); ++i)

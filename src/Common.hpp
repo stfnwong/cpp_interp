@@ -10,9 +10,9 @@
 
 #include "Object.hpp"
 
-using ExprType = LoxObject;
-using VisitType = LoxObject;
-using StmtVisitType = LoxObject;
+using EType = LoxObject;  // Type of data in expression
+using VType = LoxObject; // Type of data returned by ExprVisitor
+using StmtVType = LoxObject; // Type of data returned by StmtVisitor
 
 
 

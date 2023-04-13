@@ -16,7 +16,7 @@
 
 
 
-class Interpreter : public ExprVisitor<ExprType, VisitType>, public StmtVisitor<ExprType, StmtVisitType>
+class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, StmtVType>
 {
     private:
         Environment env;
@@ -26,26 +26,27 @@ class Interpreter : public ExprVisitor<ExprType, VisitType>, public StmtVisitor<
         void check_number_operand(const Token& otor, const LoxObject& orand);
         void check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
 
-        LoxObject evaluate(const std::unique_ptr<Expr<ExprType, VisitType>>& expr);
-        void      execute(const std::unique_ptr<Stmt<ExprType, VisitType>>& stmt);
+        LoxObject evaluate(const std::unique_ptr<Expr<EType, VType>>& expr);
+        void      execute(const std::unique_ptr<Stmt<EType, VType>>& stmt);
         
         // Expressions
-        LoxObject visit(LiteralExpr<ExprType, VisitType>& expr) final;
-        LoxObject visit(GroupingExpr<ExprType, VisitType>& expr) final;
-        LoxObject visit(UnaryExpr<ExprType, VisitType>& expr) final;
-        LoxObject visit(BinaryExpr<ExprType, VisitType>& expr) final;
-        LoxObject visit(VariableExpr<ExprType, VisitType>& expr) final;
+        LoxObject visit(LiteralExpr<EType, VType>& expr) final;
+        LoxObject visit(GroupingExpr<EType, VType>& expr) final;
+        LoxObject visit(UnaryExpr<EType, VType>& expr) final;
+        LoxObject visit(BinaryExpr<EType, VType>& expr) final;
+        LoxObject visit(VariableExpr<EType, VType>& expr) final;
+        LoxObject visit(AssignmentExpr<EType, VType>& expr) final;
 
 
         // Statments 
-        LoxObject visit(PrintStmt<ExprType, StmtVisitType>& stmt) final;
-        LoxObject visit(ExpressionStmt<ExprType, StmtVisitType>& stmt) final;
-        LoxObject visit(VariableStmt<ExprType, StmtVisitType>& stmt) final;
+        LoxObject visit(PrintStmt<EType, StmtVType>& stmt) final;
+        LoxObject visit(ExpressionStmt<EType, StmtVType>& stmt) final;
+        LoxObject visit(VariableStmt<EType, StmtVType>& stmt) final;
 
 
     public:
         Interpreter() {} 
-        void interpret(const std::vector<std::unique_ptr<Stmt<ExprType, StmtVisitType>>>& statements);
+        void interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVType>>>& statements);
 };
 
 

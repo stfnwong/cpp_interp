@@ -25,7 +25,11 @@ you are better off just reading the book instead.
 ## Syntax for Expressions
 Expressions have a different rule for each precedence level.
 
-`expression -> equality`;
+Assignment has the lowest precedence (like in C).
+
+`expression -> assignment`;
+
+`assignment -> IDENTIFIER "=" assignment | equality;`
 
 `equality -> comparison ( ( "!=" | "==") comparison )* ;`
 

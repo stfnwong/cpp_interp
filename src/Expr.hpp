@@ -14,11 +14,19 @@
 #include "Object.hpp"
 
 
-template <typename E, typename T> struct BinaryExpr;
-template <typename E, typename T> struct GroupingExpr;
+// This is a hack to get around lack of instanceof in C++. I don't know what the 
+// preferred design is here... what I am trying to avoid is the use of dynamic_cast<>
+// to figure out what the type of an Expr is.
+// TODO: think about an alternative for this
+enum class ExprType { LITERAL, UNARY, BINARY, GROUPING, VARIABLE, ASSIGNMENT };
+
+
 template <typename E, typename T> struct LiteralExpr;
 template <typename E, typename T> struct UnaryExpr;
+template <typename E, typename T> struct BinaryExpr;
+template <typename E, typename T> struct GroupingExpr;
 template <typename E, typename T> struct VariableExpr;
+template <typename E, typename T> struct AssignmentExpr;
 
 
 // Visitor object 
@@ -30,6 +38,7 @@ template <typename E, typename T> struct ExprVisitor
         virtual T visit(BinaryExpr<E, T>& expr) = 0;
         virtual T visit(GroupingExpr<E, T>& expr) = 0;
         virtual T visit(VariableExpr<E, T>& expr) = 0;
+        virtual T visit(AssignmentExpr<E, T>& expr) = 0;
 };
 
 
@@ -42,11 +51,16 @@ template <typename E, typename T> struct Expr
         explicit Expr() = default;
         virtual ~Expr() = default;
 
+        virtual ExprType    get_type(void) const = 0;
         virtual T           accept(ExprVisitor<E, T>& visitor) = 0;
         virtual std::string to_string(void) const = 0;
 };
 
 
+
+/*
+ * LiteralExpr
+ */
 template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
 {
     LoxObject value;
@@ -64,25 +78,35 @@ template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
             return !(*this == that);
         }
 
+        ExprType get_type(void) const final {
+            return ExprType::LITERAL;
+        }
+
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
 
         std::string to_string(void) const final
         {
+            if(this->value.has_type())
+                return this->value.to_string();
+            
+            return "nil";
+        }
+
+        std::string to_repr(void) const
+        {
             std::ostringstream oss;
             oss << "LiteralExpr<" << this->value.to_repr() << ">";
-            //oss << "LiteralExpr<" << this->value.to_string() << ">";
             return oss.str();
-
-            //if(this->value.has_type())
-            //    return this->value.to_string();
-            //
-            //return "nil";
         }
 };
 
 
+
+/*
+ * UnaryExpr
+ */
 template <typename E, typename T> struct UnaryExpr : public Expr<E, T>
 {
     std::unique_ptr<Expr<E, T>> right;
@@ -109,6 +133,10 @@ template <typename E, typename T> struct UnaryExpr : public Expr<E, T>
             return !(*this == that);
         }
 
+        ExprType get_type(void) const final {
+            return ExprType::UNARY;
+        }
+
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
@@ -124,6 +152,10 @@ template <typename E, typename T> struct UnaryExpr : public Expr<E, T>
 };
 
 
+
+/*
+ * BinaryExpr
+ */
 template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
 {
     std::unique_ptr<Expr<E, T>> left;
@@ -154,6 +186,10 @@ template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
             return !(*this == that);
         }
 
+        ExprType get_type(void) const final {
+            return ExprType::BINARY;
+        }
+
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
@@ -168,9 +204,24 @@ template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
 
             return oss.str();
         }
+
+        //std::string to_repr(void) const
+        //{
+        //    std::ostringstream oss;
+        //    oss << "BinaryExpr<" 
+        //        << this->left->to_string() << ""
+        //        << this->op.to_string() << " "
+        //        << this->right->to_string() << ">";
+
+        //    return oss.str();
+        //}
 };
 
 
+
+/*
+ * GroupingExpr
+ */
 template <typename E, typename T> struct GroupingExpr : public Expr<E, T>
 {
     std::unique_ptr<Expr<E, T>> left;
@@ -187,6 +238,10 @@ template <typename E, typename T> struct GroupingExpr : public Expr<E, T>
             return !(*this == that);
         }
 
+        ExprType get_type(void) const final {
+            return ExprType::GROUPING;
+        }
+
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
@@ -200,6 +255,10 @@ template <typename E, typename T> struct GroupingExpr : public Expr<E, T>
 };
 
 
+
+/*
+ * VariableExpr
+ */
 template <typename E, typename T> struct VariableExpr : public Expr<E, T>
 {
     //std::unique_ptr<Expr<E, T>> left;
@@ -217,6 +276,10 @@ template <typename E, typename T> struct VariableExpr : public Expr<E, T>
             return !(*this == that);
         }
 
+        ExprType get_type(void) const final {
+            return ExprType::VARIABLE;
+        }
+
         T accept(ExprVisitor<E, T>& visitor) final {
             return visitor.visit(*this);
         }
@@ -229,6 +292,47 @@ template <typename E, typename T> struct VariableExpr : public Expr<E, T>
         }
 };
 
+
+/*
+ * AssignmentExpr
+ */
+template <typename E, typename T> struct AssignmentExpr : Expr<E, T>
+{
+    Token token;
+    std::unique_ptr<Expr<E, T>> expr;
+
+    public:
+        AssignmentExpr(const Token& tok,  std::unique_ptr<Expr<E, T>> e) :
+            token(tok), 
+            expr(std::move(e)) {}
+
+        bool operator==(const AssignmentExpr<E, T>& that) const
+        {
+            if(this->token != that.token)
+                return false;
+            return this->expr.get() == that.expr.get();
+        }
+
+        bool operator!=(const AssignmentExpr<E, T>& that) const {
+            return !(*this == that);
+        }
+
+        ExprType get_type(void) const final {
+            return ExprType::ASSIGNMENT;
+        }
+
+        T accept(ExprVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        std::string to_string(void) const final
+        {
+            std::ostringstream oss;
+            oss << "AssignmentExpr<" << this->token.to_string() 
+                << " = " << this->expr.get()->to_string() << ">";
+            return oss.str();
+        }
+};
 
 
 /*
@@ -245,24 +349,9 @@ struct ASTPrinter : public ExprVisitor<LoxObject, std::string>
             return expr.accept(*this);
         }
 
-        //std::string parenthesize(const std::string& name, std::vector<ExprPtr>& exprs)
-        //{
-        //    std::ostringstream oss;
-
-        //    oss << "(" << name;
-        //    for(const auto& e : exprs)
-        //        oss << " " << e->accept(*this);
-        //    oss << ")";
-
-        //    return oss.str();
-        //}
-
         std::string visit(LiteralExpr<E, T>& expr) final
         {
-            if(expr.value.has_type())
-                return expr.value.to_string();
-
-            return "Nil";       // TODO: Think about if there is anything else we might prefer to return
+            return expr.value.to_string();
         }
 
         std::string visit(UnaryExpr<E, T>& expr) final
@@ -297,6 +386,13 @@ struct ASTPrinter : public ExprVisitor<LoxObject, std::string>
             std::ostringstream oss;
             oss << "(var " << expr.token.to_string() << ")";
             //oss << "(var " << expr.left->accept(*this) << ")";
+            return oss.str();
+        }
+
+        std::string visit(AssignmentExpr<E, T>& expr) final 
+        {
+            std::ostringstream oss;
+            oss << expr.token.lexeme << " = " << expr.expr->to_string();
             return oss.str();
         }
 };

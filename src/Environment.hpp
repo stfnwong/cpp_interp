@@ -21,8 +21,9 @@ class Environment
     public:
         Environment() {}
 
-        void define(const std::string& name, const LoxObject& value);
+        void      define(const std::string& name, const LoxObject& value);
         LoxObject get(const Token& name);
+        void      assign(const Token& name, const LoxObject& value);
         //LoxObject get(const std::string& name);
 };
 

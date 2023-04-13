@@ -28,7 +28,7 @@ void Lox::error(const Token& tok, const std::string& msg)
     if(tok.type == TokenType::LOX_EOF)
         report(tok.line, " at end ", msg);
     else 
-        report(tok.line, " at " + tok.lexeme + " ", msg);
+        report(tok.line, " at '" + tok.lexeme + "' ", msg);
     Lox::had_error = true;
 }
 
