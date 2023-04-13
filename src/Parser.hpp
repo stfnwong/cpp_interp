@@ -17,15 +17,6 @@
 #include "Token.hpp"
 
 
-struct ParseError : public std::exception
-{
-    Token token;
-    std::string msg_;
-
-    public:
-        explicit ParseError(const Token& tok, const std::string& msg) : token(tok), msg_(msg) {} 
-};
-
 
 
 class Parser

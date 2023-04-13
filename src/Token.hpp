@@ -55,7 +55,7 @@ struct make_literal_string{
  */
 struct Token
 {
-    using literal_type = std::variant<float, bool, std::string>; 
+    using literal_type = std::variant<double, bool, std::string>; 
 
     TokenType type;
     std::string lexeme;
@@ -67,12 +67,17 @@ struct Token
         Token(TokenType type) : type(type), lexeme(""), line(0) {}
         Token(TokenType type, const std::string l) : type(type), lexeme(l), line(0) {}
         Token(TokenType type, unsigned line) : type(type), lexeme(""), line(line) {}
+
         Token(TokenType type, const std::string& lexeme, unsigned line) : 
             type(type), lexeme(lexeme), line(line) {} 
         Token(TokenType type, const std::string& lexeme, unsigned line, const std::string& literal) : 
             type(type), lexeme(lexeme), line(line), literal{literal} {} 
-        Token(TokenType type, const std::string& lexeme, unsigned line, float literal) : 
+
+        Token(TokenType type, const std::string& lexeme, unsigned line, double literal) : 
             type(type), lexeme(lexeme), line(line), literal(literal) {} 
+
+        Token(TokenType type, const std::string& lexeme, unsigned line, bool literal) :
+            type(type), lexeme(lexeme), line(line), literal(literal) {}
 
         ~Token() {}
 
@@ -103,7 +108,7 @@ struct Token
         Token& operator=(Token that) ;
 
         std::string get_string_literal(void) const;
-        float       get_float_literal(void) const;
+        double      get_double_literal(void) const;
         bool        has_literal(void) const;
         std::string to_string(void) const;
         std::string to_repr(void) const;

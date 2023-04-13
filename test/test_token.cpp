@@ -25,15 +25,15 @@ TEST_CASE("test_create_token_with_string_literal", "token")
 
     REQUIRE(test_token.has_literal() == true);
     REQUIRE(test_token.get_string_literal() == test_literal);
-    REQUIRE_THROWS(test_token.get_float_literal());
+    REQUIRE_THROWS(test_token.get_double_literal());
 }
 
-TEST_CASE("test_create_token_with_float_literal", "token")
+TEST_CASE("test_create_token_with_double_literal", "token")
 {
     Token test_token(TokenType::VAR, "1.0", 1, 1.0f);
 
     REQUIRE(test_token.has_literal() == true);
-    REQUIRE(test_token.get_float_literal() == 1.0f);
+    REQUIRE(test_token.get_double_literal() == 1.0f);
     REQUIRE_THROWS(test_token.get_string_literal());
 }
 

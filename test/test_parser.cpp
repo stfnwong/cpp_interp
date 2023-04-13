@@ -18,7 +18,8 @@ TEST_CASE("test_parse_empty_input", "parser")
     std::vector<Token> empty_input;
     Parser parser(empty_input);
 
-    REQUIRE_THROWS(parser.parse());
+    auto statements = parser.parse();
+    REQUIRE(statements.size() == 0);
 }
 
 TEST_CASE("test_parse_binary_expr", "parser")

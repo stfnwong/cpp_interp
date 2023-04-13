@@ -9,17 +9,29 @@
 
 #include <cmath>
 
+constexpr const bool EPS = 1e-6;
 
 // Use default eps = 10e-6
 inline bool float_equal(float a, float b)
 {
-    return (std::abs(a - b) < 10e-6) ? true : false;
+    return (std::fabs(a - b) < EPS) ? true : false;
 }
 
 inline bool float_equal_eps(float a, float b, float eps)
 {
-    return (std::abs(a - b) < eps) ? true : false;
+    return (std::fabs(a - b) < eps) ? true : false;
 }
+
+inline bool double_equal(double a, double b)
+{
+    return (std::fabs(a - b) < EPS) ? true : false;
+}
+
+inline bool double_equal_eps(double a, double b, double eps)
+{
+    return (std::fabs(a - b) < eps) ? true : false;
+}
+
 
 
 #endif /*__UTIL_HPP*/

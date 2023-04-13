@@ -7,7 +7,7 @@
 #include "Object.hpp"
 
 
-LoxObject::LoxObject(const Token& token) : type(token.type)
+LoxObject::LoxObject(const Token& token) : token(token)
 {
     switch(token.type)
     {
@@ -20,7 +20,7 @@ LoxObject::LoxObject(const Token& token) : type(token.type)
             break;
 
         case TokenType::NUMBER:
-            this->value = token.get_float_literal();
+            this->value = token.get_double_literal();
             break;
 
         case TokenType::STRING:
@@ -34,9 +34,11 @@ LoxObject::LoxObject(const Token& token) : type(token.type)
 }
 
 
+
+// ======== OPERATORS ======== //
 bool LoxObject::operator==(const LoxObject& that) const
 {
-    if(this->type != that.type)
+    if(this->token.type != that.token.type)
         return false;
     if(this->value.has_value() != that.value.has_value())
         return false;
@@ -71,10 +73,10 @@ std::string LoxObject::get_string_val(void) const
 }
 
 
-float LoxObject::get_float_val(void) const
+double LoxObject::get_double_val(void) const
 {
     if(this->value.has_value())
-        return std::get<float>(this->value.value());
+        return std::get<double>(this->value.value());
 
     return 0;
 }
@@ -92,14 +94,19 @@ bool LoxObject::has_type(void) const
     return (this->value.has_value()) ? true : false;
 }
 
+TokenType LoxObject::get_type(void) const
+{
+    return this->token.type;
+}
+
 bool LoxObject::has_string_type(void) const
 {
-    return (this->type == TokenType::STRING || this->type == TokenType::IDENTIFIER) ? true : false;
+    return (this->token.type == TokenType::STRING || this->token.type == TokenType::IDENTIFIER) ? true : false;
 }
 
 bool LoxObject::has_number_type(void) const
 {
-    return (this->type == TokenType::NUMBER) ? true : false;
+    return (this->token.type == TokenType::NUMBER) ? true : false;
 }
 
 std::string LoxObject::to_string(void) const

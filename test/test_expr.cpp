@@ -31,11 +31,11 @@ TEST_CASE("test_create_unary_expr", "expr")
 {
     Token op(TokenType::MINUS, "-");
     std::unique_ptr<LiteralExpr<E, T>> right = std::make_unique<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "1", 1, 1.0)
+            Token(TokenType::NUMBER, "1", 1, 1.0f)
     );
 
     UnaryExpr<E, T> test_expr(std::move(right), op);
-    LiteralExpr<E, T> exp_right(Token(TokenType::NUMBER, "1", 1, 1.0));
+    LiteralExpr<E, T> exp_right(Token(TokenType::NUMBER, "1", 1, 1.0f));
 
     REQUIRE(test_expr.op == Token(TokenType::MINUS, "-"));
     REQUIRE(*static_cast<LiteralExpr<E, T>*>(test_expr.right.get()) == exp_right);
@@ -47,7 +47,7 @@ TEST_CASE("test_create_binary_expr", "expr")
     Token op(TokenType::PLUS, "+");
     
     std::unique_ptr<LiteralExpr<E, T>> left = std::make_unique<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "1", 1, 1.0)
+            Token(TokenType::NUMBER, "1", 1, 1.0f)
     );
 
     // TODO: Bug - the object doesn't contain a token, so we can't detect errors in the
@@ -55,15 +55,15 @@ TEST_CASE("test_create_binary_expr", "expr")
     // Do I want to have a unique_ptr to a Token and do a move each time the token is 
     // moved?
     std::unique_ptr<LiteralExpr<E, T>> right = std::make_unique<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "2", 1, 2.0)
+            Token(TokenType::NUMBER, "2", 1, 2.0f)
     );
 
     BinaryExpr<E, T> test_expr(std::move(left), std::move(right), op);
     
     REQUIRE(test_expr.op == Token(TokenType::PLUS, "+"));
 
-    LiteralExpr<E, T> exp_left(Token(TokenType::NUMBER, "1", 1, 1.0));
-    LiteralExpr<E, T> exp_right(Token(TokenType::NUMBER, "2", 1, 2.0));
+    LiteralExpr<E, T> exp_left(Token(TokenType::NUMBER, "1", 1, 1.0f));
+    LiteralExpr<E, T> exp_right(Token(TokenType::NUMBER, "2", 1, 2.0f));
 
     // I downcast the pointers here so I can write a single REQUIRES() and use the
     // == operator.
@@ -80,11 +80,11 @@ TEST_CASE("test_ast_printer", "expr")
     Token op(TokenType::PLUS, "+");
     
     std::unique_ptr<LiteralExpr<E, T>> left = std::make_unique<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "1", 1, 1.0)
+            Token(TokenType::NUMBER, "1", 1, 1.0f)
     );
 
     std::unique_ptr<LiteralExpr<E, T>> right = std::make_unique<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "1", 1, 2.0)  // TODO: put token in object so this doesn't pass
+            Token(TokenType::NUMBER, "1", 1, 2.0f)  // TODO: put token in object so this doesn't pass
     );
 
     BinaryExpr<E, T> test_expr(std::move(left), std::move(right), op);

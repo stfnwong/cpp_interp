@@ -53,8 +53,8 @@ bool Token::operator==(const Token& that) const
         return false;
     if(this->line != that.line)
         return false;
-    // TODO: how to test floats? We want to call 
-    // float_equal(this->literal.value(), that.literal.value()) here if variant is a float
+    // TODO: how to test doubles? We want to call 
+    // double_equal(this->literal.value(), that.literal.value()) here if variant is a double
     if(this->literal.has_value() && that.literal.has_value())
         return (this->literal.value() == that.literal.value()) ? true : false;
 
@@ -82,10 +82,10 @@ std::string Token::get_string_literal(void) const
     return {};
 }
 
-float Token::get_float_literal(void) const
+double Token::get_double_literal(void) const
 {
     if(this->literal.has_value())
-        return std::get<float>(this->literal.value());
+        return std::get<double>(this->literal.value());
 
     return {};
 }

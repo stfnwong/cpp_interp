@@ -64,13 +64,13 @@ TEST_CASE("test_scan_number_literal", "scanner")
 {
     std::string test_source = "1.0, 0.0, 20, 40";
     std::vector<Token> exp_tokens = {
-        Token(TokenType::NUMBER, "1.0", 1, 1.0),
+        Token(TokenType::NUMBER, "1.0", 1, 1.0f),
         Token(TokenType::COMMA, ",", 1),
-        Token(TokenType::NUMBER, "0.0", 1, 0.0),
+        Token(TokenType::NUMBER, "0.0", 1, 0.0f),
         Token(TokenType::COMMA, ",", 1),
-        Token(TokenType::NUMBER, "20", 1, 20),
+        Token(TokenType::NUMBER, "20", 1, 20.0f),
         Token(TokenType::COMMA, ",", 1),
-        Token(TokenType::NUMBER, "40", 1, 40.0),
+        Token(TokenType::NUMBER, "40", 1, 40.0f),
         Token(TokenType::LOX_EOF, "", 1),
     };
 

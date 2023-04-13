@@ -8,25 +8,10 @@
 #include <iostream>   // TODO: move all the error stuff to Error.hpp
 
 #include "Common.hpp"
+#include "Error.hpp"
 #include "Expr.hpp"
 #include "Object.hpp"
 #include "Statement.hpp"
-
-
-struct RuntimeError : public std::exception
-{
-    Token token;
-    std::string msg_;
-
-    public:
-        explicit RuntimeError(const Token& tok, const std::string& msg) : 
-            token(tok), 
-            msg_(msg) {} 
-
-        const char* what() {
-            return this->msg_.c_str();
-        }
-};
 
 
 

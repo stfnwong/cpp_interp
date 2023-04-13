@@ -5,6 +5,7 @@
 
 #include <iostream>    // TODO: debug only, remove
 
+#include "Error.hpp"
 #include "Lox.hpp"
 #include "Parser.hpp"
 
@@ -38,6 +39,7 @@ bool Parser::match(const std::vector<TokenType>& types)
 
 Token Parser::peek(void) const
 {
+    // TODO: some copy ctor issue with token...
     return this->tokens[this->current];
 }
 
@@ -266,16 +268,13 @@ std::vector<std::unique_ptr<Stmt<ExprType, VisitType>>> Parser::parse(void)
     using StmtPtr = std::unique_ptr<Stmt<ExprType, VisitType>>;
     std::vector<StmtPtr> statements; 
 
+    if(this->tokens.size() == 0)
+        return statements;
+
     try 
     {
-        if(this->tokens.size() > 0)
-        {
-            while(!this->at_end())
-                statements.push_back(std::move(this->statement()));
-                //statements.push_back(this->statement());
-        }
-        else
-            throw ParseError(Token(), "Got 0 input tokens");
+        while(!this->at_end())
+            statements.push_back(std::move(this->statement()));
     }
     catch(ParseError& error)
     {

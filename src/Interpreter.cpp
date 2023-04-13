@@ -18,7 +18,7 @@ static void runtime_error(RuntimeError& e)
 
 bool Interpreter::is_truthy(const LoxObject& obj) const
 {
-    switch(obj.type)
+    switch(obj.get_type())
     {
         case TokenType::NIL:
             return false;
@@ -89,7 +89,7 @@ LoxObject Interpreter::visit(UnaryExpr<ExprType, VisitType>& expr)
     switch(expr.op.type)
     {
         case TokenType::MINUS:
-            return LoxObject(-right.get_float_val());
+            return LoxObject(-right.get_double_val());
         case TokenType::BANG:
             return !this->is_truthy(right);
         default:
@@ -110,15 +110,15 @@ LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
         // Arithmetic operators
         case TokenType::MINUS:
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_float_val() - right.get_float_val());
+            return LoxObject(left.get_double_val() - right.get_double_val());
 
         case TokenType::SLASH:
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_float_val() / right.get_float_val());
+            return LoxObject(left.get_double_val() / right.get_double_val());
 
         case TokenType::STAR:
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_float_val() * right.get_float_val());
+            return LoxObject(left.get_double_val() * right.get_double_val());
 
         // Lox allows string concat with '+' operator
         case TokenType::PLUS:
@@ -126,7 +126,7 @@ LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
             if(left.has_string_type() && right.has_string_type())
                 return LoxObject(left.get_string_val() + right.get_string_val());
             if(left.has_number_type() && right.has_number_type())
-                return LoxObject(left.get_float_val() + right.get_float_val());
+                return LoxObject(left.get_double_val() + right.get_double_val());
 
             throw RuntimeError(expr.op, "Operands must be two numbers or two strings");
             break;
@@ -135,19 +135,19 @@ LoxObject Interpreter::visit(BinaryExpr<ExprType, VisitType>& expr)
         case TokenType::GREATER:
             this->check_number_operands(expr.op, left, right);
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_float_val() > right.get_float_val());
+            return LoxObject(left.get_double_val() > right.get_double_val());
 
         case TokenType::GREATER_EQUAL:
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_float_val() >= right.get_float_val());
+            return LoxObject(left.get_double_val() >= right.get_double_val());
 
         case TokenType::LESS:
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_float_val() >= right.get_float_val());
+            return LoxObject(left.get_double_val() >= right.get_double_val());
 
         case TokenType::LESS_EQUAL:
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_float_val() <= right.get_float_val());
+            return LoxObject(left.get_double_val() <= right.get_double_val());
 
         default:
             break;      // shut linter up
