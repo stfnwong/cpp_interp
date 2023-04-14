@@ -63,6 +63,6 @@ TEST_CASE("test_print_block_statements", "ast_printer")
 
     auto parsed_output = parser.parse();
 
-    //for(unsigned i = 0; i < parsed_output.size(); ++i)
-    //    printer.print(*parsed_output[i].get());
+    for(unsigned i = 0; i < parsed_output.size(); ++i)
+        printer.print(*parsed_output[i].get());
 }

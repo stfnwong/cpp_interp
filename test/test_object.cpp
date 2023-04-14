@@ -94,7 +94,6 @@ TEST_CASE("test_object_create_string", "object")
 
     REQUIRE_THROWS(test_object.get_double_val());
     REQUIRE_THROWS(test_object.get_bool_val());
-
 }
 
 

@@ -42,7 +42,6 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
             oss << expr.right->accept(*this).to_string();
             oss << ")";
             return LoxObject(oss.str());
-            //return this->parenthesize(expr.op.lexeme, exprs);
         }
 
         LoxObject visit(BinaryExpr<E, T>& expr) final
@@ -66,7 +65,6 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
         {
             std::ostringstream oss;
             oss << "(var " << expr.token.to_string() << ")";
-            //oss << "(var " << expr.left->accept(*this) << ")";
             return LoxObject(oss.str());
         }
 
