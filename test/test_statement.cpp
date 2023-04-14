@@ -80,25 +80,16 @@ TEST_CASE("test_create_block_statement", "stmt")
     {
         std::unique_ptr<Expr<E, T>> e = create_binary_expression();
         std::unique_ptr<Stmt<E, T>> s = std::make_unique<ExpressionStmt<E, T>>(std::move(e));
-
         statements.push_back(std::move(s));
-        //statements.push_back(ExpressionStmt(std::move(create_binary_expression())));
     }
 
-    std::cout << typeid(statements).name() << std::endl;
+    std::string exp_string_repr = "ExpressionStmt<1 + 2>";
     for(unsigned i = 0; i < statements.size(); ++i)
-        std::cout << "[" << i << "] (" << typeid(statements[i]).name() << "): " << statements[i]->to_string() << std::endl;
-
-    // TODO: This is what I want to do in the parser
-    //BlockStmt<E, T> test_stmt = BlockStmt<E, T>(std::move(statements));
-    //BlockStmt<E, T> test_stmt = BlockStmt<E, T>(statements);
-    //REQUIRE(test_stmt.statements.size() == num_stmt);
-
-    // Now create a pointer of these...
-    std::unique_ptr<Stmt<E, T>> stmt_ptr = std::make_unique<BlockStmt<E, T>>(std::move(statements));
-    std::cout << "[" << __func__ << "] stmt_ptr->to_string(): " << stmt_ptr.get()->to_string() << std::endl;
+        REQUIRE(statements[i]->to_string() == exp_string_repr);
 }
 
-// int "<<" int => (l << r) -> l * (2^r)
-// ostream << std::to_string(T)
-// ostream& operator<<(const T& that) 
+
+//TEST_CASE("test_create_if_statement", "stmt")
+//{
+//}
+

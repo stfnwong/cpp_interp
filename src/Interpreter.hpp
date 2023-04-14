@@ -44,6 +44,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         LoxObject visit(ExpressionStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(VariableStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(BlockStmt<EType, StmtVType>& stmt) final;
+        LoxObject visit(IfStmt<EType, StmtVType>& stmt) final;
 
     public:
         Interpreter() {} 

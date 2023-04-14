@@ -220,7 +220,20 @@ LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
 {
     Environment block_env;
     this->execute_block(stmt.statements, block_env);
+    return LoxObject();
 }
+
+LoxObject Interpreter::visit(IfStmt<EType, StmtVType>& stmt)
+{
+    if(this->is_truthy(this->evaluate(stmt.cond)))
+        this->execute(stmt.then_branch);
+    else if(stmt.else_branch.get())
+        this->execute(stmt.else_branch);
+
+    return LoxObject();     // TODO: what to do about bogus objects? Return a LoxObject pointer set to nullptr?
+}
+
+
 
 
 

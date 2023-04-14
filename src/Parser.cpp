@@ -265,6 +265,8 @@ std::unique_ptr<Stmt<EType, VType>> Parser::var_declaration(void)
 
 std::unique_ptr<Stmt<EType, VType>> Parser::statement(void)
 {
+    if(this->match({TokenType::IF}))
+        return this->if_statement();
     if(this->match({TokenType::PRINT}))
         return this->print_statement();
 
@@ -272,6 +274,25 @@ std::unique_ptr<Stmt<EType, VType>> Parser::statement(void)
         return this->block();
 
     return this->expression_statement();
+}
+
+std::unique_ptr<Stmt<EType, VType>> Parser::if_statement(void)
+{
+    this->consume(TokenType::LEFT_PAREN, "expect '(' after if.");
+    std::unique_ptr<Expr<EType, VType>> condition = this->expression();
+    this->consume(TokenType::RIGHT_PAREN, "expect ')' after if condition.");
+
+    std::unique_ptr<Stmt<EType, VType>> then_branch = this->statement();
+    std::unique_ptr<Stmt<EType, VType>> else_branch = nullptr;
+
+    if(this->match({TokenType::ELSE}))
+        else_branch = this->statement();
+
+    return std::make_unique<IfStmt<EType, VType>>(
+            std::move(condition),
+            std::move(then_branch),
+            std::move(else_branch)
+    );
 }
 
 

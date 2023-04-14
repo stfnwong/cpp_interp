@@ -98,6 +98,11 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
                 oss << stmt.statements[i].get()->accept(*this).to_string() << std::endl;
             return oss.str();
         }
+
+        LoxObject visit(IfStmt<E, T>& stmt) final
+        {
+            return LoxObject();   
+        }
 };
 
 

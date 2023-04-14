@@ -9,12 +9,13 @@
 #include "Expr.hpp"
 
 
-enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK };
+enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK, IF };
 
 template <typename E, typename T> struct PrintStmt;
 template <typename E, typename T> struct ExpressionStmt;
 template <typename E, typename T> struct VariableStmt;
 template <typename E, typename T> struct BlockStmt;
+template <typename E, typename T> struct IfStmt;
 
 
 template <typename E, typename T> struct StmtVisitor
@@ -24,6 +25,7 @@ template <typename E, typename T> struct StmtVisitor
         virtual T visit(ExpressionStmt<E, T>& stmt) = 0;
         virtual T visit(VariableStmt<E, T>& stmt) = 0;
         virtual T visit(BlockStmt<E, T>& stmt) = 0;
+        virtual T visit(IfStmt<E, T>& stmt) = 0;
 };
 
 
@@ -178,24 +180,52 @@ template <typename E, typename T> struct BlockStmt : public Stmt<E, T>
 };
 
 
-//struct StmtPrinter : public StmtVisitor<LoxObject, std::string>
-//{
-//    using E = LoxObject;
-//    using T = std::string;
-//    using StmtPtr = std::unique_ptr<Stmt<E, T>>;
-//
-//    public:
-//        std::string print(Stmt<E, T>& stmt) {
-//            return stmt.accept(*this);
-//        }
-//
-//        std::string visit(PrintStmt<E, T>& stmt) final
-//        {
-//        }
-//
-//        std::string visit(ExpressionStmt<E, T>& stmt) final 
-//        {
-//        }
-//};
+/*
+ * BlockStmt
+ */
+template <typename E, typename T> struct IfStmt : public Stmt<E, T>
+{
+    std::unique_ptr<Expr<E, T>> cond;
+    std::unique_ptr<Stmt<E, T>> then_branch;
+    std::unique_ptr<Stmt<E, T>> else_branch;
+
+    public:
+        IfStmt(std::unique_ptr<Expr<E, T>> cond, 
+                std::unique_ptr<Stmt<E, T>> t, 
+                std::unique_ptr<Stmt<E, T>> e) :
+            cond(std::move(cond)),
+            then_branch(std::move(t)),
+            else_branch(std::move(e)) {}
+
+        StmtType get_type(void) const final {
+            return StmtType::IF;
+        }
+
+        T accept(StmtVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        const Expr<E, T>* get_expr(void) const final {
+            return nullptr;
+        }
+
+        std::string to_string(void) const final 
+        {
+            std::ostringstream oss;
+            oss << "IfStmt<" << this->cond.get()->to_string() << " ? "
+                << this->then_branch.get()->to_string() << " : " 
+                << this->else_branch.get()->to_string()
+                << ">";
+            return oss.str();
+        }
+
+        unsigned size(void) const {
+            return this->statements.size();
+        }
+};
+
+
+
+
 
 #endif /*__STATEMENT_HPP*/

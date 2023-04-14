@@ -50,7 +50,9 @@ Variables have additional productions.
 
 `declaration -> var_decl | statement ;`
 
-`statement -> expr_stmt | print_stmt | block ;`
+`statement -> expr_stmt | if_stmt | print_stmt | block ;`
+
+`if_stmt -> "if" "(" expression ")" statement ("else" statement )? ;`
 
 A block is just a (possibly empty) series of statements surrounded by curly braces.
 
