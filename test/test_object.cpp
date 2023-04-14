@@ -6,6 +6,8 @@
 #define CATCH_CONFIG_MAIN
 #include "catch/catch.hpp"
 
+#include <sstream>
+
 #include "Util.hpp"
 #include "Object.hpp"
 
@@ -26,7 +28,8 @@ TEST_CASE("test_create_null_object", "object")
 
 TEST_CASE("test_create_number_object", "object")
 {
-    Token test_token = Token(TokenType::NUMBER, "5", 5.0f);
+    double val = 5.0f;
+    Token test_token = Token(TokenType::NUMBER, "5", val);
     LoxObject test_object(test_token);
 
     REQUIRE(test_object.has_type() == true);
@@ -93,6 +96,7 @@ TEST_CASE("test_object_create_string", "object")
     REQUIRE_THROWS(test_object.get_bool_val());
 
 }
+
 
 TEST_CASE("test_object_create_bool", "object")
 {
