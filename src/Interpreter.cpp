@@ -11,7 +11,8 @@ static bool had_runtime_error = false;
 
 static void runtime_error(RuntimeError& e)
 {
-    std::cerr << e.what() << std::endl << "[line " << e.token.line << "]";
+    //std::cerr << e.what() << std::endl << "[line " << e.token.line << "] ";
+    std::cerr << "[line " << e.token.line << "] " << e.what() << " " << std::endl;
     had_runtime_error = true;
 }
 

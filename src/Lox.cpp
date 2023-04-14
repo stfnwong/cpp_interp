@@ -14,7 +14,7 @@ bool Lox::had_runtime_error = false;
 void Lox::report(int line, const std::string& where, const std::string& msg)
 {
     std::cerr << "[line " << line << "] Error " << where
-        << ": " << msg << std::endl;
+        << ": " << msg; 
 }
 
 void Lox::error(int line, const std::string& msg)

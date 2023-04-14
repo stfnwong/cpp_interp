@@ -25,8 +25,6 @@ void run(const std::string& source)
 {
     Scanner scanner(source);
     auto scanned_tokens = scanner.scan();
-    for(const auto& tok : scanned_tokens)
-        std::cout << tok.to_repr() << std::endl;
     Parser parser(scanned_tokens);
 
     const auto statements = parser.parse();

@@ -118,8 +118,7 @@ template <typename E, typename T> struct VariableStmt : public Stmt<E, T>
     public:
         VariableStmt(const Token& tok, std::unique_ptr<Expr<E, T>> expr) : 
             token(tok),
-            expr(std::move(expr))
-    {}
+            expr(std::move(expr)) {}
 
         StmtType get_type(void) const final {
             return StmtType::VARIABLE;
@@ -151,7 +150,8 @@ template <typename E, typename T> struct BlockStmt : public Stmt<E, T>
     std::vector<std::unique_ptr<Stmt<E, T>>> statements;
 
     public:
-        BlockStmt(std::vector<std::unique_ptr<Stmt<E, T>>> s) : statements(std::move(s)) {} 
+        BlockStmt(std::vector<std::unique_ptr<Stmt<E, T>>> s) : 
+            statements(std::move(s)) {} 
 
         StmtType get_type(void) const final {
             return StmtType::BLOCK;
