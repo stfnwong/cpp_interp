@@ -35,7 +35,7 @@ inline bool double_equal_eps(double a, double b, double eps)
 
 
 // File handling 
-//std::string read_source(const std::string& filename);
+std::string read_file(const std::string& filename);
 
 
 #endif /*__UTIL_HPP*/

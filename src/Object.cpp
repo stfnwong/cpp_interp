@@ -115,7 +115,12 @@ bool LoxObject::has_number_type(void) const
 std::string LoxObject::to_string(void) const
 {
     if(this->has_type())
-        return std::visit(get_value_string(), this->value.value());
+    {
+        std::string str = std::visit(get_value_string(), this->value.value());
+        if(this->has_string_type())
+            return "\"" + str + "\"";
+        return str;
+    }
 
     return "LoxObject()";
 }

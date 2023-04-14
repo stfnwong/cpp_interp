@@ -61,7 +61,6 @@ void Interpreter::check_number_operands(const Token& otor, const LoxObject& o1, 
 
 LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
 {
-    std::cout << "[" << __func__ << "] evaluating <" << typeid(expr).name() << "> " << expr->to_string() << std::endl;
     return expr->accept(*this);
 }
 
@@ -91,22 +90,16 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VT
 // ======== EXPRESSION VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(LiteralExpr<EType, VType>& expr)
 {
-    std::cout << "[" << __func__ << "] visiting " << 
-        typeid(expr).name() << ": " << expr.to_string() << std::endl;
     return expr.value;
 }
 
 LoxObject Interpreter::visit(GroupingExpr<EType, VType>& expr)
 {
-    std::cout << "[" << __func__ << "] visiting " << 
-        typeid(expr).name() << ": " << expr.to_string() << std::endl;
     return this->evaluate(expr.left);
 }
 
 LoxObject Interpreter::visit(UnaryExpr<EType, VType>& expr)
 {
-    std::cout << "[" << __func__ << "] visiting " << 
-        typeid(expr).name() << ": " << expr.to_string() << std::endl;
     LoxObject right = this->evaluate(expr.right);
 
     switch(expr.op.type)
@@ -125,7 +118,6 @@ LoxObject Interpreter::visit(UnaryExpr<EType, VType>& expr)
 
 LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 {
-    std::cout << "[" << __func__ << "] visiting " << expr.to_string() << std::endl;
     LoxObject left = this->evaluate(expr.left);
     LoxObject right = this->evaluate(expr.right);
 
@@ -183,7 +175,6 @@ LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 
 LoxObject Interpreter::visit(VariableExpr<EType, VType>& expr)
 {
-    std::cout << "[" << __func__ << "] checking env for " << expr.token.to_string() << std::endl;
     return this->env.get(expr.token);
 }
 
@@ -209,9 +200,7 @@ LoxObject Interpreter::visit(ExpressionStmt<EType, StmtVType>& stmt)
 {
     // TODO: don't print here (since this isn't a print statement)
     LoxObject value =  this->evaluate(stmt.expr);
-    std::cout << value.to_string() << std::endl;
-    
-    //std::cout << this->evaluate(stmt.expr).to_string() << std::endl;
+    //std::cout << value.to_string() << std::endl;
     return value;
 }
 
@@ -221,7 +210,6 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
 
-    std::cout << "[" << __func__ << "] VariableStmt has value " << value.to_repr() << std::endl;
     this->env.define(stmt.token.lexeme, value);
 
     return value;       // bogus return...

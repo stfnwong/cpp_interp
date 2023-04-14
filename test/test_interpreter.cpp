@@ -12,21 +12,6 @@
 #include "Util.hpp"
 
 
-std::string read_source(const std::string& filename)
-{
-    std::string source;
-    std::string line;
-    std::ifstream file(filename);
-    
-    if(!file.good())
-        return source;
-
-    while(std::getline(file, line))
-        source += line + "\n";
-
-    return source;
-}
-
 //TEST_CASE("test_interpret_binary_expr", "interpreter")
 //{
 //    // Expression is 1 + 1 
@@ -72,7 +57,15 @@ TEST_CASE("test_parse_and_interpret", "interpreter")
 TEST_CASE("test_interpret_block_statements", "interpreter")
 {
     const std::string nesting_filename = "test/nesting.lox";
-    std::string source = read_source(nesting_filename);
+    std::string source;
+    try {
+        source = read_file(nesting_filename);
+        std::cout << "Read source file" << std::endl;
+    }
+    catch(std::ifstream::failure& e) {
+        std::cout << "Failed to read source file " << nesting_filename << std::endl;
+        FAIL();
+    }
 
     Scanner scanner(source);
     Parser parser(scanner.scan());
