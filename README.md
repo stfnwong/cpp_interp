@@ -50,7 +50,11 @@ Variables have additional productions.
 
 `declaration -> var_decl | statement ;`
 
-`statement -> expr_stmt | print_stmt ;`
+`statement -> expr_stmt | print_stmt | block ;`
+
+A block is just a (possibly empty) series of statements surrounded by curly braces.
+
+`block -> "{" declaration* "}" ;`
 
 A variable declaration looks like
 

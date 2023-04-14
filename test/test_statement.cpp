@@ -68,3 +68,37 @@ TEST_CASE("test_create_expression_statement", "stmt")
     REQUIRE(static_cast<LiteralExpr<E, T>*>(derived_ptr->left.get())->value == LoxObject(1.0f));
     REQUIRE(static_cast<LiteralExpr<E, T>*>(derived_ptr->right.get())->value == LoxObject(2.0f));
 }
+
+
+TEST_CASE("test_create_block_statement", "stmt")
+{
+    // Need to make a vector of Stmt pointers 
+    std::vector<std::unique_ptr<Stmt<E, T>>> statements;
+
+    unsigned num_stmt = 8;
+    for(unsigned i = 0; i < num_stmt; ++i)
+    {
+        std::unique_ptr<Expr<E, T>> e = create_binary_expression();
+        std::unique_ptr<Stmt<E, T>> s = std::make_unique<ExpressionStmt<E, T>>(std::move(e));
+
+        statements.push_back(std::move(s));
+        //statements.push_back(ExpressionStmt(std::move(create_binary_expression())));
+    }
+
+    std::cout << typeid(statements).name() << std::endl;
+    for(unsigned i = 0; i < statements.size(); ++i)
+        std::cout << "[" << i << "] (" << typeid(statements[i]).name() << "): " << statements[i]->to_string() << std::endl;
+
+    // TODO: This is what I want to do in the parser
+    //BlockStmt<E, T> test_stmt = BlockStmt<E, T>(std::move(statements));
+    //BlockStmt<E, T> test_stmt = BlockStmt<E, T>(statements);
+    //REQUIRE(test_stmt.statements.size() == num_stmt);
+
+    // Now create a pointer of these...
+    std::unique_ptr<Stmt<E, T>> stmt_ptr = std::make_unique<BlockStmt<E, T>>(std::move(statements));
+    std::cout << "[" << __func__ << "] stmt_ptr->to_string(): " << stmt_ptr.get()->to_string() << std::endl;
+}
+
+// int "<<" int => (l << r) -> l * (2^r)
+// ostream << std::to_string(T)
+// ostream& operator<<(const T& that) 

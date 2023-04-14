@@ -1,13 +1,14 @@
 /*
  * UTIL
- * The stuff that doesn't go anywhere else\
- *
+ * The stuff that doesn't go anywhere else
  */
 
 #ifndef __UTIL_HPP
 #define __UTIL_HPP
 
 #include <cmath>
+#include <string>
+
 
 constexpr const bool EPS = 1e-6;
 
@@ -32,6 +33,9 @@ inline bool double_equal_eps(double a, double b, double eps)
     return (std::fabs(a - b) < eps) ? true : false;
 }
 
+
+// File handling 
+//std::string read_source(const std::string& filename);
 
 
 #endif /*__UTIL_HPP*/

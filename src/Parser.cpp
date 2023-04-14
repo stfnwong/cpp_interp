@@ -268,6 +268,11 @@ std::unique_ptr<Stmt<EType, VType>> Parser::statement(void)
     if(this->match({TokenType::PRINT}))
         return this->print_statement();
 
+    // TODO: need to create a new blockstatment here
+    if(this->match({TokenType::LEFT_BRACE}))
+        return this->block();
+        //return std::make_unique<BlockStmt<EType, VType>>(this->block());
+
     return this->expression_statement();
 }
 
@@ -286,6 +291,24 @@ std::unique_ptr<Stmt<EType, VType>> Parser::expression_statement(void)
     return std::make_unique<ExpressionStmt<EType, VType>>(std::move(value));
 }
 
+// TODO: this should return a BlockStmt pointer, which will in turn contain a vector
+// of Stmt pointers
+//std::vector<std::unique_ptr<Stmt<EType, VType>>> Parser::block(void)
+std::unique_ptr<Stmt<EType, VType>> Parser::block(void)
+{
+    std::vector<std::unique_ptr<Stmt<EType, VType>>> statements;
+
+    while(!this->check(TokenType::RIGHT_BRACE) && !this->at_end())
+        statements.push_back(std::move(this->declaration()));
+    this->consume(TokenType::RIGHT_BRACE, "expect '}' after block");
+    
+    return nullptr;
+
+    // TODO: how to make_unique<> where types ctor takes a vector?
+    //return std::make_unique<BlockStmt<EType, VType>>(std::move(statements));
+    //return std::make_unique<BlockStmt<EType, VType>>(statements);
+    //return statements;
+}
 
 // ======== PUBLIC  FUNCTIONS ======== //
 std::vector<std::unique_ptr<Stmt<EType, VType>>> Parser::parse(void)

@@ -10,7 +10,6 @@
 #include <iterator>
 #include <iostream>
 
-#include <cstdio>
 
 #include "Scanner.hpp"
 #include "Parser.hpp"
@@ -31,10 +30,6 @@ void run(const std::string& source)
     Parser parser(scanned_tokens);
 
     const auto statements = parser.parse();
-    std::cout << "[" << __func__ << "] statments : " << std::endl;
-    for(const auto& statement : statements)
-        std::cout << statement->to_string() << std::endl;
-
     if(Lox::had_error)
         return;
 

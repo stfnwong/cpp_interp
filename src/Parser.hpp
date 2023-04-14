@@ -51,6 +51,8 @@ class Parser
         std::unique_ptr<Stmt<EType, VType>> statement(void);
         std::unique_ptr<Stmt<EType, VType>> print_statement(void);
         std::unique_ptr<Stmt<EType, VType>> expression_statement(void);
+        std::unique_ptr<Stmt<EType, VType>> block(void);
+        //std::vector<std::unique_ptr<Stmt<EType, VType>>> block(void);
 
     public:
         Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}

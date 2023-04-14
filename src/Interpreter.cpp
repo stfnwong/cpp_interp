@@ -70,6 +70,23 @@ void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
     stmt->accept(*this);
 }
 
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env)
+{
+    Environment prev_env = this->env;
+
+    try {
+        this->env = env;
+        for(unsigned i = 0; i < stmts.size(); ++i)
+            this->execute(stmts[i]);
+    }
+    catch(RuntimeError& e)
+    {
+        runtime_error(e);
+    }
+
+    this->env = prev_env;
+}
+
 
 // ======== EXPRESSION VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(LiteralExpr<EType, VType>& expr)
@@ -209,6 +226,14 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
 
     return value;       // bogus return...
 }
+
+LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
+{
+    Environment block_env;
+    this->execute_block(stmt.statements, block_env);
+}
+
+
 
 // ======== PUBLIC FUNCTIONS ======== //
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVType>>>& statements)

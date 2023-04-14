@@ -15,11 +15,13 @@
 
 class Environment
 {
+    Environment* enclosing;
     // We start with unscoped variables.
     std::unordered_map<std::string, LoxObject> values;
 
     public:
-        Environment() {}
+        Environment() : enclosing(nullptr) {}
+        Environment(Environment* enc) : enclosing(enc) {}
 
         void      define(const std::string& name, const LoxObject& value);
         LoxObject get(const Token& name);

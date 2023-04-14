@@ -8,7 +8,24 @@
 
 #include "Interpreter.hpp"
 #include "Parser.hpp"
+#include "Scanner.hpp"
+#include "Util.hpp"
 
+
+std::string read_source(const std::string& filename)
+{
+    std::string source;
+    std::string line;
+    std::ifstream file(filename);
+    
+    if(!file.good())
+        return source;
+
+    while(std::getline(file, line))
+        source += line + "\n";
+
+    return source;
+}
 
 //TEST_CASE("test_interpret_binary_expr", "interpreter")
 //{
@@ -50,5 +67,17 @@ TEST_CASE("test_parse_and_interpret", "interpreter")
     Interpreter interp;
 
     interp.interpret(parsed_output);
+}
 
+TEST_CASE("test_interpret_block_statements", "interpreter")
+{
+    const std::string nesting_filename = "test/nesting.lox";
+    std::string source = read_source(nesting_filename);
+
+    Scanner scanner(source);
+    Parser parser(scanner.scan());
+
+    auto statements = parser.parse();
+    Interpreter test_interp;
+    test_interp.interpret(statements);
 }

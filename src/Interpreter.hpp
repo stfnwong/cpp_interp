@@ -28,6 +28,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
 
         LoxObject evaluate(const std::unique_ptr<Expr<EType, VType>>& expr);
         void      execute(const std::unique_ptr<Stmt<EType, VType>>& stmt);
+        void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env);
         
         // Expressions
         LoxObject visit(LiteralExpr<EType, VType>& expr) final;
@@ -42,7 +43,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         LoxObject visit(PrintStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(ExpressionStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(VariableStmt<EType, StmtVType>& stmt) final;
-
+        LoxObject visit(BlockStmt<EType, StmtVType>& stmt) final;
 
     public:
         Interpreter() {} 

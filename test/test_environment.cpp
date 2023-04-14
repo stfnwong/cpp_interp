@@ -11,9 +11,22 @@
 #include "Util.hpp"
 
 
-//TEST_CASE("test_create_environment", "environment")
-//{
-//}
+TEST_CASE("test_create_environment", "environment")
+{
+    Environment env;
+
+    // Since no vars are defined basically everything should fail
+    REQUIRE_THROWS(env.get(Token(TokenType::STRING, "anything")));
+    REQUIRE_THROWS(env.assign(Token(TokenType::STRING, "anything"), LoxObject(1.0f)));
+}
+
+TEST_CASE("test_create_env_with_enclosing", "environment")
+{
+    Environment outer;
+
+    // Put some vars in the outer env
+}
+
 
 TEST_CASE("test_add_variable", "environment")
 {
