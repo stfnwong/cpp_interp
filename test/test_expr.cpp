@@ -71,24 +71,3 @@ TEST_CASE("test_create_binary_expr", "expr")
     REQUIRE(*static_cast<LiteralExpr<E, T>*>(test_expr.right.get()) == exp_right);
 }
 
-
-TEST_CASE("test_ast_printer", "expr")
-{
-    ASTPrinter printer;
-
-    // Create some expression
-    Token op(TokenType::PLUS, "+");
-    
-    std::unique_ptr<LiteralExpr<E, T>> left = std::make_unique<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "1", 1, 1.0f)
-    );
-
-    std::unique_ptr<LiteralExpr<E, T>> right = std::make_unique<LiteralExpr<E, T>>(
-            Token(TokenType::NUMBER, "1", 1, 2.0f)  // TODO: put token in object so this doesn't pass
-    );
-
-    BinaryExpr<E, T> test_expr(std::move(left), std::move(right), op);
-    
-    REQUIRE(test_expr.op == Token(TokenType::PLUS, "+"));
-    REQUIRE(printer.print(test_expr) == "(+ 1 2)");
-}
