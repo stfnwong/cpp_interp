@@ -186,22 +186,36 @@ LoxObject Interpreter::visit(AssignmentExpr<EType, VType>& expr)
     return value;
 }
 
+LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
+{
+    LoxObject left = this->evaluate(expr.left);
+
+    if(expr.op.type == TokenType::OR)
+    {
+        if(this->is_truthy(left))
+            return left;
+    }
+    else // we only have OR and AND, so this is the AND branch
+    {
+        if(!this->is_truthy(left))
+            return left;
+    }
+
+    return this->evaluate(expr.right);
+}
+
 // ======== STATEMENT VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {
     LoxObject value = this->evaluate(stmt.expr);
     std::cout << value.to_string() << std::endl;
 
-    // NOTE: one downside of this architecture is that I now have to return this 
-    // bogus value.
-    return LoxObject();
+    return value;
 }
 
 LoxObject Interpreter::visit(ExpressionStmt<EType, StmtVType>& stmt)
 {
-    // TODO: don't print here (since this isn't a print statement)
     LoxObject value =  this->evaluate(stmt.expr);
-    //std::cout << value.to_string() << std::endl;
     return value;
 }
 

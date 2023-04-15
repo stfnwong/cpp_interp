@@ -37,7 +37,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         LoxObject visit(BinaryExpr<EType, VType>& expr) final;
         LoxObject visit(VariableExpr<EType, VType>& expr) final;
         LoxObject visit(AssignmentExpr<EType, VType>& expr) final;
-
+        LoxObject visit(LogicalExpr<EType, VType>& expr) final;
 
         // Statments 
         LoxObject visit(PrintStmt<EType, StmtVType>& stmt) final;

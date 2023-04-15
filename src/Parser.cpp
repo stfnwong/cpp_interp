@@ -214,7 +214,8 @@ std::unique_ptr<Expr<EType, VType>> Parser::expression(void)
 
 std::unique_ptr<Expr<EType, VType>> Parser::assignment(void)
 {
-    std::unique_ptr<Expr<EType, VType>> expr = this->equality();
+    //std::unique_ptr<Expr<EType, VType>> expr = this->equality();
+    std::unique_ptr<Expr<EType, VType>> expr = this->or_expr();
 
     if(this->match({TokenType::EQUAL}))
     {
@@ -232,6 +233,44 @@ std::unique_ptr<Expr<EType, VType>> Parser::assignment(void)
 
     return expr;
 }
+
+
+std::unique_ptr<Expr<EType, VType>> Parser::or_expr(void)
+{
+    std::unique_ptr<Expr<EType, VType>> expr = this->and_expr();
+
+    while(this->match({TokenType::OR}))
+    {
+        Token op = this->previous();
+        std::unique_ptr<Expr<EType, VType>> right = this->and_expr();
+        expr = std::make_unique<LogicalExpr<EType, VType>>(
+                op,
+                std::move(expr),
+                std::move(right)
+        );
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expr<EType, VType>> Parser::and_expr(void)
+{
+    std::unique_ptr<Expr<EType, VType>> expr = this->equality();
+
+    while(this->match({TokenType::AND}))
+    {
+        Token op = this->previous();
+        std::unique_ptr<Expr<EType, VType>> right = this->equality();
+        expr = std::make_unique<LogicalExpr<EType, VType>>(
+                op,
+                std::move(expr),
+                std::move(right)
+        );
+    }
+
+    return expr;
+}
+
 
 // ======== STATEMENT  FUNCTIONS ======== //
 std::unique_ptr<Stmt<EType, VType>> Parser::declaration(void)

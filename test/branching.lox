@@ -1,0 +1,2 @@
+print "hi" or 2;  // prints "hi"
+print nil or "yes";  // prints  "yes"

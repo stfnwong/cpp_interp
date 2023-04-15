@@ -44,6 +44,8 @@ class Parser
         std::unique_ptr<Expr<EType, VType>> comparison(void);
         std::unique_ptr<Expr<EType, VType>> expression(void);
         std::unique_ptr<Expr<EType, VType>> assignment(void);
+        std::unique_ptr<Expr<EType, VType>> or_expr(void);
+        std::unique_ptr<Expr<EType, VType>> and_expr(void);
 
         // Statements 
         std::unique_ptr<Stmt<EType, VType>> declaration(void);            // literals, etc

@@ -16,6 +16,7 @@
 #include "Interpreter.hpp"
 #include "Lox.hpp"
 
+static constexpr bool DEBUG_OUTPUT = false;      // TODO: make cmdline option for this
 
 static const std::string VERSION_STRING = "deez nuts";
 static bool had_error = false;
@@ -26,6 +27,12 @@ void run(const std::string& source)
     Scanner scanner(source);
     auto scanned_tokens = scanner.scan();
     Parser parser(scanned_tokens);
+
+    if(DEBUG_OUTPUT)
+    {
+        for(const Token& tok : scanned_tokens)
+            std::cout << tok.to_repr() << std::endl;
+    }
 
     const auto statements = parser.parse();
     if(Lox::had_error)

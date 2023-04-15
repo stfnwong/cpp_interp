@@ -18,7 +18,7 @@
 // preferred design is here... what I am trying to avoid is the use of dynamic_cast<>
 // to figure out what the type of an Expr is.
 // TODO: think about an alternative for this
-enum class ExprType { LITERAL, UNARY, BINARY, GROUPING, VARIABLE, ASSIGNMENT };
+enum class ExprType { LITERAL, UNARY, BINARY, GROUPING, VARIABLE, ASSIGNMENT, LOGICAL };
 
 
 template <typename E, typename T> struct LiteralExpr;
@@ -27,6 +27,7 @@ template <typename E, typename T> struct BinaryExpr;
 template <typename E, typename T> struct GroupingExpr;
 template <typename E, typename T> struct VariableExpr;
 template <typename E, typename T> struct AssignmentExpr;
+template <typename E, typename T> struct LogicalExpr;
 
 
 // Visitor object 
@@ -39,6 +40,7 @@ template <typename E, typename T> struct ExprVisitor
         virtual T visit(GroupingExpr<E, T>& expr) = 0;
         virtual T visit(VariableExpr<E, T>& expr) = 0;
         virtual T visit(AssignmentExpr<E, T>& expr) = 0;
+        virtual T visit(LogicalExpr<E, T>& expr) = 0;
 };
 
 
@@ -330,6 +332,58 @@ template <typename E, typename T> struct AssignmentExpr : Expr<E, T>
             std::ostringstream oss;
             oss << "AssignmentExpr<" << this->token.to_string() 
                 << " = " << this->expr.get()->to_string() << ">";
+            return oss.str();
+        }
+};
+
+
+/*
+ * LogicalExpr
+ */
+template <typename E, typename T> struct LogicalExpr : Expr<E, T>
+{
+    Token op;
+    std::unique_ptr<Expr<E, T>> left;
+    std::unique_ptr<Expr<E, T>> right;
+
+    public:
+        LogicalExpr(const Token& o, std::unique_ptr<Expr<E, T>> l, std::unique_ptr<Expr<E, T>> r) :
+            op(o),
+            left(std::move(l)),
+            right(std::move(r)) {}
+
+        bool operator==(const LogicalExpr<E, T>& that) const 
+        {
+            if(this->op != that.op)
+                return false;
+            if(this->left.get() != that.left.get())
+                return false;
+            if(this->right.get() != that.right.get())
+                return false;
+
+            return true;
+        }
+
+        bool operator!=(const LogicalExpr<E, T>& that) const {
+            return !(*this == that);
+        }
+
+        ExprType get_type(void) const final {
+            return ExprType::LOGICAL;
+        }
+
+        T accept(ExprVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        std::string to_string(void) const final 
+        {
+            std::ostringstream oss;
+            oss << "LogicalExpr<" 
+                << this->left.get()->to_string() << " " 
+                << this->op.to_string() << " "
+                << this->right.get()->to_string() << ">";
+
             return oss.str();
         }
 };
