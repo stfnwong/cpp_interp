@@ -51,8 +51,8 @@ char Scanner::advance(void)
     else
         this->cur_char = this->source[this->cur_pos];
 
-    if(this->cur_char == '\n')
-        this->line = this->line + 1;
+    //if(this->cur_char == '\n')
+    //    this->line = this->line + 1;
 
     this->cur_pos++;
     //return this->cur_char;

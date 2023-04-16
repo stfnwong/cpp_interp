@@ -52,6 +52,8 @@ class Parser
         std::unique_ptr<Stmt<EType, VType>> var_declaration(void);            // literals, etc
         std::unique_ptr<Stmt<EType, VType>> statement(void);
         std::unique_ptr<Stmt<EType, VType>> if_statement(void);
+        std::unique_ptr<Stmt<EType, VType>> for_statement(void);
+        std::unique_ptr<Stmt<EType, VType>> while_statement(void);
         std::unique_ptr<Stmt<EType, VType>> print_statement(void);
         std::unique_ptr<Stmt<EType, VType>> expression_statement(void);
         std::unique_ptr<Stmt<EType, VType>> block(void);

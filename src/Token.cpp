@@ -114,7 +114,7 @@ std::string Token::to_repr(void) const
     {
         oss << " " << std::visit(make_literal_string(), this->literal.value()) << " ";
     }
-    oss << " line: " << this->line << " ";
+    oss << " (line: " << this->line << ") ";
 
     return oss.str();
 }

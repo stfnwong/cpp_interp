@@ -200,9 +200,11 @@ template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
         {
             std::ostringstream oss;
 
-            oss << this->left->to_string() << " " 
+            oss << "BinaryExpr<" 
+                << this->left->to_string() << " " 
                 << this->op.to_string() << " " 
-                << this->right->to_string();
+                << this->right->to_string() 
+                << ">";
 
             return oss.str();
         }

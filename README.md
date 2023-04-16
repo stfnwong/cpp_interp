@@ -54,9 +54,13 @@ Variables have additional productions.
 
 `declaration -> var_decl | statement ;`
 
-`statement -> expr_stmt | if_stmt | print_stmt | block ;`
+`statement -> expr_stmt | if_stmt | for_stmt | while_stmt | print_stmt | block ;`
 
 `if_stmt -> "if" "(" expression ")" statement ("else" statement )? ;`
+
+`for_stmt -> "for" "(" ( var_decl | expr_stmt | ";" ) expression? ";" expression? ";" statement;`
+
+`while_stmt -> "while" "(" expression ")" statement ;`
 
 A block is just a (possibly empty) series of statements surrounded by curly braces.
 

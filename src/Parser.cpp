@@ -107,11 +107,7 @@ std::unique_ptr<Expr<EType, VType>> Parser::primary(void)
         return std::make_unique<LiteralExpr<EType, VType>>(this->previous());
 
     if(this->match({TokenType::STRING, TokenType::NUMBER}))
-    {
-        Token prev = this->previous();
-        auto ret = std::make_unique<LiteralExpr<EType, VType>>(prev);
-        return ret;
-    }
+        return std::make_unique<LiteralExpr<EType, VType>>(this->previous());
 
     if(this->match({TokenType::IDENTIFIER}))
         return std::make_unique<VariableExpr<EType, VType>>(this->previous());
@@ -216,16 +212,21 @@ std::unique_ptr<Expr<EType, VType>> Parser::assignment(void)
 {
     //std::unique_ptr<Expr<EType, VType>> expr = this->equality();
     std::unique_ptr<Expr<EType, VType>> expr = this->or_expr();
+    std::cout << "[" << __func__ << "] or_expr : " << expr->to_string() << std::endl;
 
     if(this->match({TokenType::EQUAL}))
     {
         Token equals = this->previous();
         std::unique_ptr<Expr<EType, VType>> value = this->assignment();
+        std::cout << "[" << __func__ << "] while parsing '=' got value (" 
+            << value->to_string() << ")" << std::endl;
+        std::cout << "[" << __func__ << "] expr for this value was (" << expr->to_string()
+            << ")" << std::endl;
 
-        if(value->get_type() == ExprType::VARIABLE)
+        if(expr->get_type() == ExprType::VARIABLE)
         {
-            Token name = static_cast<VariableExpr<EType, VType>*>(value.get())->token;
-            return std::make_unique<AssignmentExpr<EType, VType>>(name, std::move(expr));
+            Token name = static_cast<VariableExpr<EType, VType>*>(expr.get())->token;
+            return std::make_unique<AssignmentExpr<EType, VType>>(name, std::move(value));
         }
 
         Lox::error(equals, "invalid assignment target");
@@ -293,19 +294,25 @@ std::unique_ptr<Stmt<EType, VType>> Parser::var_declaration(void)
 {
     Token name = this->consume(TokenType::IDENTIFIER, "expect variable name");
 
-    std::unique_ptr<Expr<EType, VType>> initialiser = nullptr;
+    std::cout << "[" << __func__ << "] got name " << name.to_string() << std::endl;
+
+    std::unique_ptr<Expr<EType, VType>> init;
     if(this->match({TokenType::EQUAL}))
-        initialiser = this->expression();
+        init = this->expression();
 
     this->consume(TokenType::SEMICOLON, "expect ';' after variable declaration");
 
-    return std::make_unique<VariableStmt<EType, VType>>(name, std::move(initialiser));
+    return std::make_unique<VariableStmt<EType, VType>>(name, std::move(init));
 }
 
 std::unique_ptr<Stmt<EType, VType>> Parser::statement(void)
 {
     if(this->match({TokenType::IF}))
         return this->if_statement();
+    if(this->match({TokenType::FOR}))
+        return this->for_statement();       // desugars a for into a while
+    if(this->match({TokenType::WHILE}))
+        return this->while_statement();
     if(this->match({TokenType::PRINT}))
         return this->print_statement();
 
@@ -334,6 +341,97 @@ std::unique_ptr<Stmt<EType, VType>> Parser::if_statement(void)
     );
 }
 
+
+/*
+ * for_stmt -> "for" "(" ( var_decl | expr_stmt | ";" ) expression? ";" expression? ";" statement;
+ *
+ */
+std::unique_ptr<Stmt<EType, VType>> Parser::for_statement(void)
+{
+    this->consume(TokenType::LEFT_PAREN, "expect '(' after for");
+
+    // initializer
+    std::unique_ptr<Stmt<EType, VType>> init = nullptr;
+    if(this->match({TokenType::SEMICOLON}))
+        init = nullptr;
+    else if(this->match({TokenType::VAR}))
+        init = this->var_declaration();
+    else 
+        init = this->expression_statement();
+
+    if(init)
+        std::cout << "[" << __func__ << "] parsed init (" << init->to_string() << ")" <<  std::endl;
+
+    // condition
+    std::unique_ptr<Expr<EType, VType>> cond = nullptr;
+    if(!this->check(TokenType::SEMICOLON))
+        cond = this->expression();
+    this->consume(TokenType::SEMICOLON, "expect ';' after loop condition");
+
+    if(cond)
+        std::cout << "[" << __func__ << "] parsed cond (" << cond->to_string() << ")" << std::endl;
+    
+    // increment
+    std::unique_ptr<Expr<EType, VType>> incr = nullptr;
+    if(!this->check(TokenType::RIGHT_PAREN))
+        incr = this->expression();
+    this->consume(TokenType::RIGHT_PAREN, "expect ')' after for clauses");
+
+    if(incr)
+        std::cout << "[" << __func__ << "] parsed incr (" << incr->to_string() << ")" << std::endl;
+
+    // statement(s) in body
+    std::unique_ptr<Stmt<EType, VType>> body = this->statement();
+
+    // check increment
+    if(incr != nullptr)
+    {
+        std::vector<std::unique_ptr<Stmt<EType, VType>>> stmts;
+        stmts.push_back(std::move(body));
+
+        stmts.push_back(
+                std::move(
+                    std::make_unique<ExpressionStmt<EType, VType>>(
+                        std::move(incr)
+                    )
+                )
+        );
+
+        body = std::make_unique<BlockStmt<EType, VType>>(std::move(stmts));
+
+        //body = std::make_unique<BlockStmt<EType, VType>>(
+        //        std::move({std::move(body), std::move(incr)})
+        //);
+    }
+
+    // take the condition and body and bulid a while loop - if there is no condition
+    // we just force condition to true
+    if(cond == nullptr)  
+        cond = std::make_unique<LiteralExpr<EType, VType>>(true); 
+    body = std::make_unique<WhileStmt<EType, VType>>(std::move(cond), std::move(body));
+
+    if(init != nullptr)
+    {
+        std::vector<std::unique_ptr<Stmt<EType, VType>>> block_stmts;
+
+        block_stmts.push_back(std::move(init));
+        block_stmts.push_back(std::move(body));
+
+        body = std::make_unique<BlockStmt<EType, VType>>(std::move(block_stmts));
+    }
+
+    return body;
+}
+
+std::unique_ptr<Stmt<EType, VType>> Parser::while_statement(void)
+{
+    this->consume(TokenType::LEFT_PAREN, "expect '(' after while");
+    std::unique_ptr<Expr<EType, VType>> cond = this->expression();
+    this->consume(TokenType::RIGHT_PAREN, "expect ')' after condition");
+    std::unique_ptr<Stmt<EType, VType>> body = this->statement();
+
+    return std::make_unique<WhileStmt<EType, VType>>(std::move(cond), std::move(body));
+}
 
 std::unique_ptr<Stmt<EType, VType>> Parser::print_statement(void)
 {

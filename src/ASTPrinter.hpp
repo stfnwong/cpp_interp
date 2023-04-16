@@ -110,7 +110,12 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
 
         LoxObject visit(IfStmt<E, T>& stmt) final
         {
-            return LoxObject();   
+            return LoxObject(stmt.to_string());
+        }
+
+        LoxObject visit(WhileStmt<E, T>& stmt) final
+        {
+            return LoxObject(stmt.to_string());
         }
 };
 

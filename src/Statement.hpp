@@ -9,13 +9,15 @@
 #include "Expr.hpp"
 
 
-enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK, IF };
+enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK, IF, VAR, WHILE };
 
 template <typename E, typename T> struct PrintStmt;
 template <typename E, typename T> struct ExpressionStmt;
 template <typename E, typename T> struct VariableStmt;
 template <typename E, typename T> struct BlockStmt;
 template <typename E, typename T> struct IfStmt;
+template <typename E, typename T> struct VarStmt;
+template <typename E, typename T> struct WhileStmt;
 
 
 template <typename E, typename T> struct StmtVisitor
@@ -26,6 +28,7 @@ template <typename E, typename T> struct StmtVisitor
         virtual T visit(VariableStmt<E, T>& stmt) = 0;
         virtual T visit(BlockStmt<E, T>& stmt) = 0;
         virtual T visit(IfStmt<E, T>& stmt) = 0;
+        virtual T visit(WhileStmt<E, T>& stmt) = 0;
 };
 
 
@@ -72,7 +75,10 @@ template <typename E, typename T> struct PrintStmt : public Stmt<E, T>
         std::string to_string(void) const final
         {
             std::ostringstream oss;
-            oss << "PrintStmt<" << this->expr->to_string() << ">";
+            oss << "PrintStmt<";
+            if(this->expr.get())
+                oss << this->expr->to_string();
+            oss << ">";
             return oss.str();
         }
 };
@@ -137,7 +143,10 @@ template <typename E, typename T> struct VariableStmt : public Stmt<E, T>
         std::string to_string(void) const final
         {
             std::ostringstream oss;
-            oss << "VariableStmt<" << this->expr->to_string() << ">";
+            oss << "VariableStmt<";
+            if(this->expr.get())
+                oss << this->expr->to_string();
+            oss << ">";
             return oss.str();
         }
 };
@@ -226,6 +235,39 @@ template <typename E, typename T> struct IfStmt : public Stmt<E, T>
 
 
 
+
+/*
+ * WhileStmt
+ */
+template <typename E, typename T> struct WhileStmt : public Stmt<E, T>
+{
+    std::unique_ptr<Expr<E, T>> cond;
+    std::unique_ptr<Stmt<E, T>> body;
+    
+    public:
+        WhileStmt(std::unique_ptr<Expr<E, T>> cond, std::unique_ptr<Stmt<E, T>> body) :
+            cond(std::move(cond)),
+            body(std::move(body)) {}
+
+        StmtType get_type(void) const final {
+            return StmtType::WHILE;
+        }
+
+        T accept(StmtVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        const Expr<E, T>* get_expr(void) const final {
+            return this->cond.get();
+        }
+
+        std::string to_string(void) const final 
+        {
+            std::ostringstream oss;
+
+            return oss.str();
+        }
+};
 
 
 #endif /*__STATEMENT_HPP*/

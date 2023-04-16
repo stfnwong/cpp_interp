@@ -21,10 +21,10 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
     private:
         Environment env;
 
-        bool is_truthy(const LoxObject& obj) const;
-        bool is_equal(const LoxObject& a, const LoxObject& b) const;
-        void check_number_operand(const Token& otor, const LoxObject& orand);
-        void check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
+        bool      is_truthy(const LoxObject& obj) const;
+        bool      is_equal(const LoxObject& a, const LoxObject& b) const;
+        void      check_number_operand(const Token& otor, const LoxObject& orand);
+        void      check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
 
         LoxObject evaluate(const std::unique_ptr<Expr<EType, VType>>& expr);
         void      execute(const std::unique_ptr<Stmt<EType, VType>>& stmt);
@@ -45,6 +45,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         LoxObject visit(VariableStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(BlockStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(IfStmt<EType, StmtVType>& stmt) final;
+        LoxObject visit(WhileStmt<EType, StmtVType>& stmt) final;
 
     public:
         Interpreter() {} 

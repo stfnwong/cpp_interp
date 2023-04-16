@@ -73,9 +73,15 @@ void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env)
 {
     Environment prev_env = this->env;
+    std::cout << "[" << __func__ << "] prev env contains: " << std::endl;
+    for(auto v : prev_env.get_vars())
+        std::cout << v << std::endl;
 
     try {
         this->env = env;
+        std::cout << "[" << __func__ << "] this->env contains:" << std::endl;
+        for(auto v : this->env.get_vars())
+            std::cout << v << std::endl;
         for(unsigned i = 0; i < stmts.size(); ++i)
             this->execute(stmts[i]);
     }
@@ -176,6 +182,9 @@ LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 
 LoxObject Interpreter::visit(VariableExpr<EType, VType>& expr)
 {
+    std::cout << "[" << __func__ << "] getting var from (" 
+        << expr.to_string() << ") with token " 
+        << expr.token.to_string() << std::endl;
     return this->env.get(expr.token);
 }
 
@@ -208,8 +217,7 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
 LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {
     LoxObject value = this->evaluate(stmt.expr);
-    std::cout << value.to_string() << std::endl;
-
+    std::cout << value.to_repr() << std::endl;  // Should be to_string()
     return value;
 }
 
@@ -225,14 +233,22 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
 
+    std::cout << "[" << __func__ << "] defining var in (" 
+        << stmt.to_string() << ")" << std::endl;
     this->env.define(stmt.token.lexeme, value);
+
+    // TODO: debug, remove 
+    auto vars = this->env.get_vars();
+    std::cout << "[" << __func__ << "] current vars:" << std::endl;
+    for(auto v : vars)
+        std::cout << v << std::endl;
 
     return value;       // bogus return...
 }
 
 LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
 {
-    Environment block_env;
+    Environment block_env(this->env);
     this->execute_block(stmt.statements, block_env);
     return LoxObject();
 }
@@ -247,6 +263,13 @@ LoxObject Interpreter::visit(IfStmt<EType, StmtVType>& stmt)
     return LoxObject();     // TODO: what to do about bogus objects? Return a LoxObject pointer set to nullptr?
 }
 
+LoxObject Interpreter::visit(WhileStmt<EType, StmtVType>& stmt)
+{
+    while(this->is_truthy(this->evaluate(stmt.cond)))
+        this->execute(stmt.body);
+
+    return LoxObject();
+}
 
 
 

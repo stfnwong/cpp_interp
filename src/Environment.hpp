@@ -8,6 +8,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "Object.hpp"
 
@@ -26,6 +27,7 @@ class Environment
         void      define(const std::string& name, const LoxObject& value);
         LoxObject get(const Token& name);
         void      assign(const Token& name, const LoxObject& value);
+        std::vector<std::string> get_vars(void) const;
         //LoxObject get(const std::string& name);
 };
 
