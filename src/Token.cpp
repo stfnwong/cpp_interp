@@ -112,7 +112,7 @@ std::string Token::to_repr(void) const
     oss << "Token<" << token_to_str[this->type] << "> \"" << this->lexeme << "\"";
     if(this->literal.has_value())
     {
-        oss << " " << std::visit(make_literal_string(), this->literal.value()) << " ";
+        oss << " [" << std::visit(make_literal_string(), this->literal.value()) << "] ";
     }
     oss << " (line: " << this->line << ") ";
 

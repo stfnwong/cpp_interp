@@ -217,13 +217,14 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
 LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {
     LoxObject value = this->evaluate(stmt.expr);
-    std::cout << value.to_repr() << std::endl;  // Should be to_string()
+    std::cout << value.to_string() << std::endl;  // Should be to_string()
     return value;
 }
 
 LoxObject Interpreter::visit(ExpressionStmt<EType, StmtVType>& stmt)
 {
     LoxObject value =  this->evaluate(stmt.expr);
+    //std::cout << "Evaluated: " << stmt.to_string() << " to " << value.to_string() << std::endl;
     return value;
 }
 
@@ -279,7 +280,10 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVT
 {
     try {
         for(unsigned i = 0; i < statements.size(); ++i)
+        {
+            std::cout << "[" << __func__ << "] executing statement " << statements[i]->to_string() << std::endl;
             this->execute(statements[i]);
+        }
     }
     catch(RuntimeError& e) {
         runtime_error(e);

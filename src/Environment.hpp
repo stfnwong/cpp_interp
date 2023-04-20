@@ -16,7 +16,7 @@
 
 class Environment
 {
-    Environment* enclosing;
+    Environment* enclosing;    // Who deletes this?
     // We start with unscoped variables.
     std::unordered_map<std::string, LoxObject> values;
 

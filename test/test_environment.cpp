@@ -22,11 +22,48 @@ TEST_CASE("test_create_environment", "environment")
 
 TEST_CASE("test_create_env_with_enclosing", "environment")
 {
-    Environment outer;
 
-    // Put some vars in the outer env
+    LoxObject outer_var_1(Token(TokenType::STRING, "1", 1));
+    LoxObject outer_var_2(Token(TokenType::STRING, "2", 1));
+    Token outer_var_1_name(TokenType::IDENTIFIER, "outer_var_1");
+    Token outer_var_2_name(TokenType::IDENTIFIER, "outer_var_2");
+
+    LoxObject inner_var_1(Token(TokenType::STRING, "10", 1));
+    LoxObject inner_var_2(Token(TokenType::STRING, "20", 1));
+    Token inner_var_1_name(TokenType::IDENTIFIER, "inner_var_1");
+    Token inner_var_2_name(TokenType::IDENTIFIER, "inner_var_2");
+
+
+    // Construct the outer env
+    Environment* outer = new Environment();
+    outer->define(outer_var_1_name.lexeme, outer_var_1);
+    outer->define(outer_var_2_name.lexeme, outer_var_2);
+    REQUIRE(outer->get(outer_var_1_name) == outer_var_1);
+
+    // Create inner Environment
+    Environment inner(outer);
+
+    // Add new vars to inner scope
+    inner.define(inner_var_1_name.lexeme, inner_var_1);
+    inner.define(inner_var_2_name.lexeme, inner_var_2);
+
+    REQUIRE(inner.get(inner_var_1_name) == inner_var_1);
+    REQUIRE(inner.get(inner_var_2_name) == inner_var_2);
+
+    // We can still access the variables in the outer scope
+    REQUIRE(inner.get(outer_var_1_name) == outer_var_1);
+    REQUIRE(inner.get(outer_var_2_name) == outer_var_2);
+
+    // If we shadow an outer var with an inner var, we should get the inner var
+    LoxObject outer_var_shadow_val(Token(TokenType::STRING, "inner shadow", 1));
+    
+    inner.assign(outer_var_1_name, outer_var_shadow_val);
+    REQUIRE(inner.get(outer_var_1_name) == outer_var_shadow_val);
+
+    delete outer;
 }
 
+// Test shadowing?
 
 TEST_CASE("test_add_variable", "environment")
 {

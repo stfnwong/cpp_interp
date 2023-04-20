@@ -1,0 +1,9 @@
+var a = "this is var a";
+{
+    var a = "this is var a";
+    var b = "this is var b";
+    print a;
+    print b;
+}
+
+print a;

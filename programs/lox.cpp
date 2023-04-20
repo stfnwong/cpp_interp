@@ -16,7 +16,10 @@
 #include "Interpreter.hpp"
 #include "Lox.hpp"
 
-static constexpr bool DEBUG_OUTPUT = false;      // TODO: make cmdline option for this
+#include "ASTPrinter.hpp"
+
+
+static constexpr bool DEBUG_OUTPUT = true;      // TODO: make cmdline option for this
 
 static const std::string VERSION_STRING = "deez nuts";
 static bool had_error = false;
@@ -30,13 +33,26 @@ void run(const std::string& source)
 
     if(DEBUG_OUTPUT)
     {
-        for(const Token& tok : scanned_tokens)
-            std::cout << tok.to_repr() << std::endl;
+        std::cout << "Scanner produced the following tokens:" << std::endl;
+        for(unsigned i = 0; i < scanned_tokens.size(); ++i)
+            std::cout << " " << i << ": " << scanned_tokens[i].to_repr() << std::endl;
     }
 
     const auto statements = parser.parse();
     if(Lox::had_error)
         return;
+
+    if(DEBUG_OUTPUT)
+    {
+        std::cout << "Parser produced the following statements:" << std::endl;
+        for(unsigned i = 0; i < statements.size(); ++i)
+            std::cout << " " << i << ": " << statements[i]->to_string() << std::endl;
+
+        ASTPrinter printer;
+        std::cout << "AST for output:" << std::endl;
+        for(unsigned i = 0; i < statements.size(); ++i)
+            std::cout << " " << i << ": " << printer.print(*statements[i].get()) << std::endl;
+    }
 
     Interpreter interp;
     interp.interpret(statements);

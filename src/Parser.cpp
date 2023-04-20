@@ -278,7 +278,12 @@ std::unique_ptr<Stmt<EType, VType>> Parser::declaration(void)
 {
     try {
         if(this->match({TokenType::VAR}))
-            return this->var_declaration();
+        {
+            auto var_decl = this->var_declaration();
+            std::cout << "[" << __func__ << "] return with vardecl : " << var_decl->to_string() << std::endl;
+            return var_decl;
+            //return this->var_declaration();
+        }
 
         return this->statement();
     }
@@ -437,7 +442,10 @@ std::unique_ptr<Stmt<EType, VType>> Parser::print_statement(void)
 {
     auto value = this->expression();
     this->consume(TokenType::SEMICOLON, "expect ';' after value");
-    return std::make_unique<PrintStmt<EType, VType>>(std::move(value));
+    auto ret = std::make_unique<PrintStmt<EType, VType>>(std::move(value));
+    std::cout << "[" << __func__ << "] created print statement: " << ret->to_string() << std::endl;
+    return ret;
+    //return std::make_unique<PrintStmt<EType, VType>>(std::move(value));
 }
 
 std::unique_ptr<Stmt<EType, VType>> Parser::expression_statement(void)

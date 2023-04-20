@@ -143,9 +143,9 @@ template <typename E, typename T> struct VariableStmt : public Stmt<E, T>
         std::string to_string(void) const final
         {
             std::ostringstream oss;
-            oss << "VariableStmt<";
+            oss << "VariableStmt<" << this->token.lexeme;
             if(this->expr.get())
-                oss << this->expr->to_string();
+                oss << " = " << this->expr->to_string();
             oss << ">";
             return oss.str();
         }
@@ -264,6 +264,12 @@ template <typename E, typename T> struct WhileStmt : public Stmt<E, T>
         std::string to_string(void) const final 
         {
             std::ostringstream oss;
+            oss << "WhileStmt<";
+            if(this->cond.get())
+                oss << this->cond->to_string();
+            if(this->body.get())
+                oss << " " << this->body->to_string();
+            oss << ">";
 
             return oss.str();
         }
