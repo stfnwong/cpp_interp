@@ -95,39 +95,51 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
         // Statements
         LoxObject visit(PrintStmt<E, T>& stmt) final 
         {
-            return stmt.expr->accept(*this);
+            std::ostringstream oss;
+            oss << "(print " << stmt.expr->accept(*this).to_string() << ")";
+            return LoxObject(oss.str());
         }
 
         LoxObject visit(ExpressionStmt<E, T>& stmt) final
         {
-            return stmt.expr->accept(*this);
+            std::ostringstream oss;
+            oss << "(expr " << stmt.expr->accept(*this).to_string() << ")";
+            return LoxObject(oss.str());
         }
 
         LoxObject visit(VariableStmt<E, T>& stmt) final
         {
             // TODO: this is just to prevent segfault when Variable is empty, 
-            // however this should never be the case
-            return (stmt.expr.get() != nullptr) ? stmt.expr->accept(*this) : LoxObject();
+            // This is the case when a variable is declared but not assigned.
+            return (stmt.expr.get() != nullptr) ? stmt.expr->accept(*this) : LoxObject(stmt.token.lexeme);
         }
 
         LoxObject visit(BlockStmt<E, T>& stmt) final
         {
             std::ostringstream oss;
-            oss << "(Block " << std::endl;
+            oss << "(block " << std::endl;
             for(unsigned i = 0; i < stmt.statements.size(); ++i)
-                oss << "  - " << stmt.statements[i].get()->accept(*this).to_string() << std::endl;
+                oss << "     " << i << ") " << stmt.statements[i]->accept(*this).to_string() << std::endl;
             oss << ")";
             return LoxObject(oss.str());
         }
 
         LoxObject visit(IfStmt<E, T>& stmt) final
         {
-            return LoxObject(stmt.to_string());
+            std::ostringstream oss;
+            oss << "(if " << stmt.to_string() << ")";
+            return LoxObject(oss.str());
         }
 
         LoxObject visit(WhileStmt<E, T>& stmt) final
         {
-            return LoxObject(stmt.to_string());
+            std::ostringstream oss;
+            //oss << "(while " << stmt.to_string() << ")";
+            oss << "(while ";
+            oss << stmt.cond->accept(*this).to_string() << ", ";
+            oss << stmt.body->accept(*this).to_string() << ", ";
+            oss << ")";
+            return LoxObject(oss.str());
         }
 };
 

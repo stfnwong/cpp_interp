@@ -17,12 +17,8 @@ void Environment::define(const std::string& name, const LoxObject& value)
 
 LoxObject Environment::get(const Token& name)
 {
-    std::cout << "[" << __func__ << "] looking for var: [" << name.lexeme << "]" << std::endl;
     if(this->values.find(name.lexeme) != this->values.end())
         return this->values[name.lexeme];
-
-    std::cout << "[" << __func__ << "] var  " << name.lexeme 
-        << " not found, checking enclosing..." << std::endl;;
 
     if(this->enclosing)
         return this->enclosing->get(name);

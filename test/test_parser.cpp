@@ -36,7 +36,7 @@ TEST_CASE("test_parse_binary_expr", "parser")
     };
     Parser parser(test_tokens);
     REQUIRE(parser.num_tokens() == test_tokens.size());
-    std::string exp_string_repr = "ExpressionStmt<2 + 2>";
+    std::string exp_string_repr = "ExpressionStmt<BinaryExpr<2 + 2>>";
 
     // Should return an expression
     auto parse_result = parser.parse();

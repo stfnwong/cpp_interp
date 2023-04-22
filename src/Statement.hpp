@@ -179,7 +179,10 @@ template <typename E, typename T> struct BlockStmt : public Stmt<E, T>
         std::string to_string(void) const final 
         {
             std::ostringstream oss;
-            oss << "BlockStmt<" << this->statements.size() << ">";
+            //oss << "BlockStmt<" << this->statements.size() << ">";
+            oss << "BlockStmt<" << std::endl;
+            for(unsigned i = 0; i < this->statements.size(); ++i)
+                oss << "  " << this->statements[i]->to_string() << "," << std::endl;
             return oss.str();
         }
 

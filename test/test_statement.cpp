@@ -83,7 +83,7 @@ TEST_CASE("test_create_block_statement", "stmt")
         statements.push_back(std::move(s));
     }
 
-    std::string exp_string_repr = "ExpressionStmt<1 + 2>";
+    std::string exp_string_repr = "ExpressionStmt<BinaryExpr<1 + 2>>";
     for(unsigned i = 0; i < statements.size(); ++i)
         REQUIRE(statements[i]->to_string() == exp_string_repr);
 }

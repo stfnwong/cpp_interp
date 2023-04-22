@@ -10,3 +10,6 @@
 
 # Ignore the interpreter binary
 lox
+
+# Ignore log files
+*.log

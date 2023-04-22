@@ -9,6 +9,9 @@
 #include "Lox.hpp"
 #include "Parser.hpp"
 
+#include "ASTPrinter.hpp"       // TODO: debug only, remove
+
+
 bool Parser::at_end(void) const
 {
     return this->peek().type == TokenType::LOX_EOF;
@@ -353,80 +356,160 @@ std::unique_ptr<Stmt<EType, VType>> Parser::if_statement(void)
  */
 std::unique_ptr<Stmt<EType, VType>> Parser::for_statement(void)
 {
+    // Consume a left paren
     this->consume(TokenType::LEFT_PAREN, "expect '(' after for");
-
-    // initializer
-    std::unique_ptr<Stmt<EType, VType>> init = nullptr;
+    
+    // Try to parse an initializer
+    std::unique_ptr<Stmt<EType, VType>> init;
     if(this->match({TokenType::SEMICOLON}))
         init = nullptr;
     else if(this->match({TokenType::VAR}))
         init = this->var_declaration();
-    else 
+    else
         init = this->expression_statement();
 
-    if(init)
-        std::cout << "[" << __func__ << "] parsed init (" << init->to_string() << ")" <<  std::endl;
-
-    // condition
-    std::unique_ptr<Expr<EType, VType>> cond = nullptr;
+    // Try to parse the loop condition
+    std::unique_ptr<Expr<EType, VType>> cond;
     if(!this->check(TokenType::SEMICOLON))
         cond = this->expression();
     this->consume(TokenType::SEMICOLON, "expect ';' after loop condition");
 
-    if(cond)
-        std::cout << "[" << __func__ << "] parsed cond (" << cond->to_string() << ")" << std::endl;
-    
-    // increment
-    std::unique_ptr<Expr<EType, VType>> incr = nullptr;
+    // Try to parse the loop increment
+    std::unique_ptr<Expr<EType, VType>> incr;
     if(!this->check(TokenType::RIGHT_PAREN))
         incr = this->expression();
     this->consume(TokenType::RIGHT_PAREN, "expect ')' after for clauses");
 
+    auto body = this->statement();
+
+    // If there was an increment, add it to the body as last in a block
     if(incr)
-        std::cout << "[" << __func__ << "] parsed incr (" << incr->to_string() << ")" << std::endl;
-
-    // statement(s) in body
-    std::unique_ptr<Stmt<EType, VType>> body = this->statement();
-
-    // check increment
-    if(incr != nullptr)
     {
         std::vector<std::unique_ptr<Stmt<EType, VType>>> stmts;
         stmts.push_back(std::move(body));
-
-        stmts.push_back(
-                std::move(
-                    std::make_unique<ExpressionStmt<EType, VType>>(
-                        std::move(incr)
-                    )
-                )
+        stmts.push_back(std::make_unique<ExpressionStmt<EType, VType>>(
+                    std::move(incr)
+            )
         );
 
         body = std::make_unique<BlockStmt<EType, VType>>(std::move(stmts));
-
-        //body = std::make_unique<BlockStmt<EType, VType>>(
-        //        std::move({std::move(body), std::move(incr)})
-        //);
     }
 
-    // take the condition and body and bulid a while loop - if there is no condition
-    // we just force condition to true
-    if(cond == nullptr)  
-        cond = std::make_unique<LiteralExpr<EType, VType>>(true); 
+    // Add a default condition if there is no existing condition
+    if(!cond)
+        cond = std::make_unique<LiteralExpr<EType, VType>>(true);
+
     body = std::make_unique<WhileStmt<EType, VType>>(std::move(cond), std::move(body));
 
-    if(init != nullptr)
+    if(init)
     {
-        std::vector<std::unique_ptr<Stmt<EType, VType>>> block_stmts;
-
-        block_stmts.push_back(std::move(init));
-        block_stmts.push_back(std::move(body));
-
-        body = std::make_unique<BlockStmt<EType, VType>>(std::move(block_stmts));
+        std::vector<std::unique_ptr<Stmt<EType, VType>>> stmts;
+        stmts.push_back(std::move(init));
+        stmts.push_back(std::move(body));
+        body = std::make_unique<BlockStmt<EType, VType>>(std::move(stmts));
     }
 
+    ASTPrinter printer;
+    std::cout << "[" << __func__ << "] final body: " << body->to_string() << std::endl;
+    std::cout << "[" << __func__ << "] final AST: " << printer.print(*body.get()) << std::endl;
+
     return body;
+
 }
+
+
+//std::unique_ptr<Stmt<EType, VType>> Parser::for_statement(void)
+//{
+//    ASTPrinter printer;
+//    this->consume(TokenType::LEFT_PAREN, "expect '(' after for");
+//
+//    // initializer
+//    std::unique_ptr<Stmt<EType, VType>> init = nullptr;
+//    if(this->match({TokenType::SEMICOLON}))
+//        init = nullptr;
+//    else if(this->match({TokenType::VAR}))
+//        init = this->var_declaration();
+//    else 
+//        init = this->expression_statement();
+//
+//    if(init)
+//        std::cout << "[" << __func__ << "] parsed init (" << init->to_string() << ")" <<  std::endl;
+//
+//    // condition
+//    std::unique_ptr<Expr<EType, VType>> cond = nullptr;
+//    if(!this->check(TokenType::SEMICOLON))
+//        cond = this->expression();
+//    this->consume(TokenType::SEMICOLON, "expect ';' after loop condition");
+//
+//    if(cond)
+//    {
+//        std::cout << "[" << __func__ << "] parsed cond (" << cond->to_string() << ")" << std::endl;
+//        std::cout << "[" << __func__ << "] cond AST: " << printer.print(*cond.get()) << std::endl;
+//    }
+//    
+//    // increment
+//    std::unique_ptr<Expr<EType, VType>> incr = nullptr;
+//    if(!this->check(TokenType::RIGHT_PAREN))
+//        incr = this->expression();
+//    this->consume(TokenType::RIGHT_PAREN, "expect ')' after for clauses");
+//
+//    if(incr)
+//    {
+//        std::cout << "[" << __func__ << "] parsed incr (" << incr->to_string() << ")" << std::endl;
+//        std::cout << "[" << __func__ << "] incr AST: " << printer.print(*incr.get()) << std::endl;
+//    }
+//
+//    // statement(s) in body
+//    std::unique_ptr<Stmt<EType, VType>> body = this->statement();
+//    std::cout << "[" << __func__ << "] body is now " << body->to_string() << std::endl;
+//    std::cout << "[" << __func__ << "] body AST is " << printer.print(*body.get()) << std::endl;
+//
+//    // check increment
+//    if(incr != nullptr)
+//    {
+//        std::vector<std::unique_ptr<Stmt<EType, VType>>> stmts;
+//        std::cout << "[" << __func__ << "] creating statement from body: " << body->to_string() << std::endl;
+//        std::cout << "[" << __func__ << "] body AST: " << printer.print(*body.get()) << std::endl;
+//        stmts.push_back(std::move(body));
+//        auto incr_stmt = std::make_unique<ExpressionStmt<EType, VType>>(std::move(incr));
+//        std::cout << "[" << __func__ << "] incr_stmt AST: " << printer.print(*incr_stmt.get()) << std::endl;
+//
+//        stmts.push_back(std::move(incr_stmt));
+//
+//        body = std::make_unique<BlockStmt<EType, VType>>(std::move(stmts));
+//        std::cout << "[" << __func__ << "] non-null incr, body is now " << body->to_string() << std::endl;
+//        std::cout << "[" << __func__ << "] with AST: " << printer.print(*body.get()) << std::endl;
+//    }
+//
+//    // take the condition and body and bulid a while loop - if there is no condition
+//    // we just force condition to true
+//    if(cond == nullptr)  
+//    {
+//        cond = std::make_unique<LiteralExpr<EType, VType>>(true); 
+//        std::cout << "[" << __func__ << "] cond is now " << cond->to_string() << std::endl;
+//        std::cout << "[" << __func__ << "] new cond AST: " << printer.print(*cond.get()) << std::endl;
+//    }
+//    body = std::make_unique<WhileStmt<EType, VType>>(std::move(cond), std::move(body));
+//    std::cout << "[" << __func__ << "] body is now WhileStmt: " << body->to_string() << std::endl;
+//    std::cout << "[" << __func__ << "] with AST: " << printer.print(*body.get()) << std::endl;
+//
+//    if(init != nullptr)
+//    {
+//        std::vector<std::unique_ptr<Stmt<EType, VType>>> block_stmts;
+//
+//        block_stmts.push_back(std::move(init));
+//        block_stmts.push_back(std::move(body));
+//
+//        body = std::make_unique<BlockStmt<EType, VType>>(std::move(block_stmts));
+//        std::cout << "[" << __func__ << "] body is now BlockStmt: " << body->to_string() << std::endl;
+//        std::cout << "[" << __func__ << "] with AST: " << printer.print(*body.get()) << std::endl;
+//    }
+//
+//    std::cout << "[" << __func__ << "] final body statement: " << body->to_string() << std::endl;
+//    std::cout << "[" << __func__ << "] final body AST: " << printer.print(*body.get()) << std::endl;
+//
+//    return body;
+//}
 
 std::unique_ptr<Stmt<EType, VType>> Parser::while_statement(void)
 {

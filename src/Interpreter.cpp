@@ -67,26 +67,25 @@ LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
 
 void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
 {
+    std::cout << "[" << __func__ << "] executing: " << stmt->to_string() << std::endl;
     stmt->accept(*this);
 }
 
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env)
 {
     Environment prev_env = this->env;
-    std::cout << "[" << __func__ << "] prev env contains: " << std::endl;
-    for(auto v : prev_env.get_vars())
-        std::cout << v << std::endl;
 
     try {
         this->env = env;
-        std::cout << "[" << __func__ << "] this->env contains:" << std::endl;
-        for(auto v : this->env.get_vars())
-            std::cout << v << std::endl;
         for(unsigned i = 0; i < stmts.size(); ++i)
+        {
+            std::cout << "[" << __func__ << "] executing stmt [" << i+1 << "/" << stmts.size() << "] : " << stmts[i]->to_string() << std::endl;
             this->execute(stmts[i]);
+        }
     }
     catch(RuntimeError& e)
     {
+        std::cout << "[" << __func__ << "] U DUN GOOFED" << std::endl;
         runtime_error(e);
     }
 
@@ -166,7 +165,7 @@ LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 
         case TokenType::LESS:
             this->check_number_operands(expr.op, left, right);
-            return LoxObject(left.get_double_val() >= right.get_double_val());
+            return LoxObject(left.get_double_val() < right.get_double_val());
 
         case TokenType::LESS_EQUAL:
             this->check_number_operands(expr.op, left, right);
@@ -183,8 +182,8 @@ LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 LoxObject Interpreter::visit(VariableExpr<EType, VType>& expr)
 {
     std::cout << "[" << __func__ << "] getting var from (" 
-        << expr.to_string() << ") with token " 
-        << expr.token.to_string() << std::endl;
+        << expr.to_string() << ") with token '" 
+        << expr.token.to_string() << "'" << std::endl;
     return this->env.get(expr.token);
 }
 
@@ -216,6 +215,7 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
 // ======== STATEMENT VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {
+    std::cout << "[" << __func__ << "] visiting print statement...." << std::endl;
     LoxObject value = this->evaluate(stmt.expr);
     std::cout << value.to_string() << std::endl;  // Should be to_string()
     return value;
@@ -234,21 +234,14 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
 
-    std::cout << "[" << __func__ << "] defining var in (" 
-        << stmt.to_string() << ")" << std::endl;
     this->env.define(stmt.token.lexeme, value);
-
-    // TODO: debug, remove 
-    auto vars = this->env.get_vars();
-    std::cout << "[" << __func__ << "] current vars:" << std::endl;
-    for(auto v : vars)
-        std::cout << v << std::endl;
 
     return value;       // bogus return...
 }
 
 LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
 {
+    std::cout << "[" << __func__ << "] visting block statement: " << stmt.to_string() << std::endl;
     Environment block_env(this->env);
     this->execute_block(stmt.statements, block_env);
     return LoxObject();
@@ -266,6 +259,10 @@ LoxObject Interpreter::visit(IfStmt<EType, StmtVType>& stmt)
 
 LoxObject Interpreter::visit(WhileStmt<EType, StmtVType>& stmt)
 {
+    std::cout << "[" << __func__ << "] visiting WhileStmt: " << stmt.to_string() << std::endl;
+    std::cout << "[" << __func__ << "] while cond: " << stmt.cond->to_string() << std::endl;
+    std::cout << "[" << __func__ << "] while body: " << stmt.body->to_string() << std::endl;
+
     while(this->is_truthy(this->evaluate(stmt.cond)))
         this->execute(stmt.body);
 

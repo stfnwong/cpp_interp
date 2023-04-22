@@ -123,7 +123,7 @@ std::string LoxObject::to_string(void) const
         //return str;
     }
 
-    return "LoxObject()";
+    return "Nil";
 }
 
 std::string LoxObject::to_repr(void) const
@@ -133,10 +133,6 @@ std::string LoxObject::to_repr(void) const
         oss << "LoxObject<\"" << this->token.to_string() << "\">";
     else
         oss << "LoxObject<" << this->token.to_string() << ">";
-    //if(this->value.has_value())
-    //    oss << "LoxObject<" << std::visit(get_value_string(), this->value.value()) << ">";
-    //else
-    //    oss << "LoxObject<Null>";
 
     return oss.str();
 }
