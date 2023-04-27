@@ -26,6 +26,23 @@ LoxObject Environment::get(const Token& name)
     throw RuntimeError(name, "undefined variable '" + name.lexeme + "'.");
 }
 
+void Environment::define(const Token& name, const LoxObject& value)
+{
+    this->values.insert({name.lexeme, value});
+}
+
+LoxObject Environment::get(const std::string& name)
+{
+    if(this->values.find(name) != this->values.end())
+        return this->values[name];
+
+    if(this->enclosing)
+        return this->enclosing->get(name);
+
+    // Make a fake token for the runtime error
+    throw RuntimeError(Token(TokenType::STRING, name), "undefined variable '" + name + "'.");
+}
+
 void Environment::assign(const Token& name, const LoxObject& value)
 {
     if(this->values.find(name.lexeme) != this->values.end())
@@ -43,6 +60,11 @@ void Environment::assign(const Token& name, const LoxObject& value)
     throw RuntimeError(name, "undefined variable '" + name.lexeme + "'.");
 }
 
+
+bool Environment::has_outer(void) const
+{
+    return this->enclosing != nullptr ? true : false;
+}
 
 std::vector<std::string> Environment::get_vars(void) const
 {

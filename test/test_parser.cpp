@@ -86,4 +86,26 @@ TEST_CASE("test_parse_block_statement", "parser")
     }
 
     std::cout << "There were " << num_exprs << " expressions" << std::endl;
+    unsigned exp_num_exprs = 12;
+    REQUIRE(num_exprs == exp_num_exprs);
+}
+
+TEST_CASE("test_parse_for_loop", "parser")
+{
+    std::string source_file = "test/for2.lox";
+    std::string source = read_file(source_file);
+
+    Scanner scanner(source);
+    Parser parser(scanner.scan());
+
+    auto parsed_output = parser.parse();
+
+    unsigned num_stmt = 0;
+    for(unsigned i = 0; i < parsed_output.size(); ++i)
+    {
+        std::cout << i << " " << parsed_output[i]->to_string() << std::endl;
+        num_stmt++;
+    }
+
+    std::cout << "There were " << num_stmt << " statements." << std::endl;
 }

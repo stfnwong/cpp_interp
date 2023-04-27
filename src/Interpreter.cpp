@@ -67,16 +67,20 @@ LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
 
 void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
 {
-    std::cout << "[" << __func__ << "] executing: " << stmt->to_string() << std::endl;
+    //std::cout << "[" << __func__ << "] executing: " << stmt->to_string() << std::endl;
     stmt->accept(*this);
 }
 
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env)
 {
-    Environment prev_env = this->env;
+    auto prev_env = this->env;
 
     try {
         this->env = env;
+        //std::cout << "[" << __func__ << "] this->env now contains...." << std::endl;
+        //for(auto v : this->env.get_vars())
+        //    std::cout << v << ":" << this->env.get(v).to_string() << std::endl;
+
         for(unsigned i = 0; i < stmts.size(); ++i)
         {
             std::cout << "[" << __func__ << "] executing stmt [" << i+1 << "/" << stmts.size() << "] : " << stmts[i]->to_string() << std::endl;
@@ -181,15 +185,14 @@ LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 
 LoxObject Interpreter::visit(VariableExpr<EType, VType>& expr)
 {
-    std::cout << "[" << __func__ << "] getting var from (" 
-        << expr.to_string() << ") with token '" 
-        << expr.token.to_string() << "'" << std::endl;
     return this->env.get(expr.token);
 }
 
 LoxObject Interpreter::visit(AssignmentExpr<EType, VType>& expr)
 {
     LoxObject value = this->evaluate(expr.expr);
+    std::cout << "[" << __func__ << "] evaluated " << expr.to_string() << std::endl;
+    std::cout << "[" << __func__ << "] value was: " << value.to_string() << std::endl;
     this->env.assign(expr.token, value);
     return value;
 }
@@ -215,7 +218,6 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
 // ======== STATEMENT VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {
-    std::cout << "[" << __func__ << "] visiting print statement...." << std::endl;
     LoxObject value = this->evaluate(stmt.expr);
     std::cout << value.to_string() << std::endl;  // Should be to_string()
     return value;
@@ -224,6 +226,7 @@ LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 LoxObject Interpreter::visit(ExpressionStmt<EType, StmtVType>& stmt)
 {
     LoxObject value =  this->evaluate(stmt.expr);
+    //std::cout << "[" << __func__ << "] evaluated: " << stmt.to_string() << " to " << value.to_string() << std::endl;
     //std::cout << "Evaluated: " << stmt.to_string() << " to " << value.to_string() << std::endl;
     return value;
 }
@@ -236,13 +239,20 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
 
     this->env.define(stmt.token.lexeme, value);
 
-    return value;       // bogus return...
+    return value;
 }
 
 LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
 {
     std::cout << "[" << __func__ << "] visting block statement: " << stmt.to_string() << std::endl;
-    Environment block_env(this->env);
+    //Environment block_env(this->env);
+    //Environment block_env(&this->env);
+    //auto block_env = std::make_unique<Environment>(this->env);
+    //this->execute_block(stmt.statements, std::move(block_env));
+
+    // TODO: Am doing by copy but should I try and do by reference?
+
+    Environment block_env = Environment(&this->env);
     this->execute_block(stmt.statements, block_env);
     return LoxObject();
 }
@@ -259,9 +269,9 @@ LoxObject Interpreter::visit(IfStmt<EType, StmtVType>& stmt)
 
 LoxObject Interpreter::visit(WhileStmt<EType, StmtVType>& stmt)
 {
-    std::cout << "[" << __func__ << "] visiting WhileStmt: " << stmt.to_string() << std::endl;
-    std::cout << "[" << __func__ << "] while cond: " << stmt.cond->to_string() << std::endl;
-    std::cout << "[" << __func__ << "] while body: " << stmt.body->to_string() << std::endl;
+    //std::cout << "[" << __func__ << "] visiting WhileStmt: " << stmt.to_string() << std::endl;
+    //std::cout << "[" << __func__ << "] while cond: " << stmt.cond->to_string() << std::endl;
+    //std::cout << "[" << __func__ << "] while body: " << stmt.body->to_string() << std::endl;
 
     while(this->is_truthy(this->evaluate(stmt.cond)))
         this->execute(stmt.body);
@@ -278,7 +288,7 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVT
     try {
         for(unsigned i = 0; i < statements.size(); ++i)
         {
-            std::cout << "[" << __func__ << "] executing statement " << statements[i]->to_string() << std::endl;
+            //std::cout << "[" << __func__ << "] executing statement " << statements[i]->to_string() << std::endl;
             this->execute(statements[i]);
         }
     }
