@@ -263,10 +263,7 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVT
 {
     try {
         for(unsigned i = 0; i < statements.size(); ++i)
-        {
-            //std::cout << "[" << __func__ << "] executing statement " << statements[i]->to_string() << std::endl;
             this->execute(statements[i]);
-        }
     }
     catch(RuntimeError& e) {
         runtime_error(e);

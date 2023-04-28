@@ -3,13 +3,9 @@
  * A recursive descent parser
  */
 
-#include <iostream>    // TODO: debug only, remove
-
 #include "Error.hpp"
 #include "Lox.hpp"
 #include "Parser.hpp"
-
-#include "ASTPrinter.hpp"       // TODO: debug only, remove
 
 
 bool Parser::at_end(void) const
@@ -396,12 +392,7 @@ std::unique_ptr<Stmt<EType, VType>> Parser::for_statement(void)
         body = std::make_unique<BlockStmt<EType, VType>>(std::move(stmts));
     }
 
-    ASTPrinter printer;
-    std::cout << "[" << __func__ << "] final body: " << body->to_string() << std::endl;
-    std::cout << "[" << __func__ << "] final AST: " << printer.print(*body.get()) << std::endl;
-
     return body;
-
 }
 
 
