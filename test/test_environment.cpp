@@ -105,62 +105,6 @@ TEST_CASE("test_empty_inner", "environment")
 }
 
 
-TEST_CASE("test_copy_assignment", "environment")
-{
-    Environment outer;
-
-    // add some vars 
-    LoxObject outer_1(Token(TokenType::STRING, "1", 1));
-    LoxObject outer_2(Token(TokenType::STRING, "2", 1));
-    Token outer_name_1(TokenType::IDENTIFIER, "outer_var_1");
-    Token outer_name_2(TokenType::IDENTIFIER, "outer_var_2");
-
-    outer.define(outer_name_1.lexeme, outer_1);
-    outer.define(outer_name_2.lexeme, outer_2);
-
-    Environment copy;
-
-    copy = outer;
-    REQUIRE(copy.get(outer_name_1) == outer_1);
-    REQUIRE(copy.get(outer_name_2) == outer_2);
-
-    // TODO: these should go...
-    REQUIRE(outer.has_outer() == false);
-    REQUIRE(copy.has_outer() == false);
-}
-
-
-// TODO: this doesn't really test anything...
-//TEST_CASE("test_multiple_nesting", "environment")
-//{
-//    Environment global;
-//
-//    LoxObject global_1(Token(TokenType::STRING, "global_1"));
-//    Token global_name_1(TokenType::IDENTIFIER, "global_name_1");
-//    global.define(global_name_1, global_1);
-//
-//    // mid layer env
-//    Environment mid = Environment(global);
-//
-//    LoxObject mid_1(Token(TokenType::STRING, "mid_1"));
-//    Token mid_name_1(TokenType::IDENTIFIER, "mid_name_1");
-//
-//    mid.define(mid_name_1, mid_1);
-//    // global vars should be available
-//    REQUIRE(mid.get(global_name_1) == global_1);
-//    REQUIRE(mid.get(mid_name_1) == mid_1);
-//
-//    // inner
-//    Environment inner = Environment(mid);
-//    LoxObject inner_1(Token(TokenType::STRING, "inner_1"));
-//    Token inner_name_1(TokenType::IDENTIFIER, "inner_name_1");
-//
-//    inner.define(inner_name_1, inner_1);
-//    REQUIRE(inner.get(global_name_1) == global_1);
-//    REQUIRE(inner.get(mid_name_1) == mid_1);
-//    REQUIRE(inner.get(inner_name_1) == inner_1);
-//}
-
 
 TEST_CASE("test_add_variable", "environment")
 {

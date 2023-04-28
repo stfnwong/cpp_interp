@@ -215,16 +215,11 @@ std::unique_ptr<Expr<EType, VType>> Parser::assignment(void)
 {
     //std::unique_ptr<Expr<EType, VType>> expr = this->equality();
     std::unique_ptr<Expr<EType, VType>> expr = this->or_expr();
-    std::cout << "[" << __func__ << "] or_expr : " << expr->to_string() << std::endl;
 
     if(this->match({TokenType::EQUAL}))
     {
         Token equals = this->previous();
         std::unique_ptr<Expr<EType, VType>> value = this->assignment();
-        std::cout << "[" << __func__ << "] while parsing '=' got value (" 
-            << value->to_string() << ")" << std::endl;
-        std::cout << "[" << __func__ << "] expr for this value was (" << expr->to_string()
-            << ")" << std::endl;
 
         if(expr->get_type() == ExprType::VARIABLE)
         {
@@ -281,12 +276,7 @@ std::unique_ptr<Stmt<EType, VType>> Parser::declaration(void)
 {
     try {
         if(this->match({TokenType::VAR}))
-        {
-            auto var_decl = this->var_declaration();
-            std::cout << "[" << __func__ << "] return with vardecl : " << var_decl->to_string() << std::endl;
-            return var_decl;
-            //return this->var_declaration();
-        }
+            return this->var_declaration();
 
         return this->statement();
     }
@@ -302,12 +292,9 @@ std::unique_ptr<Stmt<EType, VType>> Parser::var_declaration(void)
 {
     Token name = this->consume(TokenType::IDENTIFIER, "expect variable name");
 
-    std::cout << "[" << __func__ << "] got name " << name.to_string() << std::endl;
-
     std::unique_ptr<Expr<EType, VType>> init;
     if(this->match({TokenType::EQUAL}))
         init = this->expression();
-
     this->consume(TokenType::SEMICOLON, "expect ';' after variable declaration");
 
     return std::make_unique<VariableStmt<EType, VType>>(name, std::move(init));
@@ -432,10 +419,7 @@ std::unique_ptr<Stmt<EType, VType>> Parser::print_statement(void)
 {
     auto value = this->expression();
     this->consume(TokenType::SEMICOLON, "expect ';' after value");
-    auto ret = std::make_unique<PrintStmt<EType, VType>>(std::move(value));
-    std::cout << "[" << __func__ << "] created print statement: " << ret->to_string() << std::endl;
-    return ret;
-    //return std::make_unique<PrintStmt<EType, VType>>(std::move(value));
+    return std::make_unique<PrintStmt<EType, VType>>(std::move(value));
 }
 
 std::unique_ptr<Stmt<EType, VType>> Parser::expression_statement(void)

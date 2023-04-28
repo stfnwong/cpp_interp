@@ -67,7 +67,6 @@ LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
 
 void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
 {
-    //std::cout << "[" << __func__ << "] executing: " << stmt->to_string() << std::endl;
     stmt->accept(*this);
 }
 
@@ -75,21 +74,14 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VT
 {
     auto prev_env = this->env;
 
-    try {
+    try 
+    {
         this->env = env;
-        //std::cout << "[" << __func__ << "] this->env now contains...." << std::endl;
-        //for(auto v : this->env.get_vars())
-        //    std::cout << v << ":" << this->env.get(v).to_string() << std::endl;
-
         for(unsigned i = 0; i < stmts.size(); ++i)
-        {
-            std::cout << "[" << __func__ << "] executing stmt [" << i+1 << "/" << stmts.size() << "] : " << stmts[i]->to_string() << std::endl;
             this->execute(stmts[i]);
-        }
     }
     catch(RuntimeError& e)
     {
-        std::cout << "[" << __func__ << "] U DUN GOOFED" << std::endl;
         runtime_error(e);
     }
 
@@ -191,8 +183,6 @@ LoxObject Interpreter::visit(VariableExpr<EType, VType>& expr)
 LoxObject Interpreter::visit(AssignmentExpr<EType, VType>& expr)
 {
     LoxObject value = this->evaluate(expr.expr);
-    std::cout << "[" << __func__ << "] evaluated " << expr.to_string() << std::endl;
-    std::cout << "[" << __func__ << "] value was: " << value.to_string() << std::endl;
     this->env.assign(expr.token, value);
     return value;
 }
@@ -219,15 +209,13 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
 LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {
     LoxObject value = this->evaluate(stmt.expr);
-    std::cout << value.to_string() << std::endl;  // Should be to_string()
+    std::cout << value.to_string() << std::endl;  
     return value;
 }
 
 LoxObject Interpreter::visit(ExpressionStmt<EType, StmtVType>& stmt)
 {
     LoxObject value =  this->evaluate(stmt.expr);
-    //std::cout << "[" << __func__ << "] evaluated: " << stmt.to_string() << " to " << value.to_string() << std::endl;
-    //std::cout << "Evaluated: " << stmt.to_string() << " to " << value.to_string() << std::endl;
     return value;
 }
 
@@ -236,25 +224,14 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
     LoxObject value;
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
-
-    std::cout << "[" << __func__ << "] eval'd variable statement and got: " << value.to_string() << std::endl;
-
     this->env.define(stmt.token.lexeme, value);
 
-    std::cout << "[" << __func__ << "] defined var " << stmt.token.to_string() << " for this value." << std::endl;
     return value;
 }
 
 LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
 {
-    std::cout << "[" << __func__ << "] visting block statement: " << stmt.to_string() << std::endl;
-    //Environment block_env(this->env);
-    //Environment block_env(&this->env);
-    //auto block_env = std::make_unique<Environment>(this->env);
-    //this->execute_block(stmt.statements, std::move(block_env));
-
-    // TODO: Am doing by copy but should I try and do by reference?
-
+    // TODO: Revisit using shared_ptr here....
     auto block_env = Environment(std::make_shared<Environment>(this->env));
     this->execute_block(stmt.statements, block_env);
     return LoxObject();
@@ -272,10 +249,6 @@ LoxObject Interpreter::visit(IfStmt<EType, StmtVType>& stmt)
 
 LoxObject Interpreter::visit(WhileStmt<EType, StmtVType>& stmt)
 {
-    //std::cout << "[" << __func__ << "] visiting WhileStmt: " << stmt.to_string() << std::endl;
-    //std::cout << "[" << __func__ << "] while cond: " << stmt.cond->to_string() << std::endl;
-    //std::cout << "[" << __func__ << "] while body: " << stmt.body->to_string() << std::endl;
-
     while(this->is_truthy(this->evaluate(stmt.cond)))
         this->execute(stmt.body);
 
