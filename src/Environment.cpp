@@ -4,15 +4,28 @@
  */
 
 #include <iostream>     // TODO: remove this
+#include <utility>
 
 #include "Error.hpp"
 #include "Lox.hpp"
 #include "Environment.hpp"
 
 
+//Environment& Environment::operator=(const Environment& that)
+//{
+//    if(this != &that)
+//    {
+//        this->values = that.values;
+//        this->enclosing = that.enclosing;
+//        //this->enclosing = std::make_unique<Environment>(that.enclosing.get());
+//    }
+//    return *this;
+//}
+
 void Environment::define(const std::string& name, const LoxObject& value)
 {
-    this->values.insert({name, value});
+    this->values.insert(std::make_pair(name, value));
+    //this->values.insert({name, value});
 }
 
 LoxObject Environment::get(const Token& name)
@@ -60,7 +73,7 @@ void Environment::assign(const Token& name, const LoxObject& value)
     throw RuntimeError(name, "undefined variable '" + name.lexeme + "'.");
 }
 
-
+// TODO: get rid of this method - only using for testing
 bool Environment::has_outer(void) const
 {
     return this->enclosing != nullptr ? true : false;

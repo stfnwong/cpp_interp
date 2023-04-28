@@ -13,3 +13,6 @@ lox
 
 # Ignore log files
 *.log
+
+# Ignore core dumps
+vgcore*

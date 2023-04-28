@@ -237,8 +237,11 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
 
+    std::cout << "[" << __func__ << "] eval'd variable statement and got: " << value.to_string() << std::endl;
+
     this->env.define(stmt.token.lexeme, value);
 
+    std::cout << "[" << __func__ << "] defined var " << stmt.token.to_string() << " for this value." << std::endl;
     return value;
 }
 
@@ -252,7 +255,7 @@ LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
 
     // TODO: Am doing by copy but should I try and do by reference?
 
-    Environment block_env = Environment(&this->env);
+    auto block_env = Environment(std::make_shared<Environment>(this->env));
     this->execute_block(stmt.statements, block_env);
     return LoxObject();
 }
