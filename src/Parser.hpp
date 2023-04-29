@@ -33,10 +33,12 @@ class Parser
         Token advance(void);
         Token consume(const TokenType& type, const std::string& msg);
 
-        void synchronise(void);
+        void  synchronise(void);
+        std::unique_ptr<Expr<EType, VType>> finish_call(std::unique_ptr<Expr<EType, VType>> callee);
 
         // Expressions
         std::unique_ptr<Expr<EType, VType>> primary(void);            // literals, etc
+        std::unique_ptr<Expr<EType, VType>> call(void);
         std::unique_ptr<Expr<EType, VType>> unary(void);
         std::unique_ptr<Expr<EType, VType>> factor(void);  // multiplication, division
         std::unique_ptr<Expr<EType, VType>> term(void);    // addition, subtraction

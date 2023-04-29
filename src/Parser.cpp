@@ -123,6 +123,46 @@ std::unique_ptr<Expr<EType, VType>> Parser::primary(void)
 }
 
 
+std::unique_ptr<Expr<EType, VType>> Parser::call(void)
+{
+    auto expr = this->primary();
+
+    while(1)
+    {
+        if(this->match({TokenType::LEFT_PAREN}))
+            expr = this->finish_call(std::move(expr));
+        else
+            break;
+    }
+
+    return expr;
+}
+
+
+std::unique_ptr<Expr<EType, VType>> Parser::finish_call(std::unique_ptr<Expr<EType, VType>> callee)
+{
+    std::vector<std::unique_ptr<Expr<EType, VType>>> args;
+    
+    if(!this->check(TokenType::RIGHT_PAREN))
+    {
+        do
+        {
+            if(args.size() >= MAX_ARGUMENTS)
+                Lox::error(this->peek(), "Can't have more than " + std::to_string(MAX_ARGUMENTS) + " arguments.");
+            args.push_back(std::move(this->expression()));
+        } while(this->match({TokenType::COMMA}));
+    }
+
+    Token paren = this->consume(TokenType::RIGHT_PAREN, "expect ')' after arguments");
+
+    return std::make_unique<CallExpr<EType, VType>>(
+            std::move(callee),
+            paren,
+            std::move(args)
+    );
+}
+
+
 std::unique_ptr<Expr<EType, VType>> Parser::unary(void)
 {
     if(this->match({TokenType::BANG, TokenType::MINUS}))
@@ -132,7 +172,7 @@ std::unique_ptr<Expr<EType, VType>> Parser::unary(void)
         return std::make_unique<UnaryExpr<EType, VType>>(std::move(right), op);
     }
 
-    return this->primary();
+    return this->call();
 }
 
 std::unique_ptr<Expr<EType, VType>> Parser::factor(void)

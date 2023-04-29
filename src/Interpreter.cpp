@@ -205,6 +205,12 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
     return this->evaluate(expr.right);
 }
 
+LoxObject Interpreter::visit(CallExpr<EType, VType>& expr)
+{
+    return LoxObject();
+}
+
+
 // ======== STATEMENT VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(PrintStmt<EType, StmtVType>& stmt)
 {

@@ -43,7 +43,22 @@ Assignment has the lowest precedence (like in C).
 
 `factor -> unary ( ("/" | "*") unary )* ;`
 
-`unary -> ("!" | "-") unary | primary ;`
+`unary -> ("!" | "-") unary | call ;`
+
+For function calls we create a rule that matches a primary expression followed by
+zero or more function calls. This means that not having parenthesis parses a regular 
+primary expression, but adding a parenthesis pair makes it into a function call with
+an optional list of arguments inside.
+
+`call -> primary ( "(" arguments? ")" )* ;`
+
+The implication of the `call` rule is that there is another `arguments` rule.
+
+`arguments -> expression ( "," expression )*;`
+
+This rule requires at least one argument expression followed by zero or more other
+expressions, each preceded by a common. Zero-argument calls are handled by the fact that
+the `call` rule considers the `arguments` production itself to be optional.
 
 `primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;`
 

@@ -92,6 +92,18 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
             return LoxObject(oss.str());
         }
 
+        LoxObject visit(CallExpr<E, T>& expr) final 
+        {
+            std::ostringstream oss;
+
+            oss << "(" << expr.callee->to_string() << " ";
+            for(unsigned i = 0; i < expr.arguments.size(); ++i)
+                oss << expr.arguments[i]->to_string() << ",";
+            oss << ")";
+
+            return LoxObject(oss.str());
+        }
+
         // Statements
         LoxObject visit(PrintStmt<E, T>& stmt) final 
         {

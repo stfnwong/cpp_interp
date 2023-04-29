@@ -18,7 +18,16 @@
 // preferred design is here... what I am trying to avoid is the use of dynamic_cast<>
 // to figure out what the type of an Expr is.
 // TODO: think about an alternative for this
-enum class ExprType { LITERAL, UNARY, BINARY, GROUPING, VARIABLE, ASSIGNMENT, LOGICAL };
+enum class ExprType { 
+    LITERAL, 
+    UNARY, 
+    BINARY, 
+    GROUPING, 
+    VARIABLE, 
+    ASSIGNMENT, 
+    LOGICAL,
+    CALL
+};
 
 
 template <typename E, typename T> struct LiteralExpr;
@@ -28,6 +37,7 @@ template <typename E, typename T> struct GroupingExpr;
 template <typename E, typename T> struct VariableExpr;
 template <typename E, typename T> struct AssignmentExpr;
 template <typename E, typename T> struct LogicalExpr;
+template <typename E, typename T> struct CallExpr;
 
 
 // Visitor object 
@@ -41,6 +51,7 @@ template <typename E, typename T> struct ExprVisitor
         virtual T visit(VariableExpr<E, T>& expr) = 0;
         virtual T visit(AssignmentExpr<E, T>& expr) = 0;
         virtual T visit(LogicalExpr<E, T>& expr) = 0;
+        virtual T visit(CallExpr<E, T>& expr) = 0;
 };
 
 
@@ -339,6 +350,7 @@ template <typename E, typename T> struct AssignmentExpr : Expr<E, T>
 };
 
 
+
 /*
  * LogicalExpr
  */
@@ -390,5 +402,65 @@ template <typename E, typename T> struct LogicalExpr : Expr<E, T>
         }
 };
 
+
+/*
+ * CallExpr
+ */
+template <typename E, typename T> struct CallExpr : Expr<E, T>
+{
+    std::unique_ptr<Expr<E, T>> callee;
+    Token paren;
+    std::vector<std::unique_ptr<Expr<E, T>>> arguments;
+
+    public:
+        CallExpr(
+                std::unique_ptr<Expr<E, T>> callee, 
+                const Token& paren, 
+                std::vector<std::unique_ptr<Expr<E, T>>> args) : 
+            callee(std::move(callee)),
+            paren(paren),
+            arguments(std::move(args)) 
+    {}
+
+        bool operator==(const CallExpr<E, T>& that) const
+        {
+            if(this->callee.get() != that.callee.get())
+                return false;
+            if(this->arguments.size() != that.arguments.size())
+                return false;
+            for(unsigned i = 0; i < this->arguments.size(); ++i)
+            {
+                if(this->arguments[i] != that.arguments[i])
+                    return false;
+            }
+
+            return true;
+        }
+
+        bool operator!=(const CallExpr<E, T>& that) const {
+            return !(*this == that);
+        }
+
+        ExprType get_type(void) const final {
+            return ExprType::CALL;
+        }
+
+        T accept(ExprVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        std::string to_string(void) const final
+        {
+            std::ostringstream oss;
+
+            oss << "CallExpr<" << this->callee->to_string() << ": ";
+            oss << std::endl << "   ";
+            for(const auto& a : this->arguments)
+                oss << a->to_string() << ", ";
+            oss << ">";
+
+            return oss.str();
+        }
+};
 
 #endif /*__EXPR_HPP*/
