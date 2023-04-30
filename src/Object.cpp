@@ -5,6 +5,7 @@
  */
 
 #include "Object.hpp"
+#include "Callable.hpp"
 
 
 LoxObject::LoxObject(const Token& token) : token(token)
@@ -13,14 +14,17 @@ LoxObject::LoxObject(const Token& token) : token(token)
     {
         case TokenType::TRUE:
             this->value = true;
+            this->type = ObjType::BOOLEAN;
             break;
 
         case TokenType::FALSE:
             this->value = false;
+            this->type = ObjType::BOOLEAN;
             break;
 
         case TokenType::NUMBER:
             this->value = token.get_double_literal();
+            this->type = ObjType::NUMBER;
             break;
 
         case TokenType::STRING:
@@ -29,6 +33,7 @@ LoxObject::LoxObject(const Token& token) : token(token)
                 this->value = token.get_string_literal();
             else
                 this->value = token.lexeme;
+            this->type = ObjType::STRING;
             break;
 
         default:
@@ -102,6 +107,17 @@ TokenType LoxObject::get_type(void) const
     return this->token.type;
 }
 
+std::string LoxObject::get_type_string(void) const
+{
+    if(this->is_callable())
+        return this->callable->get_type_string();
+
+    //if(this->has_type())
+    //    return std::visit(get_type_string(), this->value.value());
+
+    return "Nil";
+}
+
 bool LoxObject::has_string_type(void) const
 {
     return (this->token.type == TokenType::STRING || this->token.type == TokenType::IDENTIFIER) ? true : false;
@@ -109,19 +125,19 @@ bool LoxObject::has_string_type(void) const
 
 bool LoxObject::has_number_type(void) const
 {
-    return (this->token.type == TokenType::NUMBER) ? true : false;
+    return (this->type == ObjType::NUMBER) ? true : false;
+    //return (this->token.type == TokenType::NUMBER) ? true : false;
+}
+
+bool LoxObject::is_callable(void) const
+{
+    return (this->type == ObjType::FUNCTION) ? true : false;
 }
 
 std::string LoxObject::to_string(void) const
 {
     if(this->has_type())
-    {
         return std::visit(get_value_string(), this->value.value());
-        //std::string str = std::visit(get_value_string(), this->value.value());
-        //if(this->has_string_type())
-        //    return "\"" + str + "\"";
-        //return str;
-    }
 
     return "Nil";
 }

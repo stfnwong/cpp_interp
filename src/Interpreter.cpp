@@ -207,6 +207,20 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
 
 LoxObject Interpreter::visit(CallExpr<EType, VType>& expr)
 {
+    LoxObject callee = this->evaluate(expr.callee);
+
+    if(!callee.is_callable())
+    {
+        throw RuntimeError(expr.paren, "Object of type " + callee.get_type_string() + 
+                " cannot be called."
+        );
+    }
+
+    std::vector<LoxObject> args;
+    for(unsigned i = 0; i < expr.arguments.size(); ++i)
+        args.push_back(std::move(this->evaluate(expr.arguments[i])));
+
+
     return LoxObject();
 }
 
