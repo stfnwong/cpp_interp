@@ -74,26 +74,17 @@ std::string LoxObject::get_val_as_str(void) const
 // TODO: do I want to throw here? 
 std::string LoxObject::get_string_val(void) const
 {
-    if(this->value.has_value())
-        return std::get<std::string>(this->value.value());
-
-    return "";
+    return std::get<std::string>(this->value.value());
 }
-
 
 double LoxObject::get_double_val(void) const
 {
-    if(this->value.has_value())
-        return std::get<double>(this->value.value());
-
-    return 0;
+    return std::get<double>(this->value.value());
 }
 
 bool LoxObject::get_bool_val(void) const
 {
-    if(this->value.has_value())
-        return std::get<bool>(this->value.value());
-    return false;
+    return std::get<bool>(this->value.value());
 }
 
 
@@ -102,16 +93,12 @@ bool LoxObject::has_type(void) const
     return (this->value.has_value()) ? true : false;
 }
 
-TokenType LoxObject::get_type(void) const
-{
-    return this->token.type;
-}
-
 std::string LoxObject::get_type_string(void) const
 {
-    if(this->is_callable())
+    if(this->has_callable())
         return this->callable->get_type_string();
 
+    // TODO: how the fuck is this supposed to work?
     //if(this->has_type())
     //    return std::visit(get_type_string(), this->value.value());
 
@@ -129,10 +116,18 @@ bool LoxObject::has_number_type(void) const
     //return (this->token.type == TokenType::NUMBER) ? true : false;
 }
 
-bool LoxObject::is_callable(void) const
+bool LoxObject::has_callable(void) const
 {
     return (this->type == ObjType::FUNCTION) ? true : false;
 }
+
+std::shared_ptr<Callable> LoxObject::get_callable(void) const
+{
+    if(!this->has_callable())
+        throw std::runtime_error("LoxObject does not contain callable");
+    return this->callable;
+}
+
 
 std::string LoxObject::to_string(void) const
 {

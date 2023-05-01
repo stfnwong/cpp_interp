@@ -19,7 +19,7 @@
 #include "ASTPrinter.hpp"
 
 
-static constexpr bool DEBUG_OUTPUT = false;      // TODO: make cmdline option for this
+static constexpr bool DEBUG_OUTPUT = true;      // TODO: make cmdline option for this
 
 static const std::string VERSION_STRING = "deez nuts";
 static bool had_error = false;

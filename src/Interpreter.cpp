@@ -4,6 +4,8 @@
 
 
 #include <iostream>
+
+#include "Callable.hpp"
 #include "Interpreter.hpp"
 
 
@@ -17,16 +19,34 @@ static void runtime_error(RuntimeError& e)
 }
 
 
+
+
+Interpreter::Interpreter()
+{
+    // Add global functions here 
+
+
+
+
+
+    this->env = this->globals;
+}
+
+void Interpreter::define_globals(void)
+{
+    //this->globals.define(
+
+}
+
+// 
 bool Interpreter::is_truthy(const LoxObject& obj) const
 {
-    switch(obj.get_type())
+    switch(obj.type)
     {
-        case TokenType::NIL:
+        case ObjType::NIL:
             return false;
-        case TokenType::TRUE:
-            return true;
-        case TokenType::FALSE:
-            return false;
+        case ObjType::BOOLEAN:
+            return (obj.token.type == TokenType::TRUE) ? true : false;
         default:
             return true;
     }
@@ -58,34 +78,6 @@ void Interpreter::check_number_operands(const Token& otor, const LoxObject& o1, 
         return;
 
     throw RuntimeError(otor, "Both operands must be numbers");
-}
-
-LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
-{
-    return expr->accept(*this);
-}
-
-void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
-{
-    stmt->accept(*this);
-}
-
-void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env)
-{
-    auto prev_env = this->env;
-
-    try 
-    {
-        this->env = env;
-        for(unsigned i = 0; i < stmts.size(); ++i)
-            this->execute(stmts[i]);
-    }
-    catch(RuntimeError& e)
-    {
-        runtime_error(e);
-    }
-
-    this->env = prev_env;
 }
 
 
@@ -209,7 +201,7 @@ LoxObject Interpreter::visit(CallExpr<EType, VType>& expr)
 {
     LoxObject callee = this->evaluate(expr.callee);
 
-    if(!callee.is_callable())
+    if(!callee.has_callable())
     {
         throw RuntimeError(expr.paren, "Object of type " + callee.get_type_string() + 
                 " cannot be called."
@@ -220,8 +212,16 @@ LoxObject Interpreter::visit(CallExpr<EType, VType>& expr)
     for(unsigned i = 0; i < expr.arguments.size(); ++i)
         args.push_back(std::move(this->evaluate(expr.arguments[i])));
 
+    Callable* func = callee.get_callable().get();
 
-    return LoxObject();
+    if(args.size() != func->arity())
+    {
+        throw RuntimeError(expr.paren, "Expected " + std::to_string(func->arity())
+                + " arguments, got " + std::to_string(args.size()) + "."
+        );
+    }
+
+    return func->call(*this, args);
 }
 
 
@@ -275,6 +275,13 @@ LoxObject Interpreter::visit(WhileStmt<EType, StmtVType>& stmt)
     return LoxObject();
 }
 
+LoxObject Interpreter::visit(FunctionStmt<EType, StmtVType>& stmt)
+{
+    LoxFunction f(&stmt);
+
+    return LoxObject();
+}
+
 
 
 
@@ -289,3 +296,38 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVT
         runtime_error(e);
     }
 }
+
+
+Environment Interpreter::get_globals(void) const
+{
+    return this->globals;
+}
+
+LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
+{
+    return expr->accept(*this);
+}
+
+void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
+{
+    stmt->accept(*this);
+}
+
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env)
+{
+    auto prev_env = this->env;
+
+    try 
+    {
+        this->env = env;
+        for(unsigned i = 0; i < stmts.size(); ++i)
+            this->execute(stmts[i]);
+    }
+    catch(RuntimeError& e)
+    {
+        runtime_error(e);
+    }
+
+    this->env = prev_env;
+}
+

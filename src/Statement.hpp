@@ -9,7 +9,7 @@
 #include "Expr.hpp"
 
 
-enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK, IF, VAR, WHILE };
+enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK, IF, VAR, WHILE, FUNCTION };
 
 template <typename E, typename T> struct PrintStmt;
 template <typename E, typename T> struct ExpressionStmt;
@@ -18,6 +18,7 @@ template <typename E, typename T> struct BlockStmt;
 template <typename E, typename T> struct IfStmt;
 template <typename E, typename T> struct VarStmt;
 template <typename E, typename T> struct WhileStmt;
+template <typename E, typename T> struct FunctionStmt;
 
 
 template <typename E, typename T> struct StmtVisitor
@@ -29,6 +30,7 @@ template <typename E, typename T> struct StmtVisitor
         virtual T visit(BlockStmt<E, T>& stmt) = 0;
         virtual T visit(IfStmt<E, T>& stmt) = 0;
         virtual T visit(WhileStmt<E, T>& stmt) = 0;
+        virtual T visit(FunctionStmt<E, T>& stmt) = 0;
 };
 
 
@@ -179,7 +181,6 @@ template <typename E, typename T> struct BlockStmt : public Stmt<E, T>
         std::string to_string(void) const final 
         {
             std::ostringstream oss;
-            //oss << "BlockStmt<" << this->statements.size() << ">";
             oss << "BlockStmt<" << std::endl;
             for(unsigned i = 0; i < this->statements.size(); ++i)
                 oss << "  " << this->statements[i]->to_string() << "," << std::endl;
@@ -274,6 +275,51 @@ template <typename E, typename T> struct WhileStmt : public Stmt<E, T>
                 oss << " " << this->body->to_string();
             oss << ">";
 
+            return oss.str();
+        }
+};
+
+
+
+/*
+ * FunctionStmt
+ */
+template <typename E, typename T> struct FunctionStmt : public Stmt<E, T>
+{
+    Token name;
+    std::vector<Token> params;
+    std::vector<std::unique_ptr<Stmt<E, T>>> body;
+
+    public:
+        FunctionStmt(
+                const Token& name, 
+                const std::vector<Token>& p,
+                std::vector<std::unique_ptr<Stmt<E, T>>> stmts
+        ) : name(name), params(p), body(std::move(stmts)) {}
+
+        StmtType get_type(void) const final {
+            return StmtType::FUNCTION;
+        }
+
+        T accept(StmtVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        const Expr<E, T>* get_expr(void) const final {
+            return nullptr;
+        }
+
+        std::string to_string(void) const final 
+        {
+            std::ostringstream oss;
+            oss << "FunctionStmt< " << this->name.lexeme << "(";
+            for(unsigned i = 0; i < this->params.size(); ++i)
+            {
+                oss << this->params[i].lexeme;
+                if(i < this->params.size()-1)
+                    oss << ",";
+            }
+            oss << ")>";
             return oss.str();
         }
 };

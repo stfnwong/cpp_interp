@@ -148,7 +148,11 @@ std::unique_ptr<Expr<EType, VType>> Parser::finish_call(std::unique_ptr<Expr<ETy
         do
         {
             if(args.size() >= MAX_ARGUMENTS)
-                Lox::error(this->peek(), "Can't have more than " + std::to_string(MAX_ARGUMENTS) + " arguments.");
+            {
+                Lox::error(this->peek(), "Can't have more than " 
+                        + std::to_string(MAX_ARGUMENTS) + " arguments."
+                );
+            }
             args.push_back(std::move(this->expression()));
         } while(this->match({TokenType::COMMA}));
     }
@@ -311,6 +315,8 @@ std::unique_ptr<Expr<EType, VType>> Parser::and_expr(void)
 std::unique_ptr<Stmt<EType, VType>> Parser::declaration(void)
 {
     try {
+        if(this->match({TokenType::FUN}))
+            return this->func("function");
         if(this->match({TokenType::VAR}))
             return this->var_declaration();
 
@@ -323,6 +329,39 @@ std::unique_ptr<Stmt<EType, VType>> Parser::declaration(void)
     }
 }
 
+std::unique_ptr<Stmt<EType, VType>> Parser::func(const std::string& kind)
+{
+    Token name = this->consume(TokenType::IDENTIFIER, "expect " + kind + " name");
+    this->consume(TokenType::LEFT_PAREN, "expect '(' after " + kind + " name.");
+
+    std::vector<Token> params;
+    if(!this->check(TokenType::RIGHT_PAREN))
+    {
+        do
+        {
+            if(params.size() >= MAX_ARGUMENTS)
+            {
+                Lox::error(this->peek(), "Can't have more than " 
+                        + std::to_string(MAX_ARGUMENTS) + " arguments."
+                );
+            }
+
+            params.push_back(
+                    this->consume(TokenType::IDENTIFIER, "expect parameter name.")
+            );
+        } while(this->match({TokenType::COMMA}));
+    }
+
+    this->consume(TokenType::RIGHT_PAREN, "expect ')' after parameters.");
+    this->consume(TokenType::LEFT_BRACE, "expect '{' before " + kind + " body.");
+
+    //auto body = this->block();
+    //std::vector<std::unique_ptr<Stmt<EType, VType>>> body {std::move(this->block())};
+    std::vector<std::unique_ptr<Stmt<EType, VType>>> body;
+    body.push_back(std::move(this->block()));
+    return std::make_unique<FunctionStmt<EType, VType>>(name, params, std::move(body));
+
+}
 
 std::unique_ptr<Stmt<EType, VType>> Parser::var_declaration(void)
 {

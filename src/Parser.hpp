@@ -51,6 +51,7 @@ class Parser
 
         // Statements 
         std::unique_ptr<Stmt<EType, VType>> declaration(void);            // literals, etc
+        std::unique_ptr<Stmt<EType, VType>> func(const std::string& kind);            // literals, etc
         std::unique_ptr<Stmt<EType, VType>> var_declaration(void);            // literals, etc
         std::unique_ptr<Stmt<EType, VType>> statement(void);
         std::unique_ptr<Stmt<EType, VType>> if_statement(void);

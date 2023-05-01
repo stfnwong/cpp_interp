@@ -67,7 +67,7 @@ Variables have additional productions.
 
 `program -> declaration* EOF;`
 
-`declaration -> var_decl | statement ;`
+`declaration -> fun_decl | var_decl | statement ;`
 
 `statement -> expr_stmt | if_stmt | for_stmt | while_stmt | print_stmt | block ;`
 
@@ -85,3 +85,8 @@ A variable declaration looks like
 
 `var_decl -> "var" IDENTIFIER  ( "=" expression)? ";"`
 
+A function declaration looks like 
+
+`fun_decl -> "fun" function ;`
+
+`function -> IDENTIFIER "(" parameters? ")" block ;`

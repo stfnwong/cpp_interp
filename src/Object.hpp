@@ -20,7 +20,7 @@ constexpr int f_precision = 4;
 class Callable;
 
 enum class ObjType {
-    NONE,
+    NIL,
     NUMBER,
     STRING,
     BOOLEAN,
@@ -31,8 +31,10 @@ enum class ObjType {
 struct get_type_string
 {
     std::string operator()(const std::string& s) const { return "String"; }
+    std::string operator()(std::string& s) const { return "String"; }
     std::string operator()(double f) const { return "Number"; }
     std::string operator()(bool b) const { return "Boolean"; }
+    std::string operator()(void) const { return "Nil"; }
 };
 
 
@@ -57,7 +59,6 @@ struct LoxObject
     std::optional<std::variant<std::string, double, bool>> value;
     std::shared_ptr<Callable> callable;
 
-    //template <class... Ts> struct overload : Ts... { using Ts::operator()...; };
     //static auto get_value_string = overload {
     //    [](const std::string& s) { return s; },
     //    [](double f) {
@@ -67,10 +68,28 @@ struct LoxObject
     //    },
     //    [](bool b) { return std::to_string(b); }
     //};
-    
 
+    //template <class... Ts> struct overload : Ts... { using Ts::operator()...; };
+    //template <class... Ts> overload(Ts... ) -> overload<Ts...>;
+
+    //std::string get_actual_string(void) const
+    //{
+    //    return std::visit(overload {
+    //            [](std::string& s) { return s; },
+    //            [](float f) { 
+    //                std::ostringstream oss;
+    //                oss << std::setprecision(f_precision) << f;
+    //                return oss.str();
+    //            },
+    //            [](bool b) { return std::to_string(b); },
+    //            [](void) { return "Nil"; }
+    //        },
+    //        this->value
+    //    );
+    //}
+    
     public:
-        LoxObject() : type(ObjType::NONE), token(Token()) {}
+        LoxObject() : type(ObjType::NIL), token(Token()) {}
         LoxObject(const Token& token);
 
         //LoxObject(std::shared_ptr<Callable> c) : type(ObjType::FUNCTION), token(Token()), value(),  callable(std::move(c)) {}
@@ -104,11 +123,12 @@ struct LoxObject
         double      get_double_val(void) const;
         bool        get_bool_val(void) const;
         bool        has_type(void) const;
-        TokenType   get_type(void) const;
         std::string get_type_string(void) const;
         bool        has_string_type(void) const;
         bool        has_number_type(void) const;
-        bool        is_callable(void) const;
+        bool        has_callable(void) const;
+
+        std::shared_ptr<Callable> get_callable(void) const;
 
         std::string to_string(void) const;
         std::string to_repr(void) const;
