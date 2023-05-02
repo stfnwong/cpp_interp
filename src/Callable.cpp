@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>     // TODO: remove, debug only
 
 #include "Callable.hpp"
 #include "Environment.hpp"
@@ -17,11 +18,20 @@ LoxFunction::LoxFunction(FunctionStmt<EType, VType>* d) :
 
 LoxObject LoxFunction::call(Interpreter& interp, const std::vector<LoxObject>& args)
 {
-    Environment env(interp.get_globals());
+    //Environment env(interp.get_globals());
+    Environment env = interp.get_globals();
+
+    std::cout << "[" << __func__ << "] env: " << std::endl << env.to_repr() << std::endl;
 
     for(unsigned i = 0; i < this->decl->params.size(); ++i)
         env.define(decl->params[i].lexeme, args[i]);
-    interp.execute_block(decl->body, env);
+
+    try {
+        interp.execute_block(decl->body, env);
+    }
+    catch(Return& rv) {
+        return rv.value;
+    }
 
     return LoxObject();         // bogus return
 }

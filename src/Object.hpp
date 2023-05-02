@@ -52,47 +52,21 @@ struct get_value_string
 };
 
 
+/*
+ * Generic Object 
+ */
 struct LoxObject
 {
-    ObjType type;
+    ObjType type;    // TODO: make these private?
     Token token;
     std::optional<std::variant<std::string, double, bool>> value;
     std::shared_ptr<Callable> callable;
-
-    //static auto get_value_string = overload {
-    //    [](const std::string& s) { return s; },
-    //    [](double f) {
-    //        std::ostringstream oss;
-    //        oss << std::setprecision(f_precision) << f;
-    //        return oss.str();
-    //    },
-    //    [](bool b) { return std::to_string(b); }
-    //};
-
-    //template <class... Ts> struct overload : Ts... { using Ts::operator()...; };
-    //template <class... Ts> overload(Ts... ) -> overload<Ts...>;
-
-    //std::string get_actual_string(void) const
-    //{
-    //    return std::visit(overload {
-    //            [](std::string& s) { return s; },
-    //            [](float f) { 
-    //                std::ostringstream oss;
-    //                oss << std::setprecision(f_precision) << f;
-    //                return oss.str();
-    //            },
-    //            [](bool b) { return std::to_string(b); },
-    //            [](void) { return "Nil"; }
-    //        },
-    //        this->value
-    //    );
-    //}
     
     public:
         LoxObject() : type(ObjType::NIL), token(Token()) {}
         LoxObject(const Token& token);
 
-        //LoxObject(std::shared_ptr<Callable> c) : type(ObjType::FUNCTION), token(Token()), value(),  callable(std::move(c)) {}
+        LoxObject(std::shared_ptr<Callable> c) : type(ObjType::FUNCTION), token(Token()), value(),  callable(std::move(c)) {}
 
         // Constructors for container types 
         LoxObject(double f) : 

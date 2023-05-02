@@ -42,8 +42,9 @@ class Callable
 
 class LoxFunction : public Callable
 {
-    //std::unique_ptr<FunctionStmt<EType, VType>> decl; // NOTE: who owns this?
-    FunctionStmt<EType, VType>* decl;
+   //std::unique_ptr<FunctionStmt<EType, VType>> decl; // NOTE: who owns this?
+   FunctionStmt<EType, VType>* decl;
+   //std::shared_ptr<Environment> closure;
 
    public:
         LoxFunction(FunctionStmt<EType, VType>* d);

@@ -23,7 +23,11 @@ class Environment
 
     public:
         Environment() : enclosing(nullptr) {}
+        Environment(const Environment& env) : 
+            enclosing(std::make_shared<Environment>(env.enclosing)), values(env.values) {} 
         Environment(std::shared_ptr<Environment> enc) : enclosing(enc) {}
+
+        // TODO: testing copy assignment
 
         void      define(const std::string& name, const LoxObject& value);
         void      define(const Token& name, const LoxObject& value);
@@ -31,6 +35,8 @@ class Environment
         LoxObject get(const Token& name);
         void      assign(const Token& name, const LoxObject& value);
         std::vector<std::string> get_vars(void) const;
+        // TODO: remove, debug only
+        std::string to_repr(void) const;
 };
 
 

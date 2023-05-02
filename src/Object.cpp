@@ -131,6 +131,9 @@ std::shared_ptr<Callable> LoxObject::get_callable(void) const
 
 std::string LoxObject::to_string(void) const
 {
+    if(this->has_callable())
+        return this->callable->to_string();
+
     if(this->has_type())
         return std::visit(get_value_string(), this->value.value());
 

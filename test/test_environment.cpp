@@ -32,13 +32,6 @@ TEST_CASE("test_create_env_with_enclosing", "environment")
     Token inner_var_1_name(TokenType::IDENTIFIER, "inner_var_1");
     Token inner_var_2_name(TokenType::IDENTIFIER, "inner_var_2");
 
-
-    // Construct the outer env
-    //Environment* outer = new Environment();
-    //outer->define(outer_var_1_name.lexeme, outer_var_1);
-    //outer->define(outer_var_2_name.lexeme, outer_var_2);
-    //REQUIRE(outer->get(outer_var_1_name) == outer_var_1);
-
     Environment outer;
     outer.define(outer_var_1_name.lexeme, outer_var_1);
     outer.define(outer_var_2_name.lexeme, outer_var_2);
@@ -150,4 +143,67 @@ TEST_CASE("test_add_assignment", "environment")
     REQUIRE(out_obj.has_type() == true);
     REQUIRE(out_obj.has_number_type() == true);
     REQUIRE(double_equal(out_obj.get_double_val(), 444.0f));
+}
+
+TEST_CASE("test_copy_assign", "environment")
+{
+    Environment base;
+
+    // add some vars 
+    LoxObject base_1(Token(TokenType::STRING, "1", 1));
+    LoxObject base_2(Token(TokenType::STRING, "2", 1));
+    Token base_name_1(TokenType::IDENTIFIER, "base_var_1");
+    Token base_name_2(TokenType::IDENTIFIER, "base_var_2");
+
+    base.define(base_name_1, base_1);
+
+    Environment base_copy = base;
+    REQUIRE(base_copy.get(base_name_1) == base_1);
+
+    base.define(base_name_2, base_2);
+    REQUIRE(base.get(base_name_1) == base_1);
+    REQUIRE(base.get(base_name_2) == base_2);
+
+    REQUIRE_THROWS(base_copy.get(base_name_2));
+
+    // Now copy back
+    base = base_copy;
+    REQUIRE_THROWS(base.get(base_name_2));
+    REQUIRE(base.get(base_name_1) == base_1);
+}
+
+
+TEST_CASE("test_copy_assignment_nested", "environment")
+{
+    Environment base;
+
+    // add some vars 
+    LoxObject base_1(Token(TokenType::STRING, "1", 1));
+    LoxObject base_2(Token(TokenType::STRING, "2", 1));
+    Token base_name_1(TokenType::IDENTIFIER, "base_var_1");
+    Token base_name_2(TokenType::IDENTIFIER, "base_var_2");
+
+    base.define(base_name_1, base_1);
+
+    Environment inner = Environment(std::make_shared<Environment>(base));
+
+    LoxObject inner_1(Token(TokenType::STRING, "1", 1));
+    Token inner_name_1(TokenType::IDENTIFIER, "inner_var_1");
+
+    inner.define(inner_name_1, inner_1);
+    REQUIRE(inner.get(inner_name_1) == inner_1);
+
+    REQUIRE_THROWS(base.get(inner_name_1));
+
+    // Now copy inner env
+    Environment inner_copy = inner;
+    REQUIRE(inner_copy.get(inner_name_1) == inner_1);
+
+    LoxObject inner_copy_1(Token(TokenType::STRING, "1", 1));
+    Token inner_copy_name_1(TokenType::IDENTIFIER, "inner_copy_var_1");
+
+    inner_copy.define(inner_copy_name_1, inner_copy_1);
+    REQUIRE(inner_copy.get(inner_copy_name_1) == inner_copy_1);
+    REQUIRE_THROWS(inner.get(inner_copy_name_1));
+    REQUIRE_THROWS(base.get(inner_copy_name_1));
 }

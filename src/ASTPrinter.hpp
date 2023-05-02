@@ -131,7 +131,7 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
             std::ostringstream oss;
             oss << "(block " << std::endl;
             for(unsigned i = 0; i < stmt.statements.size(); ++i)
-                oss << "     " << i << ") " << stmt.statements[i]->accept(*this).to_string() << std::endl;
+                oss << "     " << stmt.statements[i]->accept(*this).to_string() << std::endl;
             oss << ")";
             return LoxObject(oss.str());
         }
@@ -164,6 +164,22 @@ struct ASTPrinter : public ExprVisitor<LoxObject, LoxObject>, public StmtVisitor
                 if(i < stmt.params.size()-1)
                     oss << ",";
             }
+            oss << std::endl;
+            for(unsigned i = 0; i < stmt.body.size(); ++i)
+                oss << "    " << stmt.body[i]->to_string() << std::endl;
+            oss << ")";
+
+            return LoxObject(oss.str());
+        }
+
+        LoxObject visit(ReturnStmt<E, T>& stmt) final
+        {
+            std::ostringstream oss;
+
+            oss << "(" << stmt.keyword.lexeme << " ";
+            if(stmt.value.get())
+                oss << stmt.value->to_string();
+            oss << ")";
 
             return LoxObject(oss.str());
         }

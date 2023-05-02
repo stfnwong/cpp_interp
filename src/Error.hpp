@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "Object.hpp"
 #include "Token.hpp"
 
 
@@ -38,6 +39,15 @@ struct RuntimeError : public std::exception
         }
 };
 
+
+// TODO; move this to be closer to the interpreter?
+struct Return : public std::exception
+{
+    LoxObject value;
+
+    public:
+        explicit Return(const LoxObject& v) : value(v) {}
+};
 
 
 #endif /*__ERROR_HPP*/

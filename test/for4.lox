@@ -1,0 +1,7 @@
+fun add(a, b) {
+    return a + b;
+}
+
+for(var i = 0; i < 20; i = i + 1) {
+    print add(i, i);
+}

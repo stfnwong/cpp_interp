@@ -69,7 +69,7 @@ Variables have additional productions.
 
 `declaration -> fun_decl | var_decl | statement ;`
 
-`statement -> expr_stmt | if_stmt | for_stmt | while_stmt | print_stmt | block ;`
+`statement -> expr_stmt | if_stmt | for_stmt | return_stmt | while_stmt | print_stmt | block ;`
 
 `if_stmt -> "if" "(" expression ")" statement ("else" statement )? ;`
 
@@ -90,3 +90,29 @@ A function declaration looks like
 `fun_decl -> "fun" function ;`
 
 `function -> IDENTIFIER "(" parameters? ")" block ;`
+
+Values returned from a function have their own statement
+
+`return_stmt -> "return" expression? ";" ;`
+
+
+
+## Design notes 
+I templated the Visitor classes which are parameterized over `E` (the "expression" type)
+and `V` (the "visit" type). In theory means that visitors can hold and return arbitrary
+types. In practice you don't really want to do this. In fact it turns out to be quite 
+awkward to do this because
+
+- You have to keep specifiying the types everywhere since they are templates. That is, you can't just have a `Stmt` or an `Expr`, you need a `Stmt<E, V>` or an `Expr<E, V>`.
+- Ok fine, big deal. In practice this sucks because there is only really one type that you actually want for each of these. For example, you always want to return a `LoxObject` (or perhaps a pointer to a `LoxObject`) in every visit method.
+- This requirement to return a `LoxObject` makes things doubly stupid for the `ASTVisitor`, since that also has to be parameterized over `E` and `V`.
+- This in turn means that you can only visit an `Expr<E, V>` or `Stmt<E, V>`.
+- The interpreter wants to have `Expr<LoxObject, LoxObject>` and `Stmt<LoxObject, LoxObject>`.
+- It would be nice to have `Expr<LoxObject, std::string>` in the `ASTPrinter`, since that would return a `std::string` directly, but you can't do this since you can't visit a `Expr<LoxObject, LoxObject>` for example, which is what the interpreter actually uses. 
+
+
+At the time of writing I am leaving this templated implementation in, but I think its
+better to re-write it to have fixed types. There doesn't seem to be much use for being
+able to parameterize the visitor classes over multiple types anyway, and as such all
+you get for doing so is downsides.
+

@@ -71,3 +71,21 @@ std::vector<std::string> Environment::get_vars(void) const
 
     return keys;
 }
+
+
+std::string Environment::to_repr(void) const
+{
+    std::ostringstream oss;
+
+    oss << "Vars (this scope): (" << this->values.size() << " vars)"  << std::endl;
+    for(const auto& kv : this->values)
+        oss << "[" << kv.first << "] -> " << kv.second.to_string() << std::endl;
+    if(this->enclosing.get())
+    {
+        oss << "Vars (closure): (" << this->enclosing->values.size() << " vars)" << std::endl;
+        for(const auto& kv : this->enclosing->values)
+            oss << "[" << kv.first << "] -> " << kv.second.to_string() << std::endl;
+    }
+
+    return oss.str();
+}

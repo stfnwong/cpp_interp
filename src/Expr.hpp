@@ -219,17 +219,6 @@ template <typename E, typename T> struct BinaryExpr : public Expr<E, T>
 
             return oss.str();
         }
-
-        //std::string to_repr(void) const
-        //{
-        //    std::ostringstream oss;
-        //    oss << "BinaryExpr<" 
-        //        << this->left->to_string() << ""
-        //        << this->op.to_string() << " "
-        //        << this->right->to_string() << ">";
-
-        //    return oss.str();
-        //}
 };
 
 
@@ -419,8 +408,7 @@ template <typename E, typename T> struct CallExpr : Expr<E, T>
                 std::vector<std::unique_ptr<Expr<E, T>>> args) : 
             callee(std::move(callee)),
             paren(paren),
-            arguments(std::move(args)) 
-    {}
+            arguments(std::move(args))  {} 
 
         bool operator==(const CallExpr<E, T>& that) const
         {
@@ -453,11 +441,14 @@ template <typename E, typename T> struct CallExpr : Expr<E, T>
         {
             std::ostringstream oss;
 
-            oss << "CallExpr<" << this->callee->to_string() << ": ";
-            oss << std::endl << "   ";
-            for(const auto& a : this->arguments)
-                oss << a->to_string() << ", ";
-            oss << ">";
+            oss << "CallExpr<" << this->callee->to_string() << "(";
+            for(unsigned i = 0; i < this->arguments.size(); ++i)
+            {
+                oss << this->arguments[i]->to_string();
+                if(i < this->arguments.size()-1)
+                    oss << ",";
+            }
+            oss << ")>";
 
             return oss.str();
         }

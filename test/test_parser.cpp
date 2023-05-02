@@ -90,6 +90,7 @@ TEST_CASE("test_parse_block_statement", "parser")
     REQUIRE(num_exprs == exp_num_exprs);
 }
 
+
 TEST_CASE("test_parse_for_loop", "parser")
 {
     std::string source_file = "test/for2.lox";
@@ -108,4 +109,5 @@ TEST_CASE("test_parse_for_loop", "parser")
     }
 
     std::cout << "There were " << num_stmt << " statements." << std::endl;
+    REQUIRE(num_stmt == 4);
 }

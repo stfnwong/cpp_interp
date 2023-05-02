@@ -9,7 +9,7 @@
 #include "Expr.hpp"
 
 
-enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK, IF, VAR, WHILE, FUNCTION };
+enum class StmtType { PRINT, EXPR, VARIABLE, BLOCK, IF, VAR, WHILE, FUNCTION, RETURN };
 
 template <typename E, typename T> struct PrintStmt;
 template <typename E, typename T> struct ExpressionStmt;
@@ -19,6 +19,7 @@ template <typename E, typename T> struct IfStmt;
 template <typename E, typename T> struct VarStmt;
 template <typename E, typename T> struct WhileStmt;
 template <typename E, typename T> struct FunctionStmt;
+template <typename E, typename T> struct ReturnStmt;
 
 
 template <typename E, typename T> struct StmtVisitor
@@ -31,6 +32,7 @@ template <typename E, typename T> struct StmtVisitor
         virtual T visit(IfStmt<E, T>& stmt) = 0;
         virtual T visit(WhileStmt<E, T>& stmt) = 0;
         virtual T visit(FunctionStmt<E, T>& stmt) = 0;
+        virtual T visit(ReturnStmt<E, T>& stmt) = 0;
 };
 
 
@@ -225,10 +227,17 @@ template <typename E, typename T> struct IfStmt : public Stmt<E, T>
         std::string to_string(void) const final 
         {
             std::ostringstream oss;
-            oss << "IfStmt<" << this->cond.get()->to_string() << " ? "
-                << this->then_branch.get()->to_string() << " : " 
-                << this->else_branch.get()->to_string()
-                << ">";
+            oss << "IfStmt<" << this->cond.get()->to_string() << " ? ";
+            if(this->then_branch.get())
+                oss << this->then_branch.get()->to_string();
+            else
+                oss << "(Nil)";
+            oss << " : " ;
+            if(this->else_branch.get())
+                oss << this->else_branch.get()->to_string();
+            else
+                oss << "(Nil)";
+            oss << ">";
             return oss.str();
         }
 
@@ -312,7 +321,7 @@ template <typename E, typename T> struct FunctionStmt : public Stmt<E, T>
         std::string to_string(void) const final 
         {
             std::ostringstream oss;
-            oss << "FunctionStmt< " << this->name.lexeme << "(";
+            oss << "FunctionStmt<" << this->name.lexeme << "(";
             for(unsigned i = 0; i < this->params.size(); ++i)
             {
                 oss << this->params[i].lexeme;
@@ -320,9 +329,46 @@ template <typename E, typename T> struct FunctionStmt : public Stmt<E, T>
                     oss << ",";
             }
             oss << ")>";
+            for(unsigned i = 0; i < this->body.size(); ++i)
+                oss << this->body[i]->to_string() << ",";
             return oss.str();
         }
 };
+
+
+
+/*
+ * ReturnStmt
+ */
+template <typename E, typename T> struct ReturnStmt : public Stmt<E, T>
+{
+    Token keyword;
+    std::unique_ptr<Expr<E, T>> value;
+
+    public:
+        ReturnStmt(const Token& k, std::unique_ptr<Expr<E, T>> v) : 
+            keyword(k), value(std::move(v)) {} 
+
+        StmtType get_type(void) const final {
+            return StmtType::RETURN;
+        }
+
+        T accept(StmtVisitor<E, T>& visitor) final {
+            return visitor.visit(*this);
+        }
+
+        const Expr<E, T>* get_expr(void) const final {
+            return this->value.get();
+        }
+
+        std::string to_string(void) const final
+        {
+            std::ostringstream oss;
+
+            return oss.str();
+        }
+};
+
 
 
 #endif /*__STATEMENT_HPP*/

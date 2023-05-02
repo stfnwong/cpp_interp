@@ -3,6 +3,8 @@
  * A recursive descent parser
  */
 
+#include <iostream>
+
 #include "Error.hpp"
 #include "Lox.hpp"
 #include "Parser.hpp"
@@ -126,6 +128,8 @@ std::unique_ptr<Expr<EType, VType>> Parser::primary(void)
 std::unique_ptr<Expr<EType, VType>> Parser::call(void)
 {
     auto expr = this->primary();
+
+    std::cout << "[" << __func__ << "] call expr was " << expr->to_string() << std::endl;
 
     while(1)
     {
@@ -381,10 +385,12 @@ std::unique_ptr<Stmt<EType, VType>> Parser::statement(void)
         return this->if_statement();
     if(this->match({TokenType::FOR}))
         return this->for_statement();       // desugars a for into a while
-    if(this->match({TokenType::WHILE}))
-        return this->while_statement();
     if(this->match({TokenType::PRINT}))
         return this->print_statement();
+    if(this->match({TokenType::WHILE}))
+        return this->while_statement();
+    if(this->match({TokenType::RETURN}))
+        return this->return_statement();
 
     if(this->match({TokenType::LEFT_BRACE}))
         return this->block();
@@ -490,6 +496,18 @@ std::unique_ptr<Stmt<EType, VType>> Parser::print_statement(void)
     auto value = this->expression();
     this->consume(TokenType::SEMICOLON, "expect ';' after value");
     return std::make_unique<PrintStmt<EType, VType>>(std::move(value));
+}
+
+std::unique_ptr<Stmt<EType, VType>> Parser::return_statement(void)
+{
+    Token keyword = this->previous();
+    std::unique_ptr<Expr<EType, VType>> value;
+    if(!this->check(TokenType::SEMICOLON))
+        value = this->expression();
+
+    this->consume(TokenType::SEMICOLON, "expect ';' after return value");
+
+    return std::make_unique<ReturnStmt<EType, VType>>(keyword, std::move(value));
 }
 
 std::unique_ptr<Stmt<EType, VType>> Parser::expression_statement(void)

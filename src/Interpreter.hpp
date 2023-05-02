@@ -16,17 +16,24 @@
 
 
 
+/*
+ * Interpret a series of valid Lox statements
+ */
 class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, StmtVType>
 {
     private:
         Environment globals;
-        Environment env;            // current environment
+        Environment env;            // current environment (pointer)?
 
         void      define_globals(void);
         bool      is_truthy(const LoxObject& obj) const;
         bool      is_equal(const LoxObject& a, const LoxObject& b) const;
         void      check_number_operand(const Token& otor, const LoxObject& orand);
         void      check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
+        
+        // TODO: since this is all internal these could all return LoxObject*, which 
+        // could be set to nullptr (rather than constructing a null LoxObject as is 
+        // the case now).
         
         // Expressions
         LoxObject visit(LiteralExpr<EType, VType>& expr) final;
@@ -46,6 +53,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         LoxObject visit(IfStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(WhileStmt<EType, StmtVType>& stmt) final;
         LoxObject visit(FunctionStmt<EType, StmtVType>& stmt) final;
+        LoxObject visit(ReturnStmt<EType, StmtVType>& stmt) final;
 
     public:
         Interpreter();

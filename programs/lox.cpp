@@ -25,7 +25,7 @@ static const std::string VERSION_STRING = "deez nuts";
 static bool had_error = false;
 
 
-void run(const std::string& source)
+void run(const std::string& source, Interpreter& interp)
 {
     Scanner scanner(source);
     auto scanned_tokens = scanner.scan();
@@ -54,13 +54,13 @@ void run(const std::string& source)
             std::cout << " " << i << ": " << printer.print(*statements[i].get()) << std::endl;
     }
 
-    Interpreter interp;
     interp.interpret(statements);
 }
 
 
 void run_file(const std::string& filename)
 {
+    Interpreter interp;
     std::ifstream file(filename);
 
     if(!file.good()) 
@@ -76,7 +76,7 @@ void run_file(const std::string& filename)
     while(std::getline(file, line))
         source += line + "\n";
 
-    run(source);
+    run(source, interp);
 
     if(Lox::had_error)
         exit(2);
@@ -89,6 +89,7 @@ void run_prompt(void)
 {
     std::cout << "Lox version [" << VERSION_STRING << "]" << std::endl;
 
+    Interpreter interp;
     std::string code;
 
     while(1)
@@ -96,8 +97,12 @@ void run_prompt(void)
         std::cout << "> ";
         if(std::getline(std::cin, code))
         {
-            run(code);
+            std::cout << "[" << __func__ << "] interp env before: " << std::endl;
+            std::cout << interp.get_globals().to_repr() << std::endl;
+            run(code, interp);    // TODO: segfault referring to previous env...
             Lox::had_error = false;  // why do I have to do this?
+            std::cout << "[" << __func__ << "] interp env after: " << std::endl;
+            std::cout << interp.get_globals().to_repr() << std::endl;
         }
         else
         {

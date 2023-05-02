@@ -23,19 +23,13 @@ static void runtime_error(RuntimeError& e)
 
 Interpreter::Interpreter()
 {
-    // Add global functions here 
-
-
-
-
-
+    this->define_globals();
     this->env = this->globals;
 }
 
 void Interpreter::define_globals(void)
 {
     //this->globals.define(
-
 }
 
 // 
@@ -200,7 +194,6 @@ LoxObject Interpreter::visit(LogicalExpr<EType, VType>& expr)
 LoxObject Interpreter::visit(CallExpr<EType, VType>& expr)
 {
     LoxObject callee = this->evaluate(expr.callee);
-
     if(!callee.has_callable())
     {
         throw RuntimeError(expr.paren, "Object of type " + callee.get_type_string() + 
@@ -278,11 +271,28 @@ LoxObject Interpreter::visit(WhileStmt<EType, StmtVType>& stmt)
 LoxObject Interpreter::visit(FunctionStmt<EType, StmtVType>& stmt)
 {
     LoxFunction f(&stmt);
+    LoxObject fobj(std::make_shared<LoxFunction>(f));
+    this->env.define(stmt.name.lexeme, std::move(fobj));
+
+    //std::cout << "[" << __func__ << "] env now contains: ";
+    //for(const auto& v : this->env.get_vars())
+    //    std::cout << v << " ";
+    //std::cout << std::endl;
+    //std::cout << "[" << __func__ << "] env.get(" << stmt.name.lexeme << "): " <<
+    //    env.get(stmt.name).to_string() << std::endl;
 
     return LoxObject();
 }
 
 
+LoxObject Interpreter::visit(ReturnStmt<EType, StmtVType>& stmt) 
+{
+    LoxObject value;
+    if(stmt.value.get())
+        value = this->evaluate(stmt.value);
+
+    throw Return(value);
+}
 
 
 // ======== PUBLIC FUNCTIONS ======== //
@@ -300,7 +310,8 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVT
 
 Environment Interpreter::get_globals(void) const
 {
-    return this->globals;
+    return this->env;           // TODO; remove this
+    //return this->globals;
 }
 
 LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
@@ -313,15 +324,20 @@ void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
     stmt->accept(*this);
 }
 
-void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env)
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& block_env)
 {
     auto prev_env = this->env;
 
     try 
     {
-        this->env = env;
+        this->env = block_env;
+        std::cout << "[" << __func__ << "] this->env: " << std::endl;
+        std::cout << this->env.to_repr() << std::endl;
         for(unsigned i = 0; i < stmts.size(); ++i)
+        {
+            std::cout << "[" << __func__ << "] cur statement: " << stmts[i]->to_string() << std::endl;
             this->execute(stmts[i]);
+        }
     }
     catch(RuntimeError& e)
     {
