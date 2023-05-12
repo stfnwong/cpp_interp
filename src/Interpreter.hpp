@@ -6,6 +6,7 @@
 #define __INTERPRETER_HPP
 
 #include <iostream>   // TODO: move all the error stuff to Error.hpp
+#include <memory>
 
 #include "Common.hpp"
 #include "Environment.hpp"
@@ -22,8 +23,8 @@
 class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, StmtVType>
 {
     private:
-        Environment globals;
-        Environment env;            // current environment (pointer)?
+        std::shared_ptr<Environment> globals;
+        std::shared_ptr<Environment> env;            // current environment (pointer)?
 
         void      define_globals(void);
         bool      is_truthy(const LoxObject& obj) const;
@@ -58,11 +59,12 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
     public:
         Interpreter();
         void interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVType>>>& statements);
-        Environment get_globals(void) const;
+        std::shared_ptr<Environment> get_globals(void) const;
 
         LoxObject evaluate(const std::unique_ptr<Expr<EType, VType>>& expr);
         void      execute(const std::unique_ptr<Stmt<EType, VType>>& stmt);
-        void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env);
+        void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, std::shared_ptr<Environment> env);
+        //void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env);
         //void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env);
 };
 

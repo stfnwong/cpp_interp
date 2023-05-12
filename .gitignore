@@ -13,6 +13,10 @@ lox
 
 # Ignore log files
 *.log
+logs/
+
+# Ignore any files with the extension *.out (eg: valgrind dumps, etc)
+*.out
 
 # Ignore core dumps
 vgcore*

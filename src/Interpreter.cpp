@@ -24,7 +24,8 @@ static void runtime_error(RuntimeError& e)
 Interpreter::Interpreter()
 {
     this->define_globals();
-    this->env = this->globals;
+    this->env = std::make_shared<Environment>();
+    this->globals = this->env;
 }
 
 void Interpreter::define_globals(void)
@@ -163,13 +164,13 @@ LoxObject Interpreter::visit(BinaryExpr<EType, VType>& expr)
 
 LoxObject Interpreter::visit(VariableExpr<EType, VType>& expr)
 {
-    return this->env.get(expr.token);
+    return this->env->get(expr.token);
 }
 
 LoxObject Interpreter::visit(AssignmentExpr<EType, VType>& expr)
 {
     LoxObject value = this->evaluate(expr.expr);
-    this->env.assign(expr.token, value);
+    this->env->assign(expr.token, value);
     return value;
 }
 
@@ -237,7 +238,7 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
     LoxObject value;
     if(stmt.get_expr())
         value = this->evaluate(stmt.expr);
-    this->env.define(stmt.token.lexeme, value);
+    this->env->define(stmt.token.lexeme, value);
 
     return value;
 }
@@ -245,7 +246,9 @@ LoxObject Interpreter::visit(VariableStmt<EType, StmtVType>& stmt)
 LoxObject Interpreter::visit(BlockStmt<EType, StmtVType>& stmt)
 {
     // TODO: Revisit using shared_ptr here....
-    auto block_env = Environment(std::make_shared<Environment>(this->env));
+    //auto block_env = Environment(std::make_shared<Environment>(this->env));
+    //auto block_env = Environment(this->env);
+    auto block_env = std::make_shared<Environment>(this->env);
     this->execute_block(stmt.statements, block_env);
     return LoxObject();
 }
@@ -272,7 +275,7 @@ LoxObject Interpreter::visit(FunctionStmt<EType, StmtVType>& stmt)
 {
     LoxFunction f(&stmt);
     LoxObject fobj(std::make_shared<LoxFunction>(f));
-    this->env.define(stmt.name.lexeme, std::move(fobj));
+    this->env->define(stmt.name.lexeme, std::move(fobj));
 
     //std::cout << "[" << __func__ << "] env now contains: ";
     //for(const auto& v : this->env.get_vars())
@@ -308,7 +311,7 @@ void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVT
 }
 
 
-Environment Interpreter::get_globals(void) const
+std::shared_ptr<Environment> Interpreter::get_globals(void) const
 {
     return this->env;           // TODO; remove this
     //return this->globals;
@@ -324,15 +327,16 @@ void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
     stmt->accept(*this);
 }
 
-void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& block_env)
+//void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& block_env)
+void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, std::shared_ptr<Environment> block_env)
 {
     auto prev_env = this->env;
 
     try 
     {
-        this->env = block_env;
+        this->env = block_env;   // TODO: what is happening here?
         std::cout << "[" << __func__ << "] this->env: " << std::endl;
-        std::cout << this->env.to_repr() << std::endl;
+        std::cout << this->env->to_repr() << std::endl;
         for(unsigned i = 0; i < stmts.size(); ++i)
         {
             std::cout << "[" << __func__ << "] cur statement: " << stmts[i]->to_string() << std::endl;

@@ -19,12 +19,13 @@ LoxFunction::LoxFunction(FunctionStmt<EType, VType>* d) :
 LoxObject LoxFunction::call(Interpreter& interp, const std::vector<LoxObject>& args)
 {
     //Environment env(interp.get_globals());
-    Environment env = interp.get_globals();
+    //Environment env = interp.get_globals();
+    auto env = interp.get_globals();
 
-    std::cout << "[" << __func__ << "] env: " << std::endl << env.to_repr() << std::endl;
+    std::cout << "[" << __func__ << "] env: " << std::endl << env->to_repr() << std::endl;
 
     for(unsigned i = 0; i < this->decl->params.size(); ++i)
-        env.define(decl->params[i].lexeme, args[i]);
+        env->define(decl->params[i].lexeme, args[i]);
 
     try {
         interp.execute_block(decl->body, env);

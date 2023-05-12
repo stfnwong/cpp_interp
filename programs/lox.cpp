@@ -98,11 +98,11 @@ void run_prompt(void)
         if(std::getline(std::cin, code))
         {
             std::cout << "[" << __func__ << "] interp env before: " << std::endl;
-            std::cout << interp.get_globals().to_repr() << std::endl;
+            std::cout << interp.get_globals()->to_repr() << std::endl;
             run(code, interp);    // TODO: segfault referring to previous env...
             Lox::had_error = false;  // why do I have to do this?
             std::cout << "[" << __func__ << "] interp env after: " << std::endl;
-            std::cout << interp.get_globals().to_repr() << std::endl;
+            std::cout << interp.get_globals()->to_repr() << std::endl;
         }
         else
         {
