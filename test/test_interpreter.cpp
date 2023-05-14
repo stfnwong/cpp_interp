@@ -48,10 +48,15 @@ TEST_CASE("test_parse_and_interpret", "interpreter")
     REQUIRE(parser.num_tokens() == test_tokens.size());
 
     auto parsed_output = parser.parse();
+    REQUIRE(parsed_output.size() == 1);
 
     Interpreter interp;
 
     interp.interpret(parsed_output);
+    LoxObject res = interp.execute(parsed_output[0]);
+    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_number_type() == true);
+    REQUIRE(double_equal(res.get_double_val(), 4.0));
 }
 
 TEST_CASE("test_interpret_block_statements", "interpreter")
@@ -60,7 +65,7 @@ TEST_CASE("test_interpret_block_statements", "interpreter")
     std::string source;
     try {
         source = read_file(nesting_filename);
-        std::cout << "Read source file" << std::endl;
+        std::cout << "Read source file [" << nesting_filename << "]" << std::endl;
     }
     catch(std::ifstream::failure& e) {
         std::cout << "Failed to read source file " << nesting_filename << std::endl;
@@ -71,6 +76,21 @@ TEST_CASE("test_interpret_block_statements", "interpreter")
     Parser parser(scanner.scan());
 
     auto statements = parser.parse();
+    std::cout << "Parser produced " << statements.size() << " statements." << std::endl;
     Interpreter test_interp;
-    test_interp.interpret(statements);
+
+    for(unsigned i = 0; i < statements.size(); ++i)
+    {
+        LoxObject res = test_interp.execute(statements[i]);
+        std::cout << "[" << i << "] : " << res.to_string() << std::endl;
+    }
+    
+    //for(const auto& stmt : statements)
+    //{
+    //    LoxObject res = test_interp.execute(stmt);
+    //    std::cout << res.to_string() << std::endl;
+    //}
+
+
+    //test_interp.interpret(statements);
 }

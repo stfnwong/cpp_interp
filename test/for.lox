@@ -1,0 +1,10 @@
+var a;
+var b;
+var c = 0;
+
+for(a = 0; a < 10; a = a + 1) {
+    b = 2 * a;
+    c = 2 * b;
+    print b;
+    print c;
+}

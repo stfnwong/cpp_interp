@@ -322,12 +322,11 @@ LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
     return expr->accept(*this);
 }
 
-void Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
+LoxObject Interpreter::execute(const std::unique_ptr<Stmt<EType, VType>>& stmt)
 {
-    stmt->accept(*this);
+    return stmt->accept(*this);
 }
 
-//void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& block_env)
 void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, std::shared_ptr<Environment> block_env)
 {
     auto prev_env = this->env;
@@ -335,11 +334,11 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VT
     try 
     {
         this->env = block_env;   // TODO: what is happening here?
-        std::cout << "[" << __func__ << "] this->env: " << std::endl;
-        std::cout << this->env->to_repr() << std::endl;
+        //std::cout << "[" << __func__ << "] this->env: " << std::endl;
+        //std::cout << this->env->to_repr() << std::endl;
         for(unsigned i = 0; i < stmts.size(); ++i)
         {
-            std::cout << "[" << __func__ << "] cur statement: " << stmts[i]->to_string() << std::endl;
+            //std::cout << "[" << __func__ << "] cur statement: " << stmts[i]->to_string() << std::endl;
             this->execute(stmts[i]);
         }
     }

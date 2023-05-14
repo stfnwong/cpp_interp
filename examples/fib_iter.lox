@@ -1,8 +1,8 @@
 var a = 0;
 var temp;
+var max_fib_num = 50;
 
-for(var b = 1; a < 10000; b = temp + b) {
-    print a;
+for(var b = 1; a < max_fib_num; b = temp + b) {
     print b;
     temp = a;
     a = b;

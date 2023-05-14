@@ -66,7 +66,8 @@ TEST_CASE("test_print_block_statements", "ast_printer")
     auto parsed_output = parser.parse();
 
     for(unsigned i = 0; i < parsed_output.size(); ++i)
-        std::cout << i << ": " << printer.print(*parsed_output[i].get()) << std::endl;
+        std::cout << printer.print(*parsed_output[i].get()) << std::endl << std::endl;
+        //std::cout << i << ": " << printer.print(*parsed_output[i].get()) << std::endl;
 }
 
 TEST_CASE("test_print_function_stmt", "ast_printer")

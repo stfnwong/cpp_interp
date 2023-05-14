@@ -62,7 +62,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         std::shared_ptr<Environment> get_globals(void) const;
 
         LoxObject evaluate(const std::unique_ptr<Expr<EType, VType>>& expr);
-        void      execute(const std::unique_ptr<Stmt<EType, VType>>& stmt);
+        LoxObject execute(const std::unique_ptr<Stmt<EType, VType>>& stmt);
         void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, std::shared_ptr<Environment> env);
         //void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env);
         //void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, const Environment& env);

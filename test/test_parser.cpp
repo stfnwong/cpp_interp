@@ -93,7 +93,7 @@ TEST_CASE("test_parse_block_statement", "parser")
 
 TEST_CASE("test_parse_for_loop", "parser")
 {
-    std::string source_file = "test/for2.lox";
+    std::string source_file = "test/for.lox";
     std::string source = read_file(source_file);
 
     Scanner scanner(source);

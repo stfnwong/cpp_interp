@@ -88,6 +88,7 @@ bool LoxObject::get_bool_val(void) const
 }
 
 
+// TODO: the name for this method sucks
 bool LoxObject::has_type(void) const
 {
     return (this->value.has_value()) ? true : false;

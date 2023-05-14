@@ -129,7 +129,7 @@ std::unique_ptr<Expr<EType, VType>> Parser::call(void)
 {
     auto expr = this->primary();
 
-    std::cout << "[" << __func__ << "] call expr was " << expr->to_string() << std::endl;
+    //std::cout << "[" << __func__ << "] call expr was " << expr->to_string() << std::endl;
 
     while(1)
     {
