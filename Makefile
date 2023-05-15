@@ -49,7 +49,7 @@ $(TEST_OBJECTS): $(OBJ_DIR)/%.o : $(TEST_DIR)/%.cpp $(HEADERS)
 # ==== TEST TARGETS ==== #
 TESTS=test_token test_object test_scanner test_expr test_parser\
 	  test_interpreter test_statement test_environment \
-	  test_astprinter test_callable
+	  test_astprinter test_callable test_stdlib
 
 $(TESTS): $(TEST_OBJECTS) $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) $(OBJ_DIR)/$@.o\
