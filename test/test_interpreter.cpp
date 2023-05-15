@@ -50,25 +50,25 @@ TEST_CASE("test_interpret_ops", "interpreter")
 
     // var a = 1 + 2;
     res = interp.execute(parsed_output[0]);
-    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_value() == true);
     REQUIRE(res.has_number_type() == true);
     REQUIRE(double_equal(res.get_double_val(), 3.0));
 
     // var b = 1 < 2
     res = interp.execute(parsed_output[1]);
-    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_value() == true);
     REQUIRE(res.has_bool_type() == true);
     REQUIRE(res.get_bool_val() == true);
 
-    // var b = 1 <= 100
+    // var b = 1 >= 100
     res = interp.execute(parsed_output[2]);
-    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_value() == true);
     REQUIRE(res.has_bool_type() == true);
     REQUIRE(res.get_bool_val() == false);
 
     // var b = 100 > 100;
     res = interp.execute(parsed_output[3]);
-    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_value() == true);
     REQUIRE(res.has_bool_type() == true);
     REQUIRE(res.get_bool_val() == false);
 
@@ -83,7 +83,7 @@ TEST_CASE("test_parse_and_interpret", "interpreter")
     Interpreter interp;
 
     LoxObject res = interp.execute(parsed_output[0]);
-    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_value() == true);
     REQUIRE(res.has_number_type() == true);
     REQUIRE(double_equal(res.get_double_val(), 4.0));
 }
@@ -149,7 +149,7 @@ TEST_CASE("test_interpret_block_statements", "interpreter")
 //    res = test_interp.execute(statements[1]);
 //    //std::cout << "result: " <<  res.to_string() << std::endl;
 //
-//    REQUIRE(res.has_type() == true);
+//    REQUIRE(res.has_value() == true);
 //    REQUIRE(res.has_number_type() == true);
 //    REQUIRE(double_equal(res.get_double_val(), 3.0));
 //}

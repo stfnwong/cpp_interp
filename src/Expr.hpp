@@ -101,7 +101,7 @@ template <typename E, typename T> struct LiteralExpr : public Expr<E, T>
 
         std::string to_string(void) const final
         {
-            if(this->value.has_type())
+            if(this->value.has_value())
                 return this->value.to_string();
             
             return "nil";

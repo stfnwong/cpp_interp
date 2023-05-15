@@ -1,0 +1,13 @@
+// This requires an implementation of lambda functions 
+fun thrice(fn) {
+    for(var i = 1; i <= 3; i = i + 1) {
+        fn(i);
+    }
+}
+
+thrice(fun(a) { print a; });
+
+// Expected output is 
+// > 1
+// > 2
+// > 3

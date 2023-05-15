@@ -71,7 +71,6 @@ std::string LoxObject::get_val_as_str(void) const
     return "Nil";
 }
 
-// TODO: do I want to throw here? 
 std::string LoxObject::get_string_val(void) const
 {
     return std::get<std::string>(this->value.value());
@@ -89,7 +88,7 @@ bool LoxObject::get_bool_val(void) const
 
 
 // TODO: the name for this method sucks
-bool LoxObject::has_type(void) const
+bool LoxObject::has_value(void) const
 {
     return (this->value.has_value()) ? true : false;
 }
@@ -98,10 +97,6 @@ std::string LoxObject::get_type_string(void) const
 {
     if(this->has_callable())
         return this->callable->get_type_string();
-
-    // TODO: how the fuck is this supposed to work?
-    //if(this->has_type())
-    //    return std::visit(get_type_string(), this->value.value());
 
     return "Nil";
 }
@@ -140,7 +135,7 @@ std::string LoxObject::to_string(void) const
     if(this->has_callable())
         return this->callable->to_string();
 
-    if(this->has_type())
+    if(this->has_value())
         return std::visit(get_value_string(), this->value.value());
 
     return "Nil";

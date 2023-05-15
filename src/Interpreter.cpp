@@ -52,9 +52,9 @@ bool Interpreter::is_truthy(const LoxObject& obj) const
 
 bool Interpreter::is_equal(const LoxObject& a, const LoxObject& b) const
 {
-    if(!a.has_type() && !b.has_type())
+    if(!a.has_value() && !b.has_value())
         return true;
-    if(!a.has_type())
+    if(!a.has_value())
         return false;
 
     return a == b;

@@ -17,7 +17,7 @@ TEST_CASE("test_create_null_object", "object")
 {
     LoxObject test_object;
 
-    REQUIRE(test_object.has_type() == false);
+    REQUIRE(test_object.has_value() == false);
     REQUIRE(test_object.type == ObjType::NIL);
     REQUIRE(test_object.token.type == TokenType::EMPTY);
 
@@ -33,7 +33,7 @@ TEST_CASE("test_create_number_object", "object")
     Token test_token = Token(TokenType::NUMBER, "5", val);
     LoxObject test_object(test_token);
 
-    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.has_value() == true);
     REQUIRE(test_object.type == ObjType::NUMBER);
 
     REQUIRE_THROWS(test_object.get_string_val());
@@ -49,7 +49,7 @@ TEST_CASE("test_create_string_object", "object")
     Token test_token = Token(TokenType::STRING, test_string, 1, test_string);
     LoxObject test_object(test_token);
 
-    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.has_value() == true);
     REQUIRE(test_object.type == ObjType::STRING);
     //REQUIRE(test_object.get_type() == test_token.type);
 
@@ -77,9 +77,8 @@ TEST_CASE("test_object_create_double", "object")
 {
     LoxObject test_object(1.0f);
 
-    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.has_value() == true);
     REQUIRE(test_object.type == ObjType::NUMBER);
-    //REQUIRE(test_object.get_type() == TokenType::NUMBER);
     REQUIRE(double_equal(test_object.get_double_val(), 1.0f));
 
     REQUIRE_THROWS(test_object.get_string_val());
@@ -91,7 +90,7 @@ TEST_CASE("test_object_create_string", "object")
     std::string test_string = "some junk";
     LoxObject test_object(test_string);
 
-    REQUIRE(test_object.has_type() == true);
+    REQUIRE(test_object.has_value() == true);
     REQUIRE(test_object.type == ObjType::STRING);
     //REQUIRE(test_object.get_type() == TokenType::STRING);
     REQUIRE(test_object.get_string_val() == test_string);
@@ -107,7 +106,7 @@ TEST_CASE("test_object_create_bool", "object")
     double b = 2.0f;
     LoxObject true_object(a < b);
 
-    REQUIRE(true_object.has_type() == true);
+    REQUIRE(true_object.has_value() == true);
     REQUIRE(true_object.type == ObjType::BOOLEAN);
     REQUIRE(true_object.token.type == TokenType::TRUE);
     REQUIRE(true_object.get_bool_val() == true);
@@ -116,7 +115,7 @@ TEST_CASE("test_object_create_bool", "object")
     REQUIRE_THROWS(true_object.get_string_val());
 
     LoxObject false_object(a > b);
-    REQUIRE(false_object.has_type() == true);
+    REQUIRE(false_object.has_value() == true);
     REQUIRE(false_object.type == ObjType::BOOLEAN);
     REQUIRE(false_object.token.type == TokenType::FALSE);
     REQUIRE(false_object.get_bool_val() == false);

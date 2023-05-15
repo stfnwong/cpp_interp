@@ -24,7 +24,7 @@ TEST_CASE("test_clock", "stdlib")
     Interpreter interp;
     LoxObject res = interp.execute(statements[0]);
 
-    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_value() == true);
     REQUIRE(res.has_number_type() == true);
     // We don't really care about the value since its just going to be the moment 
     // when the test is run.

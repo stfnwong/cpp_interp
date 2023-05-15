@@ -120,7 +120,7 @@ std::unique_ptr<Expr<EType, VType>> Parser::primary(void)
         return std::make_unique<GroupingExpr<EType, VType>>(std::move(expr));
     }
 
-    Lox::error(this->peek(), "expected expression");
+    Lox::error(this->peek(), "expected expression");  // TODO: doesn;t set error?
     throw ParseError(this->peek(), "expected expression");
 }
 

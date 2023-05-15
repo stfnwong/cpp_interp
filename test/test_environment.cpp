@@ -109,7 +109,7 @@ TEST_CASE("test_add_variable", "environment")
     // Get an object that exists
     LoxObject out_obj = env.get(Token(TokenType::IDENTIFIER, "some_var"));
 
-    REQUIRE(out_obj.has_type() == true);
+    REQUIRE(out_obj.has_value() == true);
     REQUIRE(out_obj.has_number_type() == true);
     REQUIRE(double_equal(out_obj.get_double_val(), 10.0f));
 
@@ -134,13 +134,13 @@ TEST_CASE("test_add_assignment", "environment")
     env.define(name.lexeme, value);
 
     LoxObject out_obj = env.get(name);
-    REQUIRE(out_obj.has_type() == true);
+    REQUIRE(out_obj.has_value() == true);
     REQUIRE(out_obj.has_number_type() == true);
     REQUIRE(double_equal(out_obj.get_double_val(), 4.0f));
 
     env.assign(name, new_value);
     out_obj = env.get(name);
-    REQUIRE(out_obj.has_type() == true);
+    REQUIRE(out_obj.has_value() == true);
     REQUIRE(out_obj.has_number_type() == true);
     REQUIRE(double_equal(out_obj.get_double_val(), 444.0f));
 }

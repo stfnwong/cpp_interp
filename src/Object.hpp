@@ -96,7 +96,7 @@ struct LoxObject
         std::string get_string_val(void) const;
         double      get_double_val(void) const;
         bool        get_bool_val(void) const;
-        bool        has_type(void) const;
+        bool        has_value(void) const;
         std::string get_type_string(void) const;
         bool        has_string_type(void) const;
         bool        has_number_type(void) const;
