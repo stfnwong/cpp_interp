@@ -12,47 +12,76 @@
 #include "Util.hpp"
 
 
-//TEST_CASE("test_interpret_binary_expr", "interpreter")
-//{
-//    // Expression is 1 + 1 
-//    Token op(TokenType::PLUS, "+");
-//    
-//    std::unique_ptr<LiteralExpr<E, T>> left = std::make_unique<LiteralExpr<E, T>>(
-//            Token(TokenType::NUMBER, "1", 1, 1.0)
-//    );
-//
-//    std::unique_ptr<LiteralExpr<E, T>> right = std::make_unique<LiteralExpr<E, T>>(
-//            Token(TokenType::NUMBER, "1", 1, 1.0)
-//    );
-//
-//    auto expr_ptr = std::make_unique<BinaryExpr<E, T>>(std::move(left), std::move(right), op);
-//    
-//    Interpreter interp;
-//    std::string out_eval = interp.interpret(std::move(expr_ptr));
-//    std::string exp_eval_str = "2";
-//
-//    REQUIRE(out_eval == exp_eval_str);
-//}
+std::vector<std::unique_ptr<Stmt<EType, VType>>> parse_source(const std::string& source)
+{
+    Scanner scanner(source);
+    Parser parser(scanner.scan());
+    return parser.parse();
+}
+
+std::string read_source_or_fail(const std::string& filename)
+{
+    std::string source;
+    try {
+        source = read_file(filename);
+        std::cout << "Read source file [" << filename << "]" << std::endl;
+    }
+    catch(std::ifstream::failure& e) {
+        std::cout << "Failed to read source file [" << filename << "]" << std::endl;
+        FAIL();
+    }
+
+    return source;
+}
+
+
+
+TEST_CASE("test_interpret_ops", "interpreter")
+{
+    std::string filename = "test/ops.lox";
+    std::string source = read_source_or_fail(filename);
+
+    auto parsed_output = parse_source(source);
+    REQUIRE(parsed_output.size() == 4);
+
+    Interpreter interp;
+
+    LoxObject res;
+
+    // var a = 1 + 2;
+    res = interp.execute(parsed_output[0]);
+    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_number_type() == true);
+    REQUIRE(double_equal(res.get_double_val(), 3.0));
+
+    // var b = 1 < 2
+    res = interp.execute(parsed_output[1]);
+    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_bool_type() == true);
+    REQUIRE(res.get_bool_val() == true);
+
+    // var b = 1 <= 100
+    res = interp.execute(parsed_output[2]);
+    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_bool_type() == true);
+    REQUIRE(res.get_bool_val() == false);
+
+    // var b = 100 > 100;
+    res = interp.execute(parsed_output[3]);
+    REQUIRE(res.has_type() == true);
+    REQUIRE(res.has_bool_type() == true);
+    REQUIRE(res.get_bool_val() == false);
+
+}
 
 
 TEST_CASE("test_parse_and_interpret", "interpreter")
 {
-    std::vector<Token> test_tokens = {
-        Token(TokenType::NUMBER, "2", 1, 2.0f),
-        Token(TokenType::PLUS, "+", 1),
-        Token(TokenType::NUMBER, "2", 1, 2.0f),
-        Token(TokenType::SEMICOLON, ";", 1),
-        Token(TokenType::LOX_EOF, "", 1),
-    };
-    Parser parser(test_tokens);
-    REQUIRE(parser.num_tokens() == test_tokens.size());
-
-    auto parsed_output = parser.parse();
-    REQUIRE(parsed_output.size() == 1);
+    std::string source = "2+2;";
+    auto parsed_output = parse_source(source);
 
     Interpreter interp;
 
-    interp.interpret(parsed_output);
     LoxObject res = interp.execute(parsed_output[0]);
     REQUIRE(res.has_type() == true);
     REQUIRE(res.has_number_type() == true);
@@ -62,15 +91,7 @@ TEST_CASE("test_parse_and_interpret", "interpreter")
 TEST_CASE("test_interpret_block_statements", "interpreter")
 {
     const std::string nesting_filename = "test/nesting.lox";
-    std::string source;
-    try {
-        source = read_file(nesting_filename);
-        std::cout << "Read source file [" << nesting_filename << "]" << std::endl;
-    }
-    catch(std::ifstream::failure& e) {
-        std::cout << "Failed to read source file " << nesting_filename << std::endl;
-        FAIL();
-    }
+    std::string source = read_source_or_fail(nesting_filename);
 
     Scanner scanner(source);
     Parser parser(scanner.scan());
@@ -94,3 +115,41 @@ TEST_CASE("test_interpret_block_statements", "interpreter")
 
     //test_interp.interpret(statements);
 }
+
+
+
+//TEST_CASE("test_interpret_fib_rec", "interpreter")
+//{
+//    const std::string nesting_filename = "test/fib_rec.lox";
+//    std::string source;
+//    try {
+//        source = read_file(nesting_filename);
+//        std::cout << "Read source file [" << nesting_filename << "]" << std::endl;
+//    }
+//    catch(std::ifstream::failure& e) {
+//        std::cout << "Failed to read source file " << nesting_filename << std::endl;
+//        FAIL();
+//    }
+//
+//    Scanner scanner(source);
+//    Parser parser(scanner.scan());
+//
+//    auto statements = parser.parse();
+//    REQUIRE(statements.size() == 2);
+//    //std::cout << "Parser produced " << statements.size() << " statements." << std::endl;
+//    //for(unsigned i = 0; i < statements.size(); ++i)
+//    //    std::cout << i << ": " << statements[i]->to_string() << std::endl;
+//
+//    Interpreter test_interp;
+//
+//    // fib(4) = 3
+//    // fib(8) = 21
+//    LoxObject res;
+//    res = test_interp.execute(statements[0]);  // this should be empty...
+//    res = test_interp.execute(statements[1]);
+//    //std::cout << "result: " <<  res.to_string() << std::endl;
+//
+//    REQUIRE(res.has_type() == true);
+//    REQUIRE(res.has_number_type() == true);
+//    REQUIRE(double_equal(res.get_double_val(), 3.0));
+//}

@@ -21,6 +21,9 @@ class Environment
     std::shared_ptr<Environment> enclosing;   
     std::unordered_map<std::string, LoxObject> values;
 
+    private:
+        std::string level_to_repr(const Environment* env, int level) const;
+
     public:
         Environment() : enclosing(nullptr) {}
         Environment(const Environment& env) : 

@@ -100,6 +100,7 @@ struct LoxObject
         std::string get_type_string(void) const;
         bool        has_string_type(void) const;
         bool        has_number_type(void) const;
+        bool        has_bool_type(void) const;
         bool        has_callable(void) const;
 
         std::shared_ptr<Callable> get_callable(void) const;

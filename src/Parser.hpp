@@ -65,7 +65,6 @@ class Parser
     public:
         Parser(const std::vector<Token>& tokens) : tokens(tokens), current(0) {}
         std::vector<std::unique_ptr<Stmt<EType, VType>>> parse(void);
-        //std::unique_ptr<Expr<EType, VType>> parse(void);
         unsigned num_tokens(void) const;
 };
 

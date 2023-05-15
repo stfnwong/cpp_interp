@@ -117,6 +117,11 @@ bool LoxObject::has_number_type(void) const
     //return (this->token.type == TokenType::NUMBER) ? true : false;
 }
 
+bool LoxObject::has_bool_type(void) const
+{
+    return (this->type == ObjType::BOOLEAN) ? true : false;
+}
+
 bool LoxObject::has_callable(void) const
 {
     return (this->type == ObjType::FUNCTION) ? true : false;

@@ -11,6 +11,21 @@
 #include "Environment.hpp"
 
 
+std::string Environment::level_to_repr(const Environment* env, int level) const
+{
+    std::ostringstream oss;
+
+    oss << "Vars (level " << level << "): (" << env->values.size() << " vars)"  << std::endl;
+    for(const auto& kv : env->values)
+        oss << "   [" << kv.first << "] -> " << kv.second.to_string() << std::endl;
+
+    if(env->enclosing.get())
+        oss << this->level_to_repr(env->enclosing.get(), level+1);
+
+    return oss.str();
+}
+
+
 void Environment::define(const std::string& name, const LoxObject& value)
 {
     this->values.insert(std::make_pair(name, value));
@@ -73,19 +88,11 @@ std::vector<std::string> Environment::get_vars(void) const
 }
 
 
+
 std::string Environment::to_repr(void) const
 {
     std::ostringstream oss;
-
-    oss << "Vars (this scope): (" << this->values.size() << " vars)"  << std::endl;
-    for(const auto& kv : this->values)
-        oss << "[" << kv.first << "] -> " << kv.second.to_string() << std::endl;
-    if(this->enclosing.get())
-    {
-        oss << "Vars (closure): (" << this->enclosing->values.size() << " vars)" << std::endl;
-        for(const auto& kv : this->enclosing->values)
-            oss << "[" << kv.first << "] -> " << kv.second.to_string() << std::endl;
-    }
+    oss << this->level_to_repr(this, 0);
 
     return oss.str();
 }

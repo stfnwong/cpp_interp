@@ -1,8 +1,10 @@
 fun fib(n) {
-    if (n <= 1) return n;
+    print n;
+    if (n < 2) return n;
     return fib(n - 2) + fib(n - 1);
 }
 
-for(var i = 0; i < 20; i = i + 1) {
+var max_fib_num = 8;
+for(var i = 0; i < max_fib_num; i = i + 1) {
     print fib(i);
 }

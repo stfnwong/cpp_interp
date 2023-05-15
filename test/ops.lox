@@ -1,0 +1,5 @@
+// Test the various ops 
+var a = 1 + 2;      // expect 3
+var b = 1 < 2;      // expect true
+var c = 1 >= 100;     // expect false
+var d = 100 > 100;     // expect false

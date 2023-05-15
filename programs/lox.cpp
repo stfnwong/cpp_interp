@@ -24,8 +24,9 @@ static constexpr bool DEBUG_OUTPUT = false;      // TODO: make cmdline option fo
 static const std::string VERSION_STRING = "deez nuts";
 static bool had_error = false;
 
+Interpreter interp = Interpreter();
 
-void run(const std::string& source, Interpreter& interp)
+void run(const std::string& source)
 {
     Scanner scanner(source);
     auto scanned_tokens = scanner.scan();
@@ -60,7 +61,6 @@ void run(const std::string& source, Interpreter& interp)
 
 void run_file(const std::string& filename)
 {
-    Interpreter interp;
     std::ifstream file(filename);
 
     if(!file.good()) 
@@ -76,7 +76,7 @@ void run_file(const std::string& filename)
     while(std::getline(file, line))
         source += line + "\n";
 
-    run(source, interp);
+    run(source);
 
     if(Lox::had_error)
         exit(2);
@@ -89,7 +89,6 @@ void run_prompt(void)
 {
     std::cout << "Lox version [" << VERSION_STRING << "]" << std::endl;
 
-    Interpreter interp;
     std::string code;
 
     while(1)
@@ -97,12 +96,20 @@ void run_prompt(void)
         std::cout << "> ";
         if(std::getline(std::cin, code))
         {
-            std::cout << "[" << __func__ << "] interp env before: " << std::endl;
-            std::cout << interp.get_globals()->to_repr() << std::endl;
-            run(code, interp);    // TODO: segfault referring to previous env...
+            if(DEBUG_OUTPUT)
+            {
+                std::cout << "[" << __func__ << "] interp env before: " << std::endl;
+                std::cout << interp.get_globals()->to_repr() << std::endl;
+            }
+
+            run(code);
             Lox::had_error = false;  // why do I have to do this?
-            std::cout << "[" << __func__ << "] interp env after: " << std::endl;
-            std::cout << interp.get_globals()->to_repr() << std::endl;
+
+            if(DEBUG_OUTPUT)
+            {
+                std::cout << "[" << __func__ << "] interp env after: " << std::endl;
+                std::cout << interp.get_globals()->to_repr() << std::endl;
+            }
         }
         else
         {

@@ -1,0 +1,14 @@
+// Call some functions 
+
+fun func3(a, b, c) {
+    return a + func2(b, c);
+}
+
+fun func2(a, b) {
+    return a + b;
+}
+
+var num_loops = 4;
+for(var i = 0; i < num_loops; i = i + 1) {
+    print func3(i, i+1, i+2);
+}
