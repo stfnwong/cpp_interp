@@ -28,8 +28,9 @@ std::string Environment::level_to_repr(const Environment* env, int level) const
 
 void Environment::define(const std::string& name, const LoxObject& value)
 {
-    this->values.insert(std::make_pair(name, value));
-    //this->values.insert({name, value});
+    //this->values.insert(std::make_pair(name, value));
+    this->values.insert({name, value});
+    //this->values[name] = value;
 }
 
 LoxObject Environment::get(const Token& name)

@@ -7,6 +7,7 @@
 
 #include "Callable.hpp"
 #include "Interpreter.hpp"
+#include "Stdlib.hpp"
 
 
 static bool had_runtime_error = false;
@@ -23,14 +24,16 @@ static void runtime_error(RuntimeError& e)
 
 Interpreter::Interpreter()
 {
-    this->define_globals();
     this->env = std::make_shared<Environment>();
     this->globals = this->env;
+    this->define_globals();
 }
 
 void Interpreter::define_globals(void)
 {
-    //this->globals.define(
+    LoxObject clock = LoxObject(std::make_shared<StdClock>());
+    this->globals->define(clock.get_callable()->name(), std::move(clock));
+    //this->globals->define("clock", LoxObject(std::make_shared<StdClock>()));
 }
 
 // 
@@ -275,6 +278,7 @@ LoxObject Interpreter::visit(FunctionStmt<EType, StmtVType>& stmt)
 {
     LoxFunction f(&stmt);
     LoxObject fobj(std::make_shared<LoxFunction>(f));
+
     this->env->define(stmt.name.lexeme, std::move(fobj));
 
     //std::cout << "[" << __func__ << "] env now contains: ";
