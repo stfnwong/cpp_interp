@@ -79,6 +79,19 @@ void Interpreter::check_number_operands(const Token& otor, const LoxObject& o1, 
 }
 
 
+//LoxObject Interpreter::lookup_variable(const Token& name, const std::unique_ptr<EType, VType> expr)
+LoxObject Interpreter::lookup_variable(const Token& name, const std::unique_ptr<Expr<EType, VType>> expr)
+{
+    if(this->locals.find(expr.get()) != this->locals.end())
+    {
+        int dist = this->locals[expr.get()];
+        return this->env->get_at(dist, name.lexeme);
+    }
+    else
+        return this->globals->get(name);
+}
+
+
 // ======== EXPRESSION VISITOR FUNCTIONS ======== //
 LoxObject Interpreter::visit(LiteralExpr<EType, VType>& expr)
 {
@@ -321,6 +334,11 @@ std::shared_ptr<Environment> Interpreter::get_globals(void) const
     //return this->globals;
 }
 
+void Interpreter::resolve(const std::unique_ptr<Expr<EType, VType>>& expr, int depth)
+{
+    this->locals.insert({expr.get(), depth});
+}
+
 LoxObject Interpreter::evaluate(const std::unique_ptr<Expr<EType, VType>>& expr)
 {
     return expr->accept(*this);
@@ -338,8 +356,8 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VT
     try 
     {
         this->env = block_env;   // TODO: what is happening here?
-        std::cout << "[" << __func__ << "] this->env: " << std::endl;
-        std::cout << this->env->to_repr() << std::endl;
+        //std::cout << "[" << __func__ << "] this->env: " << std::endl;
+        //std::cout << this->env->to_repr() << std::endl;
         for(unsigned i = 0; i < stmts.size(); ++i)
         {
             //std::cout << "[" << __func__ << "] cur statement: " << stmts[i]->to_string() << std::endl;
@@ -353,7 +371,7 @@ void Interpreter::execute_block(const std::vector<std::unique_ptr<Stmt<EType, VT
 
     this->env = prev_env;
 
-    std::cout << "[" << __func__ << "] reverting, this->env is now :" << std::endl;
-    std::cout << this->env->to_repr() << std::endl;
+    //std::cout << "[" << __func__ << "] reverting, this->env is now :" << std::endl;
+    //std::cout << this->env->to_repr() << std::endl;
 }
 

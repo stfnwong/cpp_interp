@@ -207,3 +207,5 @@ TEST_CASE("test_copy_assignment_nested", "environment")
     REQUIRE_THROWS(inner.get(inner_copy_name_1));
     REQUIRE_THROWS(base.get(inner_copy_name_1));
 }
+
+

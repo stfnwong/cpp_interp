@@ -17,26 +17,28 @@
 
 class Environment
 {
-    //Environment* enclosing;
-    std::shared_ptr<Environment> enclosing;   
+    std::shared_ptr<Environment> parent;   
     std::unordered_map<std::string, LoxObject> values;
 
     private:
         std::string level_to_repr(const Environment* env, int level) const;
+        Environment* ancestor(int dist);
 
     public:
-        Environment() : enclosing(nullptr) {}
+        Environment() : parent(nullptr) {}
         Environment(const Environment& env) : 
-            enclosing(std::make_shared<Environment>(env.enclosing)), values(env.values) {} 
-        Environment(std::shared_ptr<Environment> enc) : enclosing(enc) {}
+            parent(std::make_shared<Environment>(env.parent)), values(env.values) {} 
+        Environment(std::shared_ptr<Environment> enc) : parent(enc) {}
 
         // TODO: testing copy assignment
 
-        void      define(const std::string& name, const LoxObject& value);
-        void      define(const Token& name, const LoxObject& value);
-        LoxObject get(const std::string& name); 
-        LoxObject get(const Token& name);
-        void      assign(const Token& name, const LoxObject& value);
+        void        define(const std::string& name, const LoxObject& value);
+        void        define(const Token& name, const LoxObject& value);
+        LoxObject   get(const std::string& name); 
+        LoxObject   get(const Token& name);
+        LoxObject   get_at(int dist, const std::string& name);
+        void        assign(const Token& name, const LoxObject& value);
+        // TODO: this is also more a debugging function... get rid of it after resolver is complete
         std::vector<std::string> get_vars(void) const;
         // TODO: remove, debug only
         std::string to_repr(void) const;

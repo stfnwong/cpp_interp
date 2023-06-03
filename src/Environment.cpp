@@ -19,10 +19,23 @@ std::string Environment::level_to_repr(const Environment* env, int level) const
     for(const auto& kv : env->values)
         oss << "   [" << kv.first << "] -> " << kv.second.to_string() << std::endl;
 
-    if(env->enclosing.get())
-        oss << this->level_to_repr(env->enclosing.get(), level+1);
+    if(env->parent.get())
+        oss << this->level_to_repr(env->parent.get(), level+1);
 
     return oss.str();
+}
+
+
+Environment* Environment::ancestor(int dist)
+{
+    Environment* env = this;
+    for(int i = 0; i < dist; ++i)
+    {
+        if(env->parent.get())
+            env = env->parent.get();
+    }
+
+    return env;
 }
 
 
@@ -33,16 +46,6 @@ void Environment::define(const std::string& name, const LoxObject& value)
     //this->values[name] = value;
 }
 
-LoxObject Environment::get(const Token& name)
-{
-    if(this->values.find(name.lexeme) != this->values.end())
-        return this->values[name.lexeme];
-
-    if(this->enclosing)
-        return this->enclosing->get(name);
-
-    throw RuntimeError(name, "undefined variable '" + name.lexeme + "'.");
-}
 
 void Environment::define(const Token& name, const LoxObject& value)
 {
@@ -54,12 +57,29 @@ LoxObject Environment::get(const std::string& name)
     if(this->values.find(name) != this->values.end())
         return this->values[name];
 
-    if(this->enclosing)
-        return this->enclosing->get(name);
+    if(this->parent)
+        return this->parent->get(name);
 
     // Make a fake token for the runtime error
     throw RuntimeError(Token(TokenType::STRING, name), "undefined variable '" + name + "'.");
 }
+
+LoxObject Environment::get(const Token& name)
+{
+    if(this->values.find(name.lexeme) != this->values.end())
+        return this->values[name.lexeme];
+
+    if(this->parent)
+        return this->parent->get(name);
+
+    throw RuntimeError(name, "undefined variable '" + name.lexeme + "'.");
+}
+
+LoxObject Environment::get_at(int dist, const std::string& name)
+{
+    return this->ancestor(dist);
+}
+
 
 void Environment::assign(const Token& name, const LoxObject& value)
 {
@@ -69,9 +89,9 @@ void Environment::assign(const Token& name, const LoxObject& value)
         return;
     }
 
-    if(this->enclosing)
+    if(this->parent)
     {
-        this->enclosing->assign(name, value);
+        this->parent->assign(name, value);
         return;
     }
 

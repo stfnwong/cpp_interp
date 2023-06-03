@@ -125,7 +125,7 @@ template <typename E, typename T> struct ExpressionStmt : public Stmt<E, T>
 template <typename E, typename T> struct VariableStmt : public Stmt<E, T>
 {
     Token token;
-    std::unique_ptr<Expr<E, T>> expr;
+    std::unique_ptr<Expr<E, T>> expr;     // optional initializer expression
 
     public:
         VariableStmt(const Token& tok, std::unique_ptr<Expr<E, T>> expr) : 

@@ -7,6 +7,7 @@
 
 #include <iostream>   // TODO: move all the error stuff to Error.hpp
 #include <memory>
+#include <unordered_map>
 
 #include "Common.hpp"
 #include "Environment.hpp"
@@ -23,6 +24,7 @@
 class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, StmtVType>
 {
     private:
+        std::unordered_map<const Expr<EType, VType>*, int> locals;  // expr -> dist
         std::shared_ptr<Environment> globals;
         std::shared_ptr<Environment> env;            // current environment (pointer)?
 
@@ -31,6 +33,9 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         bool      is_equal(const LoxObject& a, const LoxObject& b) const;
         void      check_number_operand(const Token& otor, const LoxObject& orand);
         void      check_number_operands(const Token& otor, const LoxObject& o1, const LoxObject& o2);
+
+        // TODO: could be a raw pointer....
+        LoxObject lookup_variable(const Token& name, const std::unique_ptr<Expr<EType, VType>> expr);
         
         // TODO: since this is all internal these could all return LoxObject*, which 
         // could be set to nullptr (rather than constructing a null LoxObject as is 
@@ -61,6 +66,7 @@ class Interpreter : public ExprVisitor<EType, VType>, public StmtVisitor<EType, 
         void interpret(const std::vector<std::unique_ptr<Stmt<EType, StmtVType>>>& statements);
         std::shared_ptr<Environment> get_globals(void) const;
 
+        void      resolve(const std::unique_ptr<Expr<EType, VType>>& expr, int depth);
         LoxObject evaluate(const std::unique_ptr<Expr<EType, VType>>& expr);
         LoxObject execute(const std::unique_ptr<Stmt<EType, VType>>& stmt);
         void      execute_block(const std::vector<std::unique_ptr<Stmt<EType, VType>>>& stmts, std::shared_ptr<Environment> env);

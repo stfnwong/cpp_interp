@@ -13,6 +13,8 @@
 #include "Token.hpp"
 
 
+void Error(unsigned line, const std::string& msg);
+
 
 struct ParseError : public std::exception
 {
